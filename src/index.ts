@@ -3,10 +3,11 @@ import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import itemRoutes from './routes/itemRoutes';
 
+require('dotenv').config();
+
 const app: Application = express();
 
 const PORT = process.env.PORT || 3000;
-const MONGODB_URI = 'mongodb://localhost:27017/mydatabase';
 
 // Middleware
 app.use(bodyParser.json());
@@ -15,7 +16,7 @@ app.use(bodyParser.json());
 app.use('/api/items', itemRoutes);
 
 // Connect to MongoDB
-mongoose.connect(MONGODB_URI, { })
+mongoose.connect(process.env.DB_URI!, { })
   .then(() => {
     console.log('Connected to MongoDB');
     app.listen(PORT, () => {
