@@ -6,24 +6,40 @@
   "scripts": {
     "build": "npx tsc",
     "start": "node dist/index.js",
+    "start-esm": "nodemon -r esm server.js",
     "dev": "nodemon src/index.ts"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@types/bcrypt": "^5.0.2",
+    "@types/cookie-parser": "^1.4.7",
+    "@types/csurf": "^1.11.5",
     "@types/jsonwebtoken": "^9.0.6",
     "aws-sdk": "^2.1613.0",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
+    "csurf": "^1.11.0",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-jwt": "^8.4.1",
     "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
     "mongoose": "^8.3.3",
+    "morgan": "^1.10.0",
     "nanoid": "^5.0.7"
+  },
+  "dependencies2": {
+    "passport": "^0.4.1",
+    "passport-local": "^1.0.0",
+    "bl": ">=2.2.1",
+		"concurrently": "^6.2.1",
+		"esm": "^3.2.25",
+		"express-async-handler": "^1.1.4",
+		"nodemailer": "^6.6.5",
+		"nodemon": "^2.0.12"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",

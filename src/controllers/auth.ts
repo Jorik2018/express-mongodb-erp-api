@@ -117,20 +117,27 @@ export const login = async (req: Request, res: Response) => {
 		if (!match) {
 			return res.status(400).send(`PASSWORD IS INCORRECT`);
 		}
-
-		const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET as Secret, {
+		const payload = {
+            _id: user._id,
+            name: user.name,
+            lastname: user.lastname,
+            email: user.email
+          };
+		const token = jwt.sign(payload, process.env.JWT_SECRET as Secret, {
 			expiresIn: '7d',
 		});
 		//return user and token to client, exclude hashed password
-		(user as any).password = undefined;
+		delete (user as any).password;
 		// send token in cookie
 		res.cookie('token', token, {
 			httpOnly: true,
 			// secure: true, //solo funciona en https
 		});
 		//send user as json response
+		//res.json({ token: token });
 		res.json(user);
 	} catch (error) {
+		//res.json({ error: "Password is incorrect " });
 		return res.status(400).send('ERROR. TRY AGAIN.');
 	}
 };
