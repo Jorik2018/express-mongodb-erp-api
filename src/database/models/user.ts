@@ -1,4 +1,15 @@
-const mongoose = require('mongoose');
+import mongoose, { Schema } from 'mongoose';
+import bcrypt from 'bcrypt';
+
+export interface IUser extends mongoose.Document {
+    fullName: string;
+    userName: string;
+    email: string;
+    password: string;
+    date: Date;
+    loggedOn: boolean;
+    verifyPassword(password: string): boolean;
+}
 
 const UserSchema = new mongoose.Schema({
     fullName: {
@@ -37,9 +48,8 @@ const UserSchema = new mongoose.Schema({
     }
 });
 
-UserSchema.methods.verifyPassword = function (password) {
+UserSchema.methods.verifyPassword = function (password: string) {
     return bcrypt.compareSync(password, this.password);
 };
 
-const User = mongoose.model('User',UserSchema);
-module.exports = User;
+export default mongoose.model('User2', UserSchema);

@@ -1,9 +1,9 @@
-//importo el modelo de usuario
 import User from '../models/user';
 import { hashPassword, comparePassword } from '../utils/auth';
-import jwt from 'jsonwebtoken';
-import { nanoid } from 'nanoid';
+import jwt, { Secret, JwtPayload } from 'jsonwebtoken';
 import AWS from 'aws-sdk';
+import { SendEmailRequest, SendEmailResponse } from 'aws-sdk/clients/ses';
+import { Request, Response } from 'express';
 
 const awsConfig = {
 	accessKeyId: process.env.AWS_ACCESS_KEY,
@@ -14,7 +14,7 @@ const awsConfig = {
 
 const SES = new AWS.SES(awsConfig);
 
-export const register = async (req, res) => {
+export const register = async (req: Request, res: Response) => {
 	// res.json('REGISTER USER RESPONSE FROM CONTROLLER');
 	try {
 		console.log(req.body);
@@ -54,12 +54,12 @@ export const register = async (req, res) => {
 		await user.save();
 		console.log(`SAVED USER: ${user}`);
 
-		const params = {
-			Source: process.env.EMAIL_FROM,
+		const params:SendEmailRequest = {
+			Source: process.env.EMAIL_FROM!,
 			Destination: {
 				ToAddresses: [email],
 			},
-			ReplyToAddresses: [process.env.EMAIL_FROM],
+			ReplyToAddresses: [process.env.EMAIL_FROM!],
 			Message: {
 				Body: {
 					Html: {
@@ -78,17 +78,15 @@ export const register = async (req, res) => {
 				},
 			},
 		};
-		const emailSent = SES.sendEmail(params).promise();
-
-		emailSent
-			.then((data) => {
-				console.log(data);
-				return res.json({ ok: true });
-			})
-			.catch((err) => {
+		SES.sendEmail(params, (err, data) => {
+			if (err) {
 				console.log(err);
 				return res.json({ ok: false });
-			});
+			} else {
+				console.log(data);
+				return res.json({ ok: true });
+			}
+		  });
 
 		return res.status(200).json({ ok: true });
 	} catch (err) {
@@ -97,7 +95,7 @@ export const register = async (req, res) => {
 	}
 };
 
-export const login = async (req, res) => {
+export const login = async (req: Request, res: Response) => {
 	try {
 		// console.log(req.body);
 		const { email, password } = req.body;
@@ -120,11 +118,11 @@ export const login = async (req, res) => {
 			return res.status(400).send(`PASSWORD IS INCORRECT`);
 		}
 
-		const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+		const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET as Secret, {
 			expiresIn: '7d',
 		});
 		//return user and token to client, exclude hashed password
-		user.password = undefined;
+		(user as any).password = undefined;
 		// send token in cookie
 		res.cookie('token', token, {
 			httpOnly: true,
@@ -137,7 +135,7 @@ export const login = async (req, res) => {
 	}
 };
 
-export const logout = async (req, res) => {
+export const logout = async (req: Request, res: Response) => {
 	try {
 		res.clearCookie('token');
 		return res.json({ message: 'SIGNOUT SUCCESS' });
@@ -146,9 +144,9 @@ export const logout = async (req, res) => {
 	}
 };
 
-export const currentUser = async (req, res) => {
+export const currentUser = async (req: Request, res: Response) => {
 	try {
-		const user = await User.findById(req.user._id)
+		const user = await User.findById((req as any).user._id)
 			.select('-password')
 			.exec();
 		console.log(`CURRENT USER ${user}`);
@@ -158,7 +156,7 @@ export const currentUser = async (req, res) => {
 	}
 };
 
-export const sendTestEmail = async (req, res) => {
+export const sendTestEmail = async (req: Request, res: Response) => {
 	// console.log('SEND EMAIL');
 	// res.json({ ok: true });
 	const params = {
@@ -184,23 +182,22 @@ export const sendTestEmail = async (req, res) => {
 			},
 		},
 	};
-	const emailSent = SES.sendEmail(params).promise();
-
-	emailSent
-		.then((data) => {
-			console.log(data);
-			return res.json({ ok: true });
-		})
-		.catch((err) => {
+	const emailSent = SES.sendEmail(params as SendEmailRequest, (err, data) => {
+		if (err) {
 			console.log(err);
 			return res.json({ ok: false });
-		});
+		} else {
+			console.log(data);
+			return res.json({ ok: true });
+		}
+	  });
 };
 
-export const forgotPassword = async (req, res) => {
+export const forgotPassword = async (req: Request, res: Response) => {
 	try {
 		const { email } = req.body;
 		// console.log(email);
+		const {nanoid} = await import('nanoid');
 		const shortCode = nanoid(6).toUpperCase();
 		const user = await User.findOneAndUpdate(
 			{ email },
@@ -232,24 +229,22 @@ export const forgotPassword = async (req, res) => {
 				},
 			},
 		};
-		const emailSent = SES.sendEmail(params).promise();
-
-		emailSent
-			.then((data) => {
-				console.log(data);
-				return res.json({ ok: true });
-			})
-			.catch((err) => {
+		SES.sendEmail(params as SendEmailRequest, (err, data) => {
+			if (err) {
 				console.log(err);
 				return res.json({ ok: false });
-			});
+			} else {
+				console.log(data);
+				return res.json({ ok: true });
+			}
+		  });
 	} catch (error) {
 		res.send(`AN ERROR OCURRED`);
 		console.log(error);
 	}
 };
 
-export const resetPassword = async (req, res) => {
+export const resetPassword = async (req: Request, res: Response) => {
 	try {
 		const { email, code, newPassword } = req.body;
 		console.table({ email, code, resetPassword });

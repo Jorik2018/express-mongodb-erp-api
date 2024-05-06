@@ -1,8 +1,10 @@
+import { Request, Response } from 'express'
+import { IUser } from '../database/models/user'
 const jwt = require("jsonwebtoken");
 const User = require("../database/models/user");
 
 
-const userByToken = (req, res) => {
+const userByToken = (req: Request, res: Response) => {
   const decoded = jwt.verify(
     req.headers["authorization"],
     process.env.SECRET_KEY
@@ -10,38 +12,36 @@ const userByToken = (req, res) => {
 
   User.findOne({
     _id: decoded._id
-  })
-    .then(user => {
+  }).then((user: IUser) => {
       if (user) {
         res.json(user);
       } else {
         res.send("Index does not exist");
       }
     })
-    .catch(err => {
-      res.send("error: ", err);
+    .catch((err: Error) => {
+      res.send(err);
     });
 };
 
-const userById = (req, res) => {
+const userById = (req: Request, res: Response) => {
   User.find({
     _id: req.params.userId
-  })
-    .then(user => res.send(user))
-    .catch(err => {
+  }).then((user: IUser) => res.send(user))
+    .catch((err: Error) => {
       res.send({
         err
       });
     });
 };
 
-const getUsers = (req, res) => {
+const getUsers = (req: Request, res: Response) => {
   User.find({})
-    .then(user => res.send(user))
-    .catch(error => console.log(error));
+    .then((user: any) => res.send(user))
+    .catch((error: Error) => console.log(error));
 };
 
-const addUser = (req, res) => {
+const addUser = (req: Request, res: Response) => {
   new User({
     fullName: req.body.fullName,
     userName: req.body.userName,
@@ -49,8 +49,8 @@ const addUser = (req, res) => {
     password: req.body.password
   })
     .save()
-    .then(user => res.send(user))
-    .catch(error => console.log(error));
+    .then((user: any) => res.send(user))
+    .catch((error: any) => console.log(error));
 };
 
 module.exports = {

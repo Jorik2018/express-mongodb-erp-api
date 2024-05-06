@@ -24,8 +24,8 @@ const EmployeeSchema = new mongoose.Schema({
   tags: [String]
 });
 
-EmployeeSchema.methods.saveAndPopulate = function(cb) {
-  return this.save().then(doc => doc.populate('office').execPopulate())
+EmployeeSchema.methods.saveAndPopulate = function(cb: any) {
+  return this.save().then((doc: any) => doc.populate('office').execPopulate())
 }
 
 const EmployeeModel = mongoose.model('Employee', EmployeeSchema);

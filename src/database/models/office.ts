@@ -12,4 +12,4 @@ const OfficeSchema = new mongoose.Schema({
 });
 
 const LocationModel = mongoose.model('Office', OfficeSchema);
-module.exports = LocationModel;
+export default LocationModel;

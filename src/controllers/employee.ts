@@ -1,7 +1,8 @@
+import { Request, Response} from 'express'
 const Employee = require("../database/models/employee");
 const _ = require('lodash');
 
-const getEmployees = async (req, res) => {
+const getEmployees = async (req: Request, res: Response) => {
   try {
     const employees = await Employee.find({}).populate('office');
     res.send(employees)
@@ -12,23 +13,23 @@ const getEmployees = async (req, res) => {
   }
 }
 
-const getEmployeeById = (req, res) => {
+const getEmployeeById = (req: Request, res: Response) => {
   Employee.find({
     _id: req.params.id
   })
     .populate('office')
-    .then(task => res.send(task))
-    .catch(error => console.log(error));
+    .then((task: any) => res.send(task))
+    .catch((error: Error) => console.log(error));
 };
 
-const addEmployee =  (req, res) => {
+const addEmployee =  (req: Request, res: Response) => {
   new Employee(req.body)
     .saveAndPopulate()
-    .then(employee => res.send(employee))
-    .catch(error => res.send(error));
+    .then((employee: any) => res.send(employee))
+    .catch((error: Error) => res.send(error));
 };
 
-const updateEmployee = (req, res) => {
+const updateEmployee = (req: Request, res: Response) => {
   Employee.findOneAndUpdate(
     {
       _id: req.body._id
@@ -38,7 +39,7 @@ const updateEmployee = (req, res) => {
       new: true,
     }
   ).populate('office')
-    .exec((err, employee) => {
+    .exec((err: Error, employee: any) => {
       if (!err) {
         res.send(employee);
       } else {
@@ -47,12 +48,12 @@ const updateEmployee = (req, res) => {
     });
 };
 
-const deleteEmployee = (req, res) => {
+const deleteEmployee = (req: Request, res: Response) => {
   Employee.findOneAndDelete({
     _id: req.params.id
   })
-    .then(task => res.send(task))
-    .catch(error => res.send(error));
+    .then((task: any) => res.send(task))
+    .catch((error: Error) => res.send(error));
 };
 
 module.exports = {

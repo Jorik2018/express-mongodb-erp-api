@@ -1,4 +1,5 @@
-const {getEmployees, getEmployeeById, addEmployee, updateEmployee, deleteEmployee} = require("../controller/employee");
+const {getEmployees, getEmployeeById, addEmployee, updateEmployee, deleteEmployee} = require("../controllers/employee");
+
 const router = require('express').Router();
 
 router.get('/', getEmployees);
@@ -7,4 +8,4 @@ router.post('/add', addEmployee);
 router.patch('/update', updateEmployee);
 router.delete('/:id', deleteEmployee);
 
-module.exports = router;
+export default router;
