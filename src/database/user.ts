@@ -29,7 +29,13 @@ const userSchema = new Schema(
 		passwordResetCode: {
 			type: String,
 			default: '',
-		}
+		},
+		contacts: [
+			{
+				type: Schema.Types.ObjectId,
+				ref: 'Contact'
+			}
+		]
 	},
 
 	{ timestamps: true }

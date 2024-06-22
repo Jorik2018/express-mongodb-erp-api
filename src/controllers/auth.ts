@@ -1,4 +1,4 @@
-import User from '../models/user';
+import User from '../database/user';
 import { hashPassword, comparePassword } from '../utils/auth';
 import jwt, { Secret, JwtPayload } from 'jsonwebtoken';
 import AWS from 'aws-sdk';
