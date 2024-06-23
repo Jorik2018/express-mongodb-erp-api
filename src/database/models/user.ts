@@ -1,4 +1,4 @@
-import mongoose, { Schema } from 'mongoose';
+import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 
 export interface IUser extends mongoose.Document {
@@ -11,6 +11,7 @@ export interface IUser extends mongoose.Document {
     verifyPassword(password: string): boolean;
 }
 
+
 const UserSchema = new mongoose.Schema({
     fullName: {
         type: String,
@@ -18,7 +19,7 @@ const UserSchema = new mongoose.Schema({
         trim: true,
         minlength: 1
     },
-    userName: {
+    name: {
         type: String,
         required: true,
         trim: true,
@@ -37,14 +38,18 @@ const UserSchema = new mongoose.Schema({
         minlength: 5,
         maxlength: 1024
     },
-    date:{
+    date: {
         type: Date,
-        required: true
+        required: true,
+        default: Date.now
     },
-    loggedOn:{
+    loggedOn: {
         type: Boolean,
         required: true,
         default: false
+    },
+    avatar: {
+        type: String
     }
 });
 

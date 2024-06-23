@@ -1,18 +1,17 @@
 import express from "express";
 import db from "../database/mongodb_db";
-import { Collection } from "mongoose";
 import { CollectionInfo, ObjectId } from "mongodb";
 
 const router = express.Router();
 
 router.get("/", (_, res) => {
-  db.then(db => db.collection("posts").find({})
+  db().then(db => db.collection("posts").find({})
     .limit(50)
     .toArray().then(results => res.send(results).status(200)));
 });
 
 router.get("/latest", async (_, res) => {
-  let collection = (await db).collection("posts");
+  let collection = (await db()).collection("posts");
   let results = await collection.aggregate([
     { "$project": { "author": 1, "title": 1, "tags": 1, "date": 1 } },
     { "$sort": { "date": -1 } },
@@ -26,11 +25,11 @@ type Item = { typeClient: { oid: string }, level3: Item[] };
 router.get("/thematic", async (_, res) => {
   try {
     ;
-    const results = await db
+    const results = await db()
       .then(db => db.collection("thematicCombo"))
       .then((collection) => collection.find({}).toArray());
-      
-    const typeClientCollection = (await db).collection("typeClient");
+
+    const typeClientCollection = (await db()).collection("typeClient");
     const typeClients = await typeClientCollection.find({}).toArray();
     const typeClientMap = typeClients.reduce((map, typeClient) => {
       map.set(typeClient._id.toString(), typeClient);
@@ -53,13 +52,13 @@ router.get("/thematic", async (_, res) => {
   }
 });
 router.get("/thematic_", async (_, res) => {
-  (await db).collection("thematicCombo").find({}).toArray()
+  (await db()).collection("thematicCombo").find({}).toArray()
     .then(results => res.send(results).status(200));
 });
 
 router.get("/thematic_2", async (_, res) => {
   try {
-    const collection = (await db).collection("thematicCombo");
+    const collection = (await db()).collection("thematicCombo");
     const results = await collection.aggregate([
       {
         $lookup: {
@@ -104,26 +103,24 @@ router.get("/thematic_2", async (_, res) => {
 });
 
 router.get("/collection", (_, res) => {
-  db.then(db => db.listCollections())
+  db().then(db => db.listCollections())
     .then(collections => collections.map((collection: CollectionInfo) => collection.name).toArray())
     .then((collectionNames: string[]) => res.send(collectionNames).status(200));
 });
 
 router.get("/:id", async (req, res) => {
-  let collection = (await db).collection("posts");
+  let collection = (await db()).collection("posts");
   let query = { _id: new ObjectId(req.params.id) };
   let result = await collection.findOne(query);
   if (!result) res.send("Not found").status(404);
   else res.send(result).status(200);
 });
 
-// Add a new document to the collection
-router.post("/", async (req, res) => {
-  let collection = (await db).collection("posts");
-  let newDocument = req.body;
-  newDocument.date = new Date();
-  let result = await collection.insertOne(newDocument);
-  res.send(result).status(204);
+router.post("/", (req, res) => {
+  const document = { ...req.body, date: new Date() };
+  db().then(db => db.collection("posts")).then(collection =>
+    collection.insertOne(document)
+  ).then(result => res.send(result).status(204));
 });
 
 router.patch("/comment/:id", (req, res) => {
@@ -131,14 +128,14 @@ router.patch("/comment/:id", (req, res) => {
   const updates = {
     $push: { comments: req.body }
   };
-  db.then(db => db.collection("posts"))
+  db().then(db => db.collection("posts"))
     .then(collection => collection.updateOne(query, updates))
     .then(result => res.send(result).status(200));
 });
 
 router.delete("/:id", (req, res) => {
   const query = { _id: new ObjectId(req.params.id) };
-  db.then(db => db.collection("posts"))
+  db().then(db => db.collection("posts"))
     .then(collection => collection.deleteOne(query))
     .then(result => res.send(result).status(200));
 });

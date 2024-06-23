@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Inventory{
+  id Int @id @default(autoincrement())
+  patrimonial_code String @default("S/C")
+  denomination String
+  lot String
+  brand String
+  model String
+  color String
+  dimensions String
+  serie String
+  others String
+  conservation_state String @map("conservation_state")
+  user_id String
+  observations String
+  details MovementDetail[]
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  is_delete Boolean @default(false)
+}
+
+model Movement{
+  id Int @id @default(autoincrement())
+  register_code String
+  type String
+  reason String
+  auth_document String
+  unit_organic String
+  local String
+  address String
+  unit_organic_destiny String?
+  local_destiny String?
+  address_destiny String?
+  responsible_user_document String
+  responsible_user_name String
+  responsible_user_email String
+  destiny_user_document String
+  destiny_user_name String
+  destiny_user_email String
+  date DateTime
+  user_id String
+  details MovementDetail[]
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  is_delete Boolean @default(false)
+}
+
+
+model MovementDetail{
+  id Int @id @default(autoincrement())
+  movement Movement @relation(fields: [movement_id], references: [id])
+  movement_id Int
+  inventory Inventory @relation(fields: [inventory_id], references: [id])
+  inventory_id Int
+  user_id String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  is_delete Boolean @default(false)
+
+  @@map("details_movement")
+}

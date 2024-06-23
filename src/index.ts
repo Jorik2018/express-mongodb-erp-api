@@ -18,6 +18,7 @@ const PORT = process.env.PORT || 3000;
 import authRoute from './routes/auth'
 import { createServer } from 'http';
 import { IRoom } from './database/models/room';
+import { knexMiddleware } from './database/objection_db';
 
 app.use(express.json());
 //app.use(json());
@@ -43,6 +44,8 @@ const fileFilter = (req: Request, file: { mimetype: string }, cb: Function) => {
   }
 };
 
+app.use(knexMiddleware);
+
 app.use(
   multer({ storage: fileStorage, fileFilter }).single('image')
 );
@@ -64,6 +67,7 @@ app.use('/api/items', itemRoutes);
 app.use('/api/employees', employeeRoute.default);
 app.use('/api/offices', require('./routes/office').default);
 app.use('/api/tasks', require('./routes/task').default);
+app.use('/api/persons', require('./routes/person').default);
 app.use("/api/posts", posts);
 /*
 readdirSync('./routes').map((route) => {
