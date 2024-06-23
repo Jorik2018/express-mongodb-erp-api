@@ -43,18 +43,22 @@ export class Person extends Model {
 function createKnex(): Promise<Knex> {
     return new Promise((resolve, reject) => {
         if (!knex) {
-            knex = require('knex')({
-                client: 'mysql2',
-                connection: 'mysql://root:123456_m@127.0.0.1:3306/test'
-                // {
-                //     host: '127.0.0.1',
-                //     port: 3306,
-                //     user: 'root',
-                //     password: '123456_m',
-                //     database: 'test',
-                // }
-            });
-            Model.knex(knex);
+            try {
+                knex = require('knex')({
+                    client: process.env.DB_CLIENT,
+                    connection: process.env.DB_CONNECTION
+                    // {
+                    //     host: '',
+                    //     port: ,
+                    //     user: '',
+                    //     password: '',
+                    //     database: '',
+                    // }
+                });
+                Model.knex(knex);
+            } catch (error) {
+                reject(error);
+            }
         }
         resolve(knex);
     })
