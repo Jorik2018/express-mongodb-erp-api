@@ -1,14 +1,12 @@
 import express from 'express';
 
-const {userById, userByToken, getUsers, addUser} = require("../controllers/user");
+const {userById, userByToken, getUsers, addUser,update} = require("../controllers/user");
 const router = express.Router();
-/*
-router.get('/currentUser', userByToken);
 
-router.get("/:userId", userById);
+//router.get('/currentUser', userByToken);
 
+router.get("/:id", userById);
 router.get("/", getUsers);
-
-router.post("/add", addUser);
-*/
+router.post("/", addUser);
+router.put("/", update);
 export default router;

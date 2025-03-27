@@ -1,19 +1,18 @@
 import { PrismaClient, Movement, Inventory,  MovementDetail } from '@prisma/client'
 import express, { Request, Response } from 'express';
 import { validateToken } from '../auth';
-import axios, { AxiosError } from 'axios';
-import fs, { createWriteStream } from 'fs';
+import axios from 'axios';
+import fs from 'fs';
 import fsSync from 'fs/promises';
-import { v4 as uuidv4 } from 'uuid';
 import FormData from 'form-data';
 import moment from 'moment';
+const { v4: uuidv4 } = require('uuid');
 
 const prisma = new PrismaClient()
 const router = express.Router();
 
 router.get('/', (req: Request, res: Response) => {
-    res.status(200).send("Inventory API")
-    return;
+    res.status(200).send("Inventory API");
 });
 
 function getMonth(date: any) {

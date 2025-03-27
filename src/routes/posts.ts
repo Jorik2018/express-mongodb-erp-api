@@ -116,12 +116,40 @@ router.get("/:id", async (req, res) => {
   else res.send(result).status(200);
 });
 
-router.post("/", (req, res) => {
-  const document = { ...req.body, date: new Date() };
-  db().then(db => db.collection("posts")).then(collection =>
-    collection.insertOne(document)
-  ).then(result => res.send(result).status(204));
-});
+import { check, ExpressValidator } from 'express-validator';
+
+const { param, body, validationResult } = new ExpressValidator(
+  {
+    isPostID: async (value: string) => {
+      // Verify if the value matches the post ID format
+      return value;
+    },
+  },
+  {
+    muteOffensiveWords: (value: string) => {
+      // Replace offensive words with ***
+      return value;
+    },
+  },
+);
+
+router.post("/",
+  check('email', 'Please include a valid email').isEmail(),
+  check('password', 'Password is required').exists(),
+  param('post').isPostID(),
+  body('comment').muteOffensiveWords(),
+  (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+
+    const document = { ...req.body, date: new Date() };
+    db().then(db => db.collection("posts")).then(collection =>
+      collection.insertOne(document)
+    ).then(result => res.send(result).status(204));
+  });
 
 router.patch("/comment/:id", (req, res) => {
   const query = { _id: new ObjectId(req.params.id) };

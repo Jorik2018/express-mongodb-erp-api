@@ -1,60 +1,60 @@
-import mongoose from 'mongoose';
+import mongoose, { Schema, Document, Model } from 'mongoose';
 import bcrypt from 'bcrypt';
 
-export interface IUser extends mongoose.Document {
-    fullName: string;
-    userName: string;
-    email: string;
-    password: string;
-    date: Date;
-    loggedOn: boolean;
-    verifyPassword(password: string): boolean;
+export interface IUser extends Document {
+	date: Date;
+	loggedOn: boolean;
+	verifyPassword(password: string): boolean;
 }
 
+const UserSchema = new Schema(
+	{
+		address: { type: String, required: true },
+		followers: { type: Number},
+		profileImage: { type: String, default: '' },
+		preferences: { type: [String]},
+		isAdvertiser: { type: Boolean, default: false },
 
-const UserSchema = new mongoose.Schema({
-    fullName: {
-        type: String,
-        required: true,
-        trim: true,
-        minlength: 1
-    },
-    name: {
-        type: String,
-        required: true,
-        trim: true,
-        minlength: 1
-    },
-    email: {
-        type: String,
-        required: true,
-        minlength: 5,
-        maxlength: 255,
-        unique: true
-    },
-    password: {
-        type: String,
-        required: true,
-        minlength: 5,
-        maxlength: 1024
-    },
-    date: {
-        type: Date,
-        required: true,
-        default: Date.now
-    },
-    loggedOn: {
-        type: Boolean,
-        required: true,
-        default: false
-    },
-    avatar: {
-        type: String
-    }
-});
+		name: { type: String, trim: true, required: true, min: 3, max: 64 },
+		lastname: { type: String, trim: true, required: true, min: 3, max: 64 },
+		email: {
+			type: String,
+			trim: true,
+			required: true,
+			unique: true,
+			lowercase: true,
+		},
+		password: { type: String, required: true, min: 6, max: 64 },
+		picture: {
+			type: String,
+			default: './avatar.png',
+		},
+		role: {
+			type: [String],
+			default: ['Subscriber'],
+			enum: ['Subscriber', 'Instructor', 'Admin'],
+		},
+		confirmed: {
+			type: Boolean,
+			default: false,
+		},
+		passwordResetCode: {
+			type: String,
+			default: '',
+		},
+		contacts: [
+			{
+				type: Schema.Types.ObjectId,
+				ref: 'Contact'
+			}
+		]
+	},
+
+	{ timestamps: true }
+);
 
 UserSchema.methods.verifyPassword = function (password: string) {
-    return bcrypt.compareSync(password, this.password);
+	return bcrypt.compareSync(password, this.password);
 };
 
-export default mongoose.model('User2', UserSchema);
+export default mongoose.model('User', UserSchema);

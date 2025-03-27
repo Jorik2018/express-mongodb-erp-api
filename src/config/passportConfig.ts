@@ -5,23 +5,23 @@ const mongoose = require('mongoose');
 const User = mongoose.model('User');
 
 passport.use(
-    new localStrategy ({
-        usernameField : 'emailId'
-        },
-        (username, password, done) => {
+    new localStrategy({
+        usernameField: 'emailId'
+    },
+        (username: string, password: string, done) => {
             User.findOne({
-                email : username
+                email: username
             },
-            (err, user) => {
-                if (err)
-                    return done(err);
-                else if(!user)
-                    return done(null, false, {message: 'Email is not registered'});
-                else if(!user.verifyPassword(password))
-                    return done(null, false, {message: 'Wrong Password'});
-                else
-                    return done(null, user);
-            });
+                (err, user) => {
+                    if (err)
+                        return done(err);
+                    else if (!user)
+                        return done(null, false, { message: 'Email is not registered' });
+                    else if (!user.verifyPassword(password))
+                        return done(null, false, { message: 'Wrong Password' });
+                    else
+                        return done(null, user);
+                });
         }
     )
 );

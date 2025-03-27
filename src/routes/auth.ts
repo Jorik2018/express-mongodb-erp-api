@@ -1,4 +1,4 @@
-import express from 'express';
+import { Router } from 'express';
 import {
 	currentUser,
 	forgotPassword,
@@ -9,8 +9,9 @@ import {
 	sendTestEmail,
 } from '../controllers/auth';
 import { requireSignin } from '../middlewares';
+import multer from 'multer';
 
-const router = express.Router();
+const router = Router();
 
 router.post('/register', register);
 router.post('/login', login);

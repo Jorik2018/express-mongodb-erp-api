@@ -101,7 +101,7 @@ const knexMiddleware = (req: Request, res: Response, next: () => void) => {
     // knex.transaction()
     //     .then((transaction:Transaction) => {
     res.on('finish', () => {
-        transaction.commit().then(() => {
+        transaction?.commit().then(() => {
             console.log('transaction.commit()');
         }).catch((error: Error) => {
             console.error(error);

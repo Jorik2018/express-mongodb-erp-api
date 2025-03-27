@@ -1,12 +1,12 @@
 import express, { Application, Request, Response } from 'express';
 //import "express-async-errors";
-import {json} from 'body-parser';
+//import {json} from 'body-parser';
+//import { readdirSync } from 'fs';
 import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
 import itemRoutes from './routes/itemRoutes';
 import posts from "./routes/posts";
 import csrf from 'csurf';
-//import { readdirSync } from 'fs';
 import { Server } from 'socket.io';
 
 require('dotenv').config();
@@ -17,10 +17,11 @@ const PORT = process.env.PORT || 3000;
 
 import authRoute from './routes/auth'
 import { createServer } from 'http';
-import { IRoom } from './database/models/room';
 import { knexMiddleware } from './database/objection_db';
+import { configureSocket } from './quiz/server';
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 //app.use(json());
 
 const multer = require('multer');
@@ -59,10 +60,12 @@ app.use(require("cors")());
   next();
 });*/
 
-app.use('/auth', authRoute);
+app.use('/api', authRoute);
 const usersRoute = require('./routes/user');
 const employeeRoute = require('./routes/employee');
 app.use('/api/users', usersRoute.default)
+app.use('/api/campaigns', require('./routes/campaign').default);
+app.use('/api/contacts', require('./routes/contact').default);
 app.use('/api/items', itemRoutes);
 app.use('/api/employees', employeeRoute.default);
 app.use('/api/offices', require('./routes/office').default);
@@ -84,13 +87,13 @@ app.use((err: any, _req: Request, res: Response, _next: ()=>void) => {
   //res.status(status).send('Something broke!')
 })
 
-app.use(express.urlencoded({ extended: true }));
+
 
 app.use(cookieParser());
 
 app.use(require('morgan')('dev'));
 
-app.use(csrf({ cookie: true }));
+//app.use(csrf({ cookie: true }));
 
 app.get('/api/csrf-token', (req, res) => {
   res.json({ csrfToken: req.csrfToken() });
@@ -108,36 +111,7 @@ mongoose.connect(process.env.DB_URI!, {})
     });
 
     io.on('connection', (socket) => {
-      console.log('A user connected');
-      socket.on('chat message', (msg) => {
-        console.log('message: ' + msg);
-      });
-      socket.on('login', (msg) => {
-        console.log('login: ' + JSON.stringify(msg));
-        require('./controllers/room').list({}, {
-          send: ({ data, ...others }: Error & { data: IRoom[] }) => {
-            socket.emit('login', { rooms: data, ...others });
-          }
-        })
-        socket.emit('login', { message: "Success", rooms: [] })
-      });
-      socket.on('createroom', (room: IRoom) => {
-        require('./controllers/room').create({ body: room }, {
-          send: (res: { error: Error } | IRoom) => {
-            socket.emit('createroom', res);
-          }
-        })
-      });
-      socket.on('fetchroom', (id: string) => {
-        require('./controllers/room').find({ params: { id } }, {
-          send: (res: { error: Error } | IRoom) => {
-            socket.emit('fetchroom', res);
-          }
-        })
-      });
-      socket.on('disconnect', () => {
-        console.log('A user disconnected');
-      });
+      configureSocket(socket)
     });
 
     io.listen(server);

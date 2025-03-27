@@ -1,19 +1,30 @@
-const path = require('path');
+import { NextFunction, Request, Response } from 'express'
+import Contact from '../database/models/contact';
 
-const {validationResult} = require('express-validator/check');
-const Contact = require('../models/contact');
+const find = (req: Request, res: Response) => {
+    Contact.findOne({
+      _id: req.params.id
+    })
+      .then((task: any) => res.send(task))
+      .catch((error: Error) => console.log(error));
+  };
 
-const getContacts = (req, res, next) => {
-    Contact.find()
-        .then(contacts => {
-            res.status(200).json({
-                message: 'Fetched contacts successfully',
-                contacts
+  
+const list = (req: Request, res: Response, next: NextFunction) => {
+    Contact.find({})
+        .then((data:any[]) => {
+            res.status(200).send({
+                data:data.map(({_doc:{_id,...item}})=>({id:_id,...item}))
             })
-        }).catch(err => {
-            if(!err.statusCode) {
+        }).catch((err:any) => {
+            if (!err.statusCode) {
                 err.statusCode = 500;
             }
             next(err);
-    })
+        })
 };
+
+module.exports = {
+    list,
+    find
+}

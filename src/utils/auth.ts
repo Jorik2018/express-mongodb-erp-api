@@ -17,6 +17,7 @@ export const hashPassword = (password: string) => {
   });
 };
 
+
 export const comparePassword = (password: string, hashed: string) => {
   //funcion que compara el password ingresado con el hasheado
   return bcrypt.compare(password, hashed);

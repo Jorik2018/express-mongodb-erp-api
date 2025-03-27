@@ -1,11 +1,16 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+import { model, Schema } from 'mongoose';
 
 const contactSchema = new Schema({
     name: {
         type: String,
         required: true
     },
+    photoUrl: { type: String, required: true },
+    rating: { type: Number, required: true },
+    categories: { type: [String], required: true },
+    videosCount: { type: Number, required: true },
+    followersCount: { type: Number, required: true },
+    bio: { type: String, required: true },
     email: {
         type: String,
         required: true
@@ -51,4 +56,4 @@ const contactSchema = new Schema({
 
 });
 
-module.exports = mongoose.model('Contact', contactSchema);
+export default model('influencers', contactSchema);
