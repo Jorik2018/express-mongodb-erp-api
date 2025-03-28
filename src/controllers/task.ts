@@ -5,7 +5,7 @@ const list = async (req: Request, res: Response) => {
   try {
     const tasks = await Task.find({})
     res.send({data:tasks})
-  } catch (err) {
+  } catch (err:any) {
     res.send({
       err,
     })

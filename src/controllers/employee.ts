@@ -6,7 +6,7 @@ const getEmployees = async (req: Request, res: Response) => {
   try {
     const employees = await Employee.find({}).populate('office');
     res.send(employees)
-  } catch (err) {
+  } catch (err:any) {
     res.send({
       err,
     })

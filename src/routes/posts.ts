@@ -108,7 +108,7 @@ router.get("/collection", (_, res) => {
     .then((collectionNames: string[]) => res.send(collectionNames).status(200));
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", async (req:any, res:any) => {
   let collection = (await db()).collection("posts");
   let query = { _id: new ObjectId(req.params.id) };
   let result = await collection.findOne(query);
@@ -138,7 +138,7 @@ router.post("/",
   check('password', 'Password is required').exists(),
   param('post').isPostID(),
   body('comment').muteOffensiveWords(),
-  (req, res) => {
+  (req:any, res:any) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -151,7 +151,7 @@ router.post("/",
     ).then(result => res.send(result).status(204));
   });
 
-router.patch("/comment/:id", (req, res) => {
+router.patch("/comment/:id", (req:any, res:any) => {
   const query = { _id: new ObjectId(req.params.id) };
   const updates = {
     $push: { comments: req.body }
@@ -161,7 +161,7 @@ router.patch("/comment/:id", (req, res) => {
     .then(result => res.send(result).status(200));
 });
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", (req:any, res:any) => {
   const query = { _id: new ObjectId(req.params.id) };
   db().then(db => db.collection("posts"))
     .then(collection => collection.deleteOne(query))

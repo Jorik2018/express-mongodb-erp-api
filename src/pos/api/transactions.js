@@ -15,19 +15,19 @@ var Transactions = new Datastore({
   autoload: true
 });
 
-app.get("/", function(req, res) {
+app.get("/", function(req:any, res:any) {
   res.send("Transactions API");
 });
 
 // GET all transactions
-app.get("/all", function(req, res) {
+app.get("/all", function(req:any, res:any) {
   Transactions.find({}, function(err, docs) {
     res.send(docs);
   });
 });
 
 // GET all transactions
-app.get("/limit", function(req, res) {
+app.get("/limit", function(req:any, res:any) {
   var limit = parseInt(req.query.limit, 10);
   if (!limit) limit = 5;
 
@@ -40,7 +40,7 @@ app.get("/limit", function(req, res) {
 });
 
 // GET total sales for the current day
-app.get("/day-total", function(req, res) {
+app.get("/day-total", function(req:any, res:any) {
   // if date is provided
   if (req.query.date) {
     startDate = new Date(req.query.date);
@@ -82,7 +82,7 @@ app.get("/day-total", function(req, res) {
 });
 
 // GET transactions for a particular date
-app.get("/by-date", function(req, res) {
+app.get("/by-date", function(req:any, res:any) {
   var startDate = new Date();
   startDate.setHours(0, 0, 0, 0);
 
@@ -98,11 +98,11 @@ app.get("/by-date", function(req, res) {
 });
 
 // Add new transaction
-app.post("/new", function(req, res) {
+app.post("/new", function(req:any, res:any) {
   var newTransaction = req.body;
 
   Transactions.insert(newTransaction, function(err, transaction) {
-    if (err) res.status(500).send(err);
+    if (err:any) res.status(500).send(err:any);
     else {
       res.sendStatus(200);
       Inventory.decrementInventory(transaction.products);
@@ -111,7 +111,7 @@ app.post("/new", function(req, res) {
 });
 
 // GET a single transaction
-app.get("/:transactionId", function(req, res) {
+app.get("/:transactionId", function(req:any, res:any) {
   Transactions.find({ _id: req.params.transactionId }, function(err, doc) {
     if (doc) res.send(doc[0]);
   });

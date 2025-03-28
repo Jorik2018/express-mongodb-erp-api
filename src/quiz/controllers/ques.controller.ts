@@ -42,7 +42,7 @@ export function findNext(roomid: string, serial: number): Promise<[QuestionInsta
                     resolve([questions[serial], false]);
                 };
             })
-            .catch((err) => reject(err));
+            .catch((err:any) => reject(err));
     });
 };
 
@@ -64,7 +64,7 @@ export function checkAnswer(roomid: string, serial: number, attempt: number): Pr
                     resolve(questions[serial].answer === attempt);
                 };
             })
-            .catch((err) => {
+            .catch((err:any) => {
                 reject(err);
             });
     });
@@ -92,7 +92,7 @@ export function getByRoom(roomid: string): Promise<quesArray> {
                 console.log('Done.');
                 resolve(quesArray);
             })
-            .catch((err) => {
+            .catch((err:any) => {
                 reject(err);
             });
     });
@@ -131,7 +131,7 @@ export function deleteQuestion(roomid: string, id: number): Promise<quesArray> {
                 console.log('Deleted question.');
                 resolve(quesArray);
             })
-            .catch((err) => {
+            .catch((err:any) => {
                 reject(err);
             });
     });

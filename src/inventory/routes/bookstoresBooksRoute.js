@@ -20,7 +20,7 @@ module.exports = (
       .then((result) => {
         res.json(result);
       })
-      .catch((err) => next(err));
+      .catch((err:any) => next(err:any));
   });
 
   router.post("/", (req, res, next) => {
@@ -45,7 +45,7 @@ module.exports = (
             }
           );
         })
-        .catch((err) => next(err));
+        .catch((err:any) => next(err:any));
     }
   });
 
@@ -56,7 +56,7 @@ module.exports = (
         if (!result.length) throw new ErrorHandler(404, "Not found");
         res.json(result[0]);
       })
-      .catch((err) => next(err));
+      .catch((err:any) => next(err:any));
   });
 
   router.patch(`/:id(${regex.id})`, (req, res, next) => {
@@ -73,7 +73,7 @@ module.exports = (
             res.json(result[0]);
           });
         })
-        .catch((err) => next(err));
+        .catch((err:any) => next(err:any));
     }
   });
 
@@ -86,7 +86,7 @@ module.exports = (
           res.status(202).json(result[0]);
         });
       })
-      .catch((err) => next(err));
+      .catch((err:any) => next(err:any));
   });
 
   return router;

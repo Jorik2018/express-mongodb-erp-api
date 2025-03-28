@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 const JWT_SECRET_TOKEN = process.env.JWT_SECRET;
 const auth = require("../middelware/auth");
 
-router.get("/", auth, async (req, res) => {
+router.get("/", auth, async (req:any, res:any) => {
 	try {
 		const user = await Profile.findOne({ user: res.authToken.id });
 		res.json(user);
@@ -16,7 +16,7 @@ router.get("/", auth, async (req, res) => {
 	}
 });
 
-router.post("/signup", async (req, res) => {
+router.post("/signup", async (req:any, res:any) => {
 	try {
 		const { uid, displayName, email, avatar } = req.body;
 		const user = await Profile.findOne({ email: req.body.email });
@@ -46,7 +46,7 @@ router.post("/signup", async (req, res) => {
 			JWT_SECRET_TOKEN,
 			{ expiresIn: 35000000000000000 },
 			(err, token) => {
-				if (err) {
+				if (err:any) {
 					res.json({ msg: err });
 				} else {
 					res.json({ token });
@@ -59,7 +59,7 @@ router.post("/signup", async (req, res) => {
 });
 
 // Sing IN
-router.post("/signin", async (req, res) => {
+router.post("/signin", async (req:any, res:any) => {
 	try {
 		// IF USER ALREADY EXISTS
 		let userData = await User.findOne({ email: req.body.email });
@@ -75,7 +75,7 @@ router.post("/signin", async (req, res) => {
 			id: userData.uid,
 		};
 		jwt.sign(payload, JWT_SECRET_TOKEN, { expiresIn: 3600 }, (err, token) => {
-			if (err) {
+			if (err:any) {
 				res.json({ msg: err });
 			} else {
 				res.json({ token });
@@ -87,7 +87,7 @@ router.post("/signin", async (req, res) => {
 });
 
 //authwithgoogle
-router.post("/authwithgoogle", async (req, res) => {
+router.post("/authwithgoogle", async (req:any, res:any) => {
 	const { uid, displayName, email, avatar } = req.body;
 	try {
 		//Get user and profile schema
@@ -119,7 +119,7 @@ router.post("/authwithgoogle", async (req, res) => {
 					JWT_SECRET_TOKEN,
 					{ expiresIn: 3500 },
 					(err, token) => {
-						if (err) {
+						if (err:any) {
 							res.json({ errors: err.message });
 						} else {
 							res.json({ token });
@@ -144,7 +144,7 @@ router.post("/authwithgoogle", async (req, res) => {
 					JWT_SECRET_TOKEN,
 					{ expiresIn: 3600 },
 					(err, token) => {
-						if (err) {
+						if (err:any) {
 							res.json({ msg: err });
 						} else {
 							res.json({ token });

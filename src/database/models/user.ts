@@ -47,7 +47,26 @@ const UserSchema = new Schema(
 				type: Schema.Types.ObjectId,
 				ref: 'Contact'
 			}
-		]
+		],
+
+
+		uid: {
+			type: String,
+		},
+		displayName: {
+			type: String,
+		},
+		avatar: {
+			type: String,
+		},
+		membership: {
+			type: String,
+	
+		},
+		date: {
+			type: Date,
+			default: Date.now,
+		},
 	},
 
 	{ timestamps: true }

@@ -1,5 +1,6 @@
 import { PrismaClient, Movement, Inventory,  MovementDetail } from '@prisma/client'
 import express, { Request, Response } from 'express';
+
 import { validateToken } from '../auth';
 import axios from 'axios';
 import fs from 'fs';
@@ -59,7 +60,7 @@ function getMonth(date: any) {
     return res;
 }
 
-router.get('/test', (req, res) => {
+router.get('/test', (req:any, res:any) => {
     res.json({ message: 'Hello, World!' });
 });
 
@@ -91,7 +92,7 @@ router.get('/report', validateToken, async (req: Request, res: Response) => {
                         }
                     }
                 })
-                data.map(x => {
+                data.map((x:any) => {
                     x.details.map((y:any) => {
                         aux.push({
                             canceled: y.inventory.is_delete,
@@ -269,7 +270,7 @@ router.get('/report', validateToken, async (req: Request, res: Response) => {
                 },
                 responseType: 'arraybuffer'
             })
-            fs.writeFile('./temp/pdf/' + uniqueId + '.pdf', response.data, { encoding: null }, (err) => {
+            fs.writeFile('./temp/pdf/' + uniqueId + '.pdf', response.data, { encoding: null }, (err:any) => {
                 if (err) {
                     console.log("Error to create a .pdf file")
                 } else {

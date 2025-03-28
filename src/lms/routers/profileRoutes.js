@@ -4,7 +4,7 @@ const auth = require("../middelware/auth");
 const Profile = require("../models/ProfileSchema");
 const Course = require("../models/CourseSchema");
 
-router.get("/me", auth, async (req, res) => {
+router.get("/me", auth, async (req:any, res:any) => {
 	try {
 		const profile = await Profile.findOne({ user: res.authToken.id });
 		if (!profile) {
@@ -16,7 +16,7 @@ router.get("/me", auth, async (req, res) => {
 	}
 });
 
-router.post("/", auth, async (req, res) => {
+router.post("/", auth, async (req:any, res:any) => {
 	const { address, bio, gender, twitter, facebook, github } = req.body;
 	const profileFields = {};
 	if (address) profileFields.address = address;
@@ -45,7 +45,7 @@ router.post("/", auth, async (req, res) => {
 });
 
 //Add Wishlist
-router.put("/wish/:courseId", auth, async (req, res) => {
+router.put("/wish/:courseId", auth, async (req:any, res:any) => {
 	try {
 		let profile = await Profile.findOne({ user: res.authToken.id });
 		const populateProfile = {
@@ -78,7 +78,7 @@ router.put("/wish/:courseId", auth, async (req, res) => {
 });
 
 // Add Review
-router.put("/review/:courseId", auth, async (req, res) => {
+router.put("/review/:courseId", auth, async (req:any, res:any) => {
 	const { rating, text } = req.body;
 	try {
 		const course = await Course.findById(req.params.courseId);
@@ -97,7 +97,7 @@ router.put("/review/:courseId", auth, async (req, res) => {
 });
 
 //Enrolled new Course
-router.put("/enrolled/:courseId", auth, async (req, res) => {
+router.put("/enrolled/:courseId", auth, async (req:any, res:any) => {
 	try {
 		//Get Course Schema by id
 		const course = await Course.findById(req.params.courseId);

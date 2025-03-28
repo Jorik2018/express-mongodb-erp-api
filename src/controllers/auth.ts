@@ -1,6 +1,6 @@
 import User from '../database/models/user';
 import { hashPassword, comparePassword } from '../utils/auth';
-import jwt, { Secret, JwtPayload } from 'jsonwebtoken';
+import jwt, { Secret } from 'jsonwebtoken';
 import AWS from 'aws-sdk';
 import { SendEmailRequest, SendEmailResponse } from 'aws-sdk/clients/ses';
 import { Request, Response, NextFunction } from 'express';
@@ -90,8 +90,8 @@ export const register = async (req: Request, res: Response) => {
 				},
 			};
 			/*SES.sendEmail(params, (err, data) => {
-				if (err) {
-					console.log(err);
+				if (err:any) {
+					console.log(err:any);
 					return res.json({ ok: false });
 				} else {
 					console.log(data);
@@ -101,7 +101,7 @@ export const register = async (req: Request, res: Response) => {
 			const { profileImage, followers, name } = user;
 			return res.status(200).json({ profileImage, followers, name, token });
 		});
-	} catch (err) {
+	} catch (err:any) {
 		console.log(err);
 		return res.status(400).send(`ERROR: ${err}`);
 	}
@@ -145,7 +145,7 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
 				expiresIn: '7d',
 			}/*,
 				(err, token) => {
-					if (err) throw err;
+					if (err:any) throw err;
 					res.json({ token });
 				}*/);
 			//return user and token to client, exclude hashed password

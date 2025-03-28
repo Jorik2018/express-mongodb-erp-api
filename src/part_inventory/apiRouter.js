@@ -38,7 +38,7 @@ const defaultRoute = (req, res, next) => {
 
 apiRouter.get("/*", defaultRoute);
 
-apiRouter.get('/success', (req, res) => {
+apiRouter.get('/success', (req:any, res:any) => {
     res.status(200).send({
         'status': 'authorized',
         'message': 'user is authenticated',
@@ -47,7 +47,7 @@ apiRouter.get('/success', (req, res) => {
     });
 });
 
-apiRouter.get('/getuser', (req, res) => {
+apiRouter.get('/getuser', (req:any, res:any) => {
     request({
         method: 'get',
         uri: `https://api.github.com/user`,
@@ -58,7 +58,7 @@ apiRouter.get('/getuser', (req, res) => {
     }).pipe(res);
 });
 
-apiRouter.get('/oemsecret/:query?', (req, res) => {
+apiRouter.get('/oemsecret/:query?', (req:any, res:any) => {
     request({
         uri: 'https://beta.api.oemsecrets.com/partsearch',
         qs: {
@@ -71,7 +71,7 @@ apiRouter.get('/oemsecret/:query?', (req, res) => {
     }).pipe(res);
 });
 
-apiRouter.get('/mouser/:query?', (req, res) => {
+apiRouter.get('/mouser/:query?', (req:any, res:any) => {
     request({
         uri: 'https://api.mouser.com/api/v1.0/search/keyword',
         method: 'post',
@@ -94,28 +94,28 @@ apiRouter.get('/mouser/:query?', (req, res) => {
     }).pipe(res);
 });
 
-apiRouter.get('/parts', (req, res) => {
+apiRouter.get('/parts', (req:any, res:any) => {
     gitrows.get(userParts(req.userID))
         .then((data) => {
             res.status(200).send(data && data.reverse());
         });
 });
 
-apiRouter.get('/partcolumns', (req, res) => {
+apiRouter.get('/partcolumns', (req:any, res:any) => {
     gitrows.get(process.env.DB_PATH + 'structure.json')
         .then((data) => {
             res.status(200).send(data);
         });
 });
 
-apiRouter.post('/delete', (req, res) => {
+apiRouter.post('/delete', (req:any, res:any) => {
     gitrows.delete(userParts(req.userID), req.body,  { id: req.body.id })
         .then((response) => {
             res.status(200).send({ ...response, ...{ id: req.body.id }});
         });
 });
 
-apiRouter.post('/part', (req, res) => {
+apiRouter.post('/part', (req:any, res:any) => {
 
     const now = date.format(new Date(), 'YYYY-MM-DD HH:mm:ss');
 
@@ -132,14 +132,14 @@ apiRouter.post('/part', (req, res) => {
         });
 });
 
-apiRouter.get('/parts/:id?', (req, res) => {
+apiRouter.get('/parts/:id?', (req:any, res:any) => {
     gitrows.get(userParts(req.userID), { id: req.params.id })
         .then((data) => {
             res.status(200).send(data);
         });
 });
 
-apiRouter.post('/addpart', (req, res) => {
+apiRouter.post('/addpart', (req:any, res:any) => {
 
     const now = date.format(new Date(), 'YYYY-MM-DD HH:mm:ss');
 
@@ -158,7 +158,7 @@ apiRouter.post('/addpart', (req, res) => {
         });
 });
 
-apiRouter.get('/latestentries', (req, res) => {
+apiRouter.get('/latestentries', (req:any, res:any) => {
     gitrows.get(userParts(req.userID))
         .then((data) => {
             res.status(200).send(data && data.slice(-5).reverse());

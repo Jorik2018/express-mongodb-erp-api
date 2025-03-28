@@ -27,7 +27,7 @@ export function getState(roomid: string): Promise<string> {
                     throw 'No room with id ' + roomid;
                 };
             })
-            .catch((err) => {
+            .catch((err:any) => {
                 reject(err);
             });
     });
@@ -51,7 +51,7 @@ export function changeState(roomid: string, state: string): Promise<void> {
                 console.log('Changed state of room', roomid);
                 resolve();
             })
-            .catch((err) => {
+            .catch((err:any) => {
                 reject(err);
             });
     });

@@ -5,7 +5,7 @@ const getOffices = async (req: Request, res: Response) => {
   try {
     const offices = await Office.find({})
     res.send(offices)
-  } catch (err) {
+  } catch (err:any) {
     res.send({
       err,
     })

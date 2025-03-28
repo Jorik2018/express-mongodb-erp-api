@@ -7,3 +7,7 @@ https://dev.to/cristain/how-to-implement-jwt-authentication-using-node-express-t
 https://dev.to/juliecherner/authentication-with-jwt-tokens-in-typescript-with-express-3gb1
 
 https://blog.logrocket.com/using-sequelize-with-typescript/
+
+npm install @prisma/client
+
+npx prisma generate

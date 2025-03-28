@@ -56,7 +56,7 @@ export function addToRoom(username: string, roomid: string): Promise<string[]> {
             .then((users) => {
                 resolve(users.map((user, index) => user.get().username));
             })
-            .catch((err) => reject(err));
+            .catch((err:any) => reject(err));
     });
 }
 
@@ -70,6 +70,6 @@ export function findByRoom(roomid: string): Promise<UserModel[]> {
             },
         })
             .then((users) => resolve(users))
-            .catch((err) => reject(err));
+            .catch((err:any) => reject(err));
     });
 }

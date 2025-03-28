@@ -95,7 +95,7 @@ app.use(require('morgan')('dev'));
 
 //app.use(csrf({ cookie: true }));
 
-app.get('/api/csrf-token', (req, res) => {
+app.get('/api/csrf-token', (req:any, res:any) => {
   res.json({ csrfToken: req.csrfToken() });
 });
 

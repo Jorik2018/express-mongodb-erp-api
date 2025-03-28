@@ -1,12 +1,13 @@
 import { Request, Response } from 'express'
-import User, { IUser } from '../database/models/user'
-const jwt = require("jsonwebtoken");
+import User from '../database/models/user'
+import jwt from 'jsonwebtoken'
+
 
 
 const userByToken = (req: Request, res: Response) => {
-  const decoded = jwt.verify(
-    req.headers["authorization"],
-    process.env.SECRET_KEY
+  const decoded:any = jwt.verify(
+    req.headers["authorization"]!,
+    process.env.SECRET_KEY!
   );
 
   User.findOne({

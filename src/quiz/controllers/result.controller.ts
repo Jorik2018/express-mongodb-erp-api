@@ -21,7 +21,7 @@ export function createResult(roomid: string, username: string): Promise<ResultMo
                 console.log('Created result');
                 resolve(result);
             })
-            .catch((err) => reject(err));
+            .catch((err:any) => reject(err));
     });
 };
 
@@ -78,7 +78,7 @@ export function addAttempt(roomid: string, username: string, serial: number, att
                 console.log('Added attempt');
                 resolve(result);
             })
-            .catch((err) => {
+            .catch((err:any) => {
                 reject(err)
             });
     });
@@ -96,7 +96,7 @@ export function getByRoom(roomid: string): Promise<ResultModel[]> {
                 console.log('Done.');
                 resolve(results);
             })
-            .catch((err) => {
+            .catch((err:any) => {
                 reject(err);
             });
     });

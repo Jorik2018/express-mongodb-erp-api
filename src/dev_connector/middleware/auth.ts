@@ -18,7 +18,7 @@ module.exports = function (req: Request, res: Response, next: NextFunction) {
         next();
       }
     });
-  } catch (err) {
+  } catch (err:any) {
     console.error('something wrong with auth middleware');
     res.status(500).json({ msg: 'Server Error' });
   }

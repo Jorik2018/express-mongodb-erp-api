@@ -1,10 +1,10 @@
-module.exports = (db) => {
+module.exports = (db:any) => {
   const getBooks = () => {
     return db
       .select("*")
       .from("books")
       .orderBy("id")
-      .then((result) => result);
+      .then((result:any) => result);
   };
 
   const createBook = (title: string, author: string, summary: string) => {
@@ -15,7 +15,7 @@ module.exports = (db) => {
         summary,
       })
       .returning("*")
-      .then((result) => result);
+      .then((result:any) => result);
   };
 
   const getBookById = (id: string) => {
@@ -23,26 +23,26 @@ module.exports = (db) => {
       .select("*")
       .from("books")
       .where("id", id)
-      .then((result) => result);
+      .then((result:any) => result);
   };
 
-  const getBookByContent = (title, author) => {
+  const getBookByContent = (title:string, author:string) => {
     return db
       .select("*")
       .from("books")
       .where({ title, author })
-      .then((result) => result);
+      .then((result:any) => result);
   };
 
-  const deleteBookById = (id) => {
+  const deleteBookById = (id:any) => {
     return db("books")
       .where({ id })
       .del()
       .returning("*")
-      .then((result) => result);
+      .then((result:any) => result);
   };
 
-  const getBookstoresForBookById = (id) => {
+  const getBookstoresForBookById = (id:any) => {
     return db
       .select([
         "bookstores.*",
@@ -57,7 +57,7 @@ module.exports = (db) => {
       )
       .where("book_id", id)
       .orderBy("bookstores.id")
-      .then((result) => result);
+      .then((result:any) => result);
   };
 
   return {

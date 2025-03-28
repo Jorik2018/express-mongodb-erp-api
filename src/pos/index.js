@@ -29,7 +29,7 @@ app.all("/*", function(req, res, next) {
   }
 });
 
-app.get("/", function(req, res) {
+app.get("/", function(req:any, res:any) {
   res.send(" Real time POS web app running.");
 });
 

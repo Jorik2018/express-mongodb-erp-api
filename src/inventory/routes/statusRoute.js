@@ -7,7 +7,7 @@ module.exports = ({ getBookstoresBooksStatus }) => {
       .then((result) => {
         res.json(result);
       })
-      .catch((err) => next(err));
+      .catch((err:any) => next(err:any));
   });
 
   return router;

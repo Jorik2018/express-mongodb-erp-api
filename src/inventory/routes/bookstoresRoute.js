@@ -16,7 +16,7 @@ module.exports = ({
       .then((bookstores) => {
         res.json(bookstores);
       })
-      .catch((err) => next(err));
+      .catch((err:any) => next(err:any));
   });
 
   router.post("/", (req, res, next) => {
@@ -32,7 +32,7 @@ module.exports = ({
             res.status(201).json(result[0]);
           });
         })
-        .catch((err) => next(err));
+        .catch((err:any) => next(err:any));
     }
   });
 
@@ -43,7 +43,7 @@ module.exports = ({
         if (!result.length) throw new ErrorHandler(404, "Not found");
         res.json(result[0]);
       })
-      .catch((err) => next(err));
+      .catch((err:any) => next(err:any));
   });
 
   router.delete(`/:id(${regex.id})`, (req, res, next) => {
@@ -55,7 +55,7 @@ module.exports = ({
           res.status(202).json(result[0]);
         });
       })
-      .catch((err) => next(err));
+      .catch((err:any) => next(err:any));
   });
 
   router.get(`/:id(${regex.id})/books`, (req, res, next) => {
@@ -67,7 +67,7 @@ module.exports = ({
           res.json(result);
         });
       })
-      .catch((err) => next(err));
+      .catch((err:any) => next(err:any));
   });
 
   return router;

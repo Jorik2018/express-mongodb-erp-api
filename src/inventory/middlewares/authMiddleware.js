@@ -8,7 +8,7 @@ const authMiddleware = (req, res, next) => {
   jwt.verify(authorization, process.env.JWT_KEY, (err, decoded) => {
     if (err && err.message === "jwt expired") {
       next(new ErrorHandler(401, "Session expired"));
-    } else if (err) {
+    } else if (err:any) {
       next(new ErrorHandler(401, "Unauthorized"));
     } else {
       next();

@@ -5,7 +5,7 @@ const authRouter = Router();
 
 authRouter.get('/login/github', passport.authenticate('github'));
 
-authRouter.get('/logout', (req: Request, res: Response) => {
+authRouter.get('/logout', (req: any, res: Response) => {
     delete req.session.token;
     delete req.session.passport;
     req.logout();

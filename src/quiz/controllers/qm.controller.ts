@@ -52,7 +52,7 @@ export function authenticate(socketid: string, roomid: string): Promise<void> {
                     throw 'This qm has no control over this room.'
                 };
             })
-            .catch((err) => {
+            .catch((err:any) => {
                 reject(err);
             })
     });

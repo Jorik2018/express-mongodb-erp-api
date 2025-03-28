@@ -9,7 +9,7 @@ module.exports = ({ getUsers, getUserById }) => {
       .then((users) => {
         res.json(users);
       })
-      .catch((err) => next(err));
+      .catch((err:any) => next(err:any));
   });
 
   router.get(`/:id(${regex.id})`, (req, res, next) => {
@@ -19,7 +19,7 @@ module.exports = ({ getUsers, getUserById }) => {
         if (!result.length) throw new ErrorHandler(404, "Not found");
         res.json(result[0]);
       })
-      .catch((err) => next(err));
+      .catch((err:any) => next(err:any));
   });
 
   return router;

@@ -9,7 +9,7 @@ const list = async (req: Request, res: Response) => {
       _id: undefined, // Optionally remove _id
     }));
     res.send({data:campaign})
-  } catch (err) {
+  } catch (err:any) {
     res.send({
       err,
     })

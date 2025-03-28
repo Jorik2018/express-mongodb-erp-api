@@ -2,7 +2,7 @@
 var ObjectId = require('mongodb').ObjectID;
 
 // index return all dogs
-exports.homeDog = function(req, res) {
+exports.homeDog = function(req:any, res:any) {
 	var db = req.db;
 	var collection = db.collection('dogs');
 	collection.find().toArray(function(err, dogsArray) {
@@ -22,7 +22,7 @@ exports.homeDog = function(req, res) {
 };
 
 // get one dog
-exports.findByName = function(req, res) {
+exports.findByName = function(req:any, res:any) {
 	var db = req.db;
 	var collection = db.collection('dogs');
 	var name = req.params.name;
@@ -44,7 +44,7 @@ exports.findByName = function(req, res) {
 };
 
 // create a new dog
-exports.createDog = function(req, res) {
+exports.createDog = function(req:any, res:any) {
 	var db = req.db;
 	var collection = db.collection('dogs');
 	var post = req.body;
@@ -63,7 +63,7 @@ exports.createDog = function(req, res) {
 };
 
 // update a dog
-exports.updateDog = function(req, res) {
+exports.updateDog = function(req:any, res:any) {
 	var db = req.db;
 	var collection = db.collection('dogs');
 	var id = req.body._id;
@@ -87,7 +87,7 @@ exports.updateDog = function(req, res) {
 		}, {
 			safe: true
 		}, function(err, item) {
-			if (err) {
+			if (err:any) {
 				res.render('error', {
 					message: 'Dog Update Failed! ' + err
 				});
@@ -105,7 +105,7 @@ exports.updateDog = function(req, res) {
 };
 
 // delete a dog
-exports.deleteDog = function(req, res) {
+exports.deleteDog = function(req:any, res:any) {
 	var db = req.db;
 	var collection = db.collection('dogs');
 	var _id = req.body._id;
