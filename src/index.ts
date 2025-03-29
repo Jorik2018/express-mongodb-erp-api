@@ -59,19 +59,19 @@ app.use(require("cors")());
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
 });*/
-
-app.use('/api', authRoute);
+const api=process.env.API ||'/api';
+app.use(api, authRoute);
 const usersRoute = require('./routes/user');
 const employeeRoute = require('./routes/employee');
-app.use('/api/users', usersRoute.default)
-app.use('/api/campaigns', require('./routes/campaign').default);
-app.use('/api/contacts', require('./routes/contact').default);
-app.use('/api/items', itemRoutes);
-app.use('/api/employees', employeeRoute.default);
-app.use('/api/offices', require('./routes/office').default);
-app.use('/api/tasks', require('./routes/task').default);
-app.use('/api/persons', require('./routes/person').default);
-app.use("/api/posts", posts);
+app.use(`${api}/users`, usersRoute.default)
+app.use(`${api}/campaigns`, require('./routes/campaign').default);
+app.use(`${api}/contacts`, require('./routes/contact').default);
+app.use(`${api}/items`, itemRoutes);
+app.use(`${api}/employees`, employeeRoute.default);
+app.use(`${api}/offices`, require('./routes/office').default);
+app.use(`${api}/tasks`, require('./routes/task').default);
+app.use(`${api}/persons`, require('./routes/person').default);
+app.use(`${api}/posts`, posts);
 /*
 readdirSync('./routes').map((route) => {
   console.log(route);

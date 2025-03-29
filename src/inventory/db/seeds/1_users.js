@@ -1,5 +1,5 @@
 const faker = require("faker");
-const bcrypt = require("bcrypt");
+import bcrypt from 'bcrypt';
 
 const createFakeUsers = (n) => {
   const users = [];

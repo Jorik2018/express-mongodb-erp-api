@@ -2,7 +2,7 @@ import { Request, Response, Router } from 'express'
 const router = Router();
 require("dotenv").config({ path: "../.env" });
 import jwt from 'jsonwebtoken'
-const bcrypt = require("bcrypt");
+import bcrypt from 'bcrypt';
 const { ErrorHandler } = require("../helpers/errorsHelper");
 
 export default ({ getUserByEmail }: any) => {

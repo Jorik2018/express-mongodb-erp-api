@@ -10,4 +10,4 @@ https://blog.logrocket.com/using-sequelize-with-typescript/
 
 npm install @prisma/client
 
-npx prisma generate
+npx prisma generate && npm run build && npm run start
