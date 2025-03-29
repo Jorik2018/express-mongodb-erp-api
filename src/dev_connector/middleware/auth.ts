@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
+import jwt from 'jsonwebtoken'
 
 module.exports = function (req: Request, res: Response, next: NextFunction) {
   // Get token from header
@@ -10,7 +11,8 @@ module.exports = function (req: Request, res: Response, next: NextFunction) {
   }
 
   try {
-    jwt.verify(token, config.get('jwtSecret'), (error: Error, decoded: { user: string }) => {
+    const config = require('config');
+    jwt.verify(token, config.get('jwtSecret'), (error: any, decoded: any) => {
       if (error) {
         return res.status(401).json({ msg: 'Token is not valid' });
       } else {
