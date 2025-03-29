@@ -1,6 +1,7 @@
-const {getEmployees, getEmployeeById, addEmployee, updateEmployee, deleteEmployee} = require("../controllers/employee");
+import { Router } from 'express';
 
-const router = require('express').Router();
+const { getEmployees, getEmployeeById, addEmployee, updateEmployee, deleteEmployee } = require("../controllers/employee");
+const router = Router();
 
 router.get('/', getEmployees);
 router.get('/:id', getEmployeeById);

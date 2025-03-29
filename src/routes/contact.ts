@@ -1,7 +1,7 @@
-import express from 'express';
+import { Router } from 'express';
 
-const {list,find} = require("../controllers/contact");
-const router = express.Router();
+const { list, find } = require("../controllers/contact");
+const router = Router();
 
 //router.get('/currentUser', userByToken);
 router.get("/:id", find);

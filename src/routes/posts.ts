@@ -1,8 +1,8 @@
-import express from "express";
+import { Router } from 'express';
 import db from "../database/mongodb_db";
 import { CollectionInfo, ObjectId } from "mongodb";
 
-const router = express.Router();
+const router = Router();
 
 router.get("/", (_, res) => {
   db().then(db => db.collection("posts").find({})

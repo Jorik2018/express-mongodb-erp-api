@@ -1,5 +1,6 @@
+import { Router } from 'express';
 const { getOffices, getOfficeById, deleteOffice, addOffice, updateOffice } = require("../controllers/office");
-const router = require('express').Router();
+const router = Router();
 import { check, validationResult, body, param } from 'express-validator';
 
 router.get('/', getOffices);

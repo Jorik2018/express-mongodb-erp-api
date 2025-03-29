@@ -65,6 +65,7 @@ const usersRoute = require('./routes/user');
 const employeeRoute = require('./routes/employee');
 app.use(`${api}/users`, usersRoute.default)
 app.use(`${api}/campaigns`, require('./routes/campaign').default);
+app.use(`${api}/auth/facebook`, require('./routes/facebook').default);
 app.use(`${api}/contacts`, require('./routes/contact').default);
 app.use(`${api}/items`, itemRoutes);
 app.use(`${api}/employees`, employeeRoute.default);

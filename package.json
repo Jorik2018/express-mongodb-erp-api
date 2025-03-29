@@ -44,6 +44,7 @@
     "npm": "^10.8.1",
     "objection": "^3.1.4",
     "passport": "^0.7.0",
+    "passport-facebook": "^3.0.0",
     "sequelize": "^6.37.3",
     "socket.io": "^4.7.5",
     "uuid": "^10.0.0"

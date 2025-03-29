@@ -1,10 +1,10 @@
-import express, { Request, Response } from 'express';
+import { Router, Request, Response } from 'express';
 import Item from '../database/models/item';
 
-const router = express.Router();
+const router = Router();
 
 interface IError {
-    message: string
+  message: string
 }
 // GET all items
 router.get('/', async (req: Request, res: Response) => {

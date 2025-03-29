@@ -1,5 +1,7 @@
+import { Router } from 'express';
+
 const { list, find, deleteOffice, create, update} = require("../controllers/task");
-const router = require('express').Router();
+const router = Router();
 
 router.get('/', list);
 router.post('/', create);

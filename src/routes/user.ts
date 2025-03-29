@@ -1,7 +1,7 @@
-import express from 'express';
+import { Router } from 'express';
 
 const {userById, userByToken, getUsers, addUser,update} = require("../controllers/user");
-const router = express.Router();
+const router = Router();
 
 //router.get('/currentUser', userByToken);
 

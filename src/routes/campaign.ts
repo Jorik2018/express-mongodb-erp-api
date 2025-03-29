@@ -1,5 +1,7 @@
+import { Router } from 'express';
+
 const { list, find, remove, create, update} = require("../controllers/campaign");
-const router = require('express').Router();
+const router = Router();
 
 router.get('/', list);
 router.post('/', create);
