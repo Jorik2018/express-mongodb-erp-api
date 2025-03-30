@@ -76,7 +76,7 @@ name: "Erik Alarcón Pinedo"
             res.send(profile);
         }
     } catch (error: any) {
-        console.error('Error:', error.response.data.error);
+        console.error('Error-token:', error.response.data);
         //res.redirect('/login');
     }
 });
@@ -97,7 +97,7 @@ router.get('/callback', async (req, res) => {
 
         //res.redirect('/');
     } catch (error: any) {
-        console.error('Error:', error.response.data.error);
+        console.error('Error-callback:', error.response);
         //res.redirect('/login');
     }
 });
