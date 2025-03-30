@@ -66,14 +66,18 @@ name: "Erik Alarcón Pinedo"
         if (cookies) provider = cookies.provider || provider
         console.log('provider=', provider)
         if (provider == 'tiktok') {
-            const codeVerifier = cookies.verifier; // Recuperar el code_verifier desde la cookie
-            const data = await axios.post(`https://open.tiktokapis.com/v2/oauth/token/`, {
-                client_key: TIKTOK_CLIENT_KEY,
-                client_secret: TIKTOK_CLIENT_SECRET,
-                code,
-                grant_type: "authorization_code",
-                redirect_uri: TIKTOK_REDIRECT_URI,
-                code_verifier: codeVerifier,
+            const codeVerifier = cookies.verifier;
+            const params = new URLSearchParams();
+            params.append('client_key', TIKTOK_CLIENT_KEY!);
+            params.append('client_secret', TIKTOK_CLIENT_SECRET!);
+            params.append('code', code);
+            params.append('grant_type', 'authorization_code');
+            params.append('redirect_uri', TIKTOK_REDIRECT_URI!);
+            params.append('code_verifier', codeVerifier);
+            const data = await axios.post(`https://open.tiktokapis.com/v2/oauth/token/`, params, {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
             });
             console.log(data)
             res.send(data.data || data);
