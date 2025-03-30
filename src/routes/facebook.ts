@@ -56,9 +56,10 @@ name: "Erik Alarcón Pinedo"
 */
         console.log(code, provider, cookies)
         provider = cookies.provider
+        console.log('provider=', provider)
         if (provider == 'tiktok') {
             const codeVerifier = cookies.verifier; // Recuperar el code_verifier desde la cookie
-            const { data } = await axios.post(`https://open.tiktokapis.com/v2/oauth/token/`, {
+            const data = await axios.post(`https://open.tiktokapis.com/v2/oauth/token/`, {
                 client_key: TIKTOK_CLIENT_KEY,
                 client_secret: TIKTOK_CLIENT_SECRET,
                 code,
@@ -66,7 +67,8 @@ name: "Erik Alarcón Pinedo"
                 redirect_uri: TIKTOK_REDIRECT_URI,
                 code_verifier: codeVerifier,
             });
-            res.send(data);
+            console.log(data)
+            res.send(data.data||data);
         } else {
             const { data } = await axios.get(`https://graph.facebook.com/v13.0/oauth/access_token?client_id=${FACEBOOK_APP_ID}&client_secret=${FACEBOOK_APP_SECRET}&code=${code}&redirect_uri=${FACEBOOK_REDIRECT_URI}`);
             const { access_token } = data;
