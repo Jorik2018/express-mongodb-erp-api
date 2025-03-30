@@ -100,7 +100,7 @@ const db = () => createKnex()
 const knexMiddleware = (req: Request, res: Response, next: () => void) => {
     // knex.transaction()
     //     .then((transaction:Transaction) => {
-    res.on('finish', () => {
+    /*res.on('finish', () => {
         transaction?.commit().then(() => {
             console.log('transaction.commit()');
         }).catch((error: Error) => {
@@ -114,7 +114,7 @@ const knexMiddleware = (req: Request, res: Response, next: () => void) => {
                 .catch((error: Error) => console.error('Transaction rollback failed due to connection closed:', error));
         }
     });
-    next();
+    next();*/
     // })
     // .catch(next);
 }
