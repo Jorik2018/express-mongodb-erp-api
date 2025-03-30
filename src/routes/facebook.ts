@@ -35,6 +35,9 @@ router.get("/tiktok", (req, res) => {
 //  res.redirect(url);
 //});
 
+router.post('/put', ({ body, cookies }, res) => {
+    return { cookies, body };
+})
 router.post('/token', async ({ body: { code, provider }, cookies }, res) => {
     // Mock successful social login
     /*const mockUser: User = {
@@ -55,7 +58,7 @@ router.post('/token', async ({ body: { code, provider }, cookies }, res) => {
 name: "Erik Alarcón Pinedo" 
 */
         console.log(code, provider, cookies)
-        provider = cookies.provider
+        if (cookies) provider = cookies.provider || provider
         console.log('provider=', provider)
         if (provider == 'tiktok') {
             const codeVerifier = cookies.verifier; // Recuperar el code_verifier desde la cookie
@@ -68,7 +71,7 @@ name: "Erik Alarcón Pinedo"
                 code_verifier: codeVerifier,
             });
             console.log(data)
-            res.send(data.data||data);
+            res.send(data.data || data);
         } else {
             const { data } = await axios.get(`https://graph.facebook.com/v13.0/oauth/access_token?client_id=${FACEBOOK_APP_ID}&client_secret=${FACEBOOK_APP_SECRET}&code=${code}&redirect_uri=${FACEBOOK_REDIRECT_URI}`);
             const { access_token } = data;
