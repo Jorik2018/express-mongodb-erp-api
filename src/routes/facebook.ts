@@ -22,7 +22,7 @@ router.get("/tiktok", (req, res) => {
     const { codeVerifier, codeChallenge } = generatePKCE();
     res.cookie('verifier', codeVerifier, { maxAge: 60000 });
     let url = 'https://www.tiktok.com/v2/auth/authorize';
-    url += `? client_key = ${TIKTOK_CLIENT_KEY}`;
+    url += `?client_key=${TIKTOK_CLIENT_KEY}`;
     url += '&scope=user.info.basic,video.list';
     url += '&response_type=code';
     url += `& redirect_uri=${TIKTOK_REDIRECT_URI}`;
