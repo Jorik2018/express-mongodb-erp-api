@@ -25,9 +25,9 @@ router.get("/tiktok", (req, res) => {
     url += `?client_key=${TIKTOK_CLIENT_KEY}`;
     url += '&scope=user.info.basic,video.list';
     url += '&response_type=code';
-    url += `& redirect_uri=${TIKTOK_REDIRECT_URI}`;
+    url += `&redirect_uri=${TIKTOK_REDIRECT_URI}`;
     url += `&state=${csrfState}`;
-    url += `& code_challenge=${codeChallenge}& code_challenge_method=S256`;
+    url += `&code_challenge=${codeChallenge}&code_challenge_method=S256`;
     res.redirect(url);
 });
 //router.get('/tiktok', (req, res) => {
