@@ -62,9 +62,9 @@ router.post('/token', async ({ body: { code, provider }, cookies }, res) => {
          * id: "1650937281635586"
 name: "Erik Alarcón Pinedo" 
 */
-        console.log(code, provider, cookies)
+       
         if (cookies) provider = cookies.provider || provider
-        console.log('provider=', provider)
+        console.log(code, 'provider=',provider,cookies)
         if (provider == 'tiktok') {
             const codeVerifier = cookies.verifier;
             const params = new URLSearchParams();
