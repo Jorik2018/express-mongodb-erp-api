@@ -45,7 +45,7 @@ const fileFilter = (req: Request, file: { mimetype: string }, cb: Function) => {
   }
 };
 
-app.use(knexMiddleware);
+//app.use(knexMiddleware);
 
 app.use(
   multer({ storage: fileStorage, fileFilter }).single('image')
