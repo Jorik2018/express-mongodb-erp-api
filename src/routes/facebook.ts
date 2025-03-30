@@ -34,9 +34,14 @@ router.get("/tiktok", (req, res) => {
 //  const url = `https://www.facebook.com/v13.0/dialog/oauth?client_id=${TIKTOK_APP_ID}&redirect_uri=${TIKTOK_REDIRECT_URI}&scope=email`;
 //  res.redirect(url);
 //});
-
-router.post('/put', ({ body, cookies }, res) => {
-    return { cookies, body };
+router.post('/put', (req, res) => {
+    res.cookie('value', req.body.name, { maxAge: 60000, httpOnly: true });
+    res.send({ ok: true })
+})
+router.post('/get', (req, res) => {
+    const { body } = req;
+    console.log(req.cookies);
+    res.send({ ok: true })
 })
 router.post('/token', async ({ body: { code, provider }, cookies }, res) => {
     // Mock successful social login

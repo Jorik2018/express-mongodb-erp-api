@@ -51,7 +51,7 @@ app.use(
   multer({ storage: fileStorage, fileFilter }).single('image')
 );
 
-
+app.use(cookieParser());
 app.use(require("cors")());
 /*app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -90,7 +90,7 @@ app.use((err: any, _req: Request, res: Response, _next: ()=>void) => {
 
 
 
-app.use(cookieParser());
+
 
 app.use(require('morgan')('dev'));
 
