@@ -73,13 +73,14 @@ name: "Erik Alarcón Pinedo"
             params.append('code', code);
             params.append('grant_type', 'authorization_code');
             params.append('redirect_uri', TIKTOK_REDIRECT_URI!);
-            params.append('code_verifier', codeVerifier);
+            //params.append('code_verifier', codeVerifier);
+            console.log(Object.fromEntries(params))
             const data = await axios.post(`https://open.tiktokapis.com/v2/oauth/token/`, params, {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
             });
-            console.log(data)
+            
             res.send(data.data || data);
         } else {
             const { data } = await axios.get(`https://graph.facebook.com/v13.0/oauth/access_token?client_id=${FACEBOOK_APP_ID}&client_secret=${FACEBOOK_APP_SECRET}&code=${code}&redirect_uri=${FACEBOOK_REDIRECT_URI}`);
