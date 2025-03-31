@@ -69,7 +69,16 @@ name: "Erik Alarcón Pinedo"
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
             });
-            res.send(data);
+            console.log(data);
+            const { data: userData } = await axios.get('https://open.tiktokapis.com/v2/user/info/', {
+                headers: {
+                    Authorization: `Bearer ${data.access_token}`,
+                },
+                params: {
+                    fields: 'open_id,union_id,display_name,avatar_url',
+                },
+            });
+            res.send(userData);
         } else {
             const { data } = await axios.get(`https://graph.facebook.com/v13.0/oauth/access_token?client_id=${FACEBOOK_APP_ID}&client_secret=${FACEBOOK_APP_SECRET}&code=${code}&redirect_uri=${FACEBOOK_REDIRECT_URI}`);
             const { access_token } = data;
