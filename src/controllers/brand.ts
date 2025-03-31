@@ -20,10 +20,8 @@ const find = (req: Request, res: Response) => {
     .catch((error: Error) => console.log(error));
 };
 
-const create = (req: Request|any, res: Response) => {
-  console.log('req.userId=',req.userId);
-  req.body.user=req.userId;
-  new Brand(req.body)
+const create = ({ body, userId: user }: Request | any, res: Response) => {
+  new Brand({ ...body, user })
     .save()
     .then((brand: IBrand) => res.send(brand))
     .catch((err: Error) => {
