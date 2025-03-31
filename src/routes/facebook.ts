@@ -4,7 +4,7 @@ import generatePKCE from '../utils/pkce'
 const router = Router();
 
 const {
-    FACEBOOK_APP_ID, FACEBOOK_APP_SECRET, 
+    FACEBOOK_APP_ID, FACEBOOK_APP_SECRET,
     FACEBOOK_REDIRECT_URI,
     TIKTOK_CLIENT_KEY, TIKTOK_CLIENT_SECRET, TIKTOK_REDIRECT_URI
 } = process.env;
@@ -31,19 +31,7 @@ router.get("/tiktok", (req, res) => {
     url += `&code_challenge=${codeChallenge}&code_challenge_method=S256`;
     res.redirect(url);
 });
-//router.get('/tiktok', (req, res) => {
-//  const url = `https://www.facebook.com/v13.0/dialog/oauth?client_id=${TIKTOK_APP_ID}&redirect_uri=${TIKTOK_REDIRECT_URI}&scope=email`;
-//  res.redirect(url);
-//});
-router.post('/put', (req, res) => {
-    res.cookie('value', req.body.name, { maxAge: 60000, httpOnly: true });
-    res.send({ ok: true })
-})
-router.post('/get', (req, res) => {
-    const { body } = req;
-    console.log(req.cookies);
-    res.send({ ok: true })
-})
+
 router.post('/token', async ({ body: { code, provider }, cookies }, res) => {
     // Mock successful social login
     /*const mockUser: User = {
@@ -63,9 +51,9 @@ router.post('/token', async ({ body: { code, provider }, cookies }, res) => {
          * id: "1650937281635586"
 name: "Erik Alarcón Pinedo" 
 */
-       
+
         if (cookies) provider = cookies.provider || provider
-        console.log(code, 'provider=',provider,cookies)
+        console.log(code, 'provider=', provider, cookies)
         if (provider == 'tiktok') {
             const codeVerifier = cookies.verifier;
             const params = new URLSearchParams();
@@ -76,13 +64,12 @@ name: "Erik Alarcón Pinedo"
             params.append('redirect_uri', TIKTOK_REDIRECT_URI!);
             params.append('code_verifier', codeVerifier);
             console.log(Object.fromEntries(params))
-            const data = await axios.post(`https://open.tiktokapis.com/v2/oauth/token/`, params, {
+            const { data } = await axios.post(`https://open.tiktokapis.com/v2/oauth/token/`, params, {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
             });
-            
-            res.send(data.data || data);
+            res.send(data);
         } else {
             const { data } = await axios.get(`https://graph.facebook.com/v13.0/oauth/access_token?client_id=${FACEBOOK_APP_ID}&client_secret=${FACEBOOK_APP_SECRET}&code=${code}&redirect_uri=${FACEBOOK_REDIRECT_URI}`);
             const { access_token } = data;
