@@ -22,7 +22,7 @@ const find = (req: Request, res: Response) => {
 
 const create = (req: Request|any, res: Response) => {
   console.log('req.userId=',req.userId);
-  req.body.userId=req.userId;
+  req.body.user=req.userId;
   new Brand(req.body)
     .save()
     .then((brand: IBrand) => res.send(brand))

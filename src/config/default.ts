@@ -1,1 +1,0 @@
-module.exports = 'we love js';

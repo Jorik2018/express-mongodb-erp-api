@@ -59,11 +59,11 @@ app.use(require("cors")());
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
 });*/
-const api=process.env.API ||'/api';
+const api = process.env.API || '/api';
 app.use(api, authRoute);
-const usersRoute = require('./routes/user');
+const isAuth = require('./auth/is-auth');
 const employeeRoute = require('./routes/employee');
-app.use(`${api}/users`, usersRoute.default)
+app.use(`${api}/users`, require('./routes/user').default)
 app.use(`${api}/campaigns`, require('./routes/campaign').default);
 app.use(`${api}/oauth`, require('./routes/facebook').default);
 app.use(`${api}/contacts`, require('./routes/contact').default);
@@ -71,7 +71,7 @@ app.use(`${api}/items`, itemRoutes);
 app.use(`${api}/employees`, employeeRoute.default);
 app.use(`${api}/offices`, require('./routes/office').default);
 app.use(`${api}/tasks`, require('./routes/task').default);
-app.use(`${api}/brands`, require('./routes/brand').default);
+app.use(`${api}/brands`, isAuth, require('./routes/brand').default);
 app.use(`${api}/persons`, require('./routes/person').default);
 app.use(`${api}/posts`, posts);
 /*
@@ -80,7 +80,7 @@ readdirSync('./routes').map((route) => {
   //app.use('/api', require(`./routes/${route}`));
 });
 */
-app.use((err: any, _req: Request, res: Response, _next: ()=>void) => {
+app.use((err: any, _req: Request, res: Response, _next: () => void) => {
   const status = err.statusCode || 500;
   const message = err.message;
   const data = err.data || null;
@@ -97,7 +97,7 @@ app.use(require('morgan')('dev'));
 
 //app.use(csrf({ cookie: true }));
 
-app.get('/api/csrf-token', (req:any, res:any) => {
+app.get('/api/csrf-token', (req: any, res: any) => {
   res.json({ csrfToken: req.csrfToken() });
 });
 
