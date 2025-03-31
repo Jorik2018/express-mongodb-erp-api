@@ -71,6 +71,7 @@ app.use(`${api}/items`, itemRoutes);
 app.use(`${api}/employees`, employeeRoute.default);
 app.use(`${api}/offices`, require('./routes/office').default);
 app.use(`${api}/tasks`, require('./routes/task').default);
+app.use(`${api}/brands`, require('./routes/brand').default);
 app.use(`${api}/persons`, require('./routes/person').default);
 app.use(`${api}/posts`, posts);
 /*
