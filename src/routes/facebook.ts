@@ -4,7 +4,8 @@ import generatePKCE from '../utils/pkce'
 const router = Router();
 
 const {
-    FACEBOOK_APP_ID, FACEBOOK_APP_SECRET, FACEBOOK_REDIRECT_URI,
+    FACEBOOK_APP_ID, FACEBOOK_APP_SECRET, 
+    FACEBOOK_REDIRECT_URI,
     TIKTOK_CLIENT_KEY, TIKTOK_CLIENT_SECRET, TIKTOK_REDIRECT_URI
 } = process.env;
 
