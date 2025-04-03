@@ -1,15 +1,15 @@
-import { Request, Response} from 'express';
+import { Request, Response } from 'express';
 import Campaign, { ICampaign } from '../database/models/campaign';
 
 const list = async (req: Request, res: Response) => {
   try {
-    const campaign = (await Campaign.find({}).populate('sponsor')).map(({_doc:doc}:any) => ({
+    const campaign = (await Campaign.find({}).populate('sponsor')).map(({ _doc: doc }: any) => ({
       ...doc,
       id: doc._id,
       _id: undefined, // Optionally remove _id
     }));
-    res.send({data:campaign})
-  } catch (err:any) {
+    res.send({ data: campaign })
+  } catch (err: any) {
     res.send({
       err,
     })
@@ -20,7 +20,11 @@ const find = (req: Request, res: Response) => {
   Campaign.findOne({
     _id: req.params.id
   }).populate('sponsor')
-    .then(({_doc:{_id,...campaign}}: any) => res.send({id:_id,...campaign}))
+    .then(({ _doc: { _id, categories, category, gallery, image, ...campaign } }: any) => res.send({
+      id: _id,
+      categories: categories && categories.length ? categories : [category],
+      gallery: gallery && gallery.length ? gallery : [image, image, image, image], ...campaign
+    }))
     .catch((error: Error) => console.log(error));
 };
 

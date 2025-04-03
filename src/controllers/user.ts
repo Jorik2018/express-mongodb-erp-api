@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken'
 
 
 const userByToken = (req: Request, res: Response) => {
-  const decoded:any = jwt.verify(
+  const decoded: any = jwt.verify(
     req.headers["authorization"]!,
     process.env.SECRET_KEY!
   );
@@ -55,20 +55,17 @@ const update = ({ body: { id, ...body } }: Request, res: Response) => {
   User.findOne({
     _id: id
   }).then((data: any) => {
-    const{ _doc: { _id, ...others } }=data;
+    const { _doc: { _id, ...others } } = data;
     const updatedValue = { ...others, ...body };
     return User.findOneAndUpdate({ _id }, updatedValue, { new: true });
-  }).then(({ _doc:{ _id, ...data  }}:any) => {
-    
-    console.log('data=', data);
-    res.send({id:_id,...data});
-  })
-    .catch((err: Error) => {
-      console.error(err)
-      res.send({
-        err
-      });
+  }).then(({ _doc: { _id, ...data } }: any) => {
+    res.send({ id: _id, ...data });
+  }).catch((err: Error) => {
+    console.error(err)
+    res.send({
+      err
     });
+  });
 };
 
 module.exports = {

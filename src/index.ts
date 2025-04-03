@@ -63,7 +63,8 @@ const api = process.env.API || '/api';
 app.use(api, authRoute);
 const isAuth = require('./auth/is-auth');
 const employeeRoute = require('./routes/employee');
-app.use(`${api}/users`, require('./routes/user').default)
+app.use(`${api}/users`, require('./routes/user').default);
+app.use(`${api}/applications`, isAuth, require('./routes/application').default);
 app.use(`${api}/campaigns`, require('./routes/campaign').default);
 app.use(`${api}/oauth`, require('./routes/facebook').default);
 app.use(`${api}/contacts`, require('./routes/contact').default);

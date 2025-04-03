@@ -1,33 +1,29 @@
-import { model, Schema } from 'mongoose';
+import { Model, model, Schema } from 'mongoose';
 
 const contactSchema = new Schema({
     name: {
         type: String,
         required: true
     },
-    photoUrl: { type: String, required: true },
-    rating: { type: Number, required: true },
+    photoUrl: { type: String },
+    rating: { type: Number },
     categories: { type: [String], required: true },
-    videosCount: { type: Number, required: true },
-    followersCount: { type: Number, required: true },
-    bio: { type: String, required: true },
+    videosCount: { type: Number },
+    followersCount: { type: Number },
+    bio: { type: String },
     email: {
-        type: String,
-        required: true
+        type: String
     },
     phone: {
         type: String,
-        required: true,
         minlength: 8,
         maxlength: 12
     },
     imageURL: {
-        type: String,
-        required: true
+        type: String
     },
     location: {
-        type: String,
-        required: true
+        type: String
     },
     website: {
         type: String
@@ -49,11 +45,13 @@ const contactSchema = new Schema({
             type: String
         }
     },
-    users: [{
+    user: {
         type: Schema.Types.ObjectId,
         ref: 'User'
-    }]
+    }
 
 });
 
-export default model('influencers', contactSchema);
+const Contact = model('Contact', contactSchema);
+
+export default Contact;

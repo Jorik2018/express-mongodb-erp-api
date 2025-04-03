@@ -1,10 +1,21 @@
 import { Request, Response } from 'express';
+import { Types } from 'mongoose';
 import Brand, { IBrand } from '../database/models/brand';
 
-const list = async (req: Request, res: Response) => {
+const list = async ({ userId: user, from = 0, to = 10, query }: Request | any, res: Response) => {
   try {
-    const tasks = await Brand.find({})
-    res.send({ data: tasks })
+    const filter = { user };
+    console.log('query=', query)
+    const brands = await Brand.find(filter)
+    const transformedBrands = brands.map((brand) => {
+      const { _id, ...data } = brand.toObject();
+      return ({
+        ...data,
+        id: _id
+      })
+    });
+    const total = await Brand.countDocuments(filter);
+    res.send({ data: transformedBrands, total })
   } catch (err: any) {
     res.send({
       err,
@@ -20,10 +31,17 @@ const find = (req: Request, res: Response) => {
     .catch((error: Error) => console.log(error));
 };
 
-const create = ({ body, userId: user }: Request | any, res: Response) => {
+const create = ({ body, userId }: Request | any, res: Response) => {
+  const user = Types.ObjectId.createFromHexString(userId);
   new Brand({ ...body, user })
     .save()
-    .then((brand: IBrand) => res.send(brand))
+    .then((brand: IBrand) => {
+      const { _id, ...data } = brand.toObject();
+      res.send({
+        ...data,
+        id: _id
+      });
+    })
     .catch((err: Error) => {
       res.send({
         err,
@@ -31,23 +49,28 @@ const create = ({ body, userId: user }: Request | any, res: Response) => {
     });
 };
 
-const update = (req: Request, res: Response) => {
+const update = ({ body: { id, ...body } }: Request, res: Response) => {
   Brand.findOneAndUpdate(
-    {
-      _id: req.params.id
-    },
-    { $set: req.body }
-  )
-    .then((Brand: any) => res.send(Brand))
-    .catch((error: Error) => console.log(error));
+    { _id: id },
+    { $set: body },
+    { new: true }
+  ).then(({ _doc: { _id, ...data } }: any) => {
+    res.send({
+      ...data,
+      id: _id
+    });
+  }).catch((error: Error) => console.log(error));
 };
 
-const deleteOffice = (req: Request, res: Response) => {
+const destroy = (req: Request, res: Response) => {
   Brand.findOneAndDelete({
     _id: req.params.id
-  })
-    .then((Brand: any) => res.send(Brand))
-    .catch((error: Error) => console.log(error));
+  }).then(({ _doc: { _id, ...data } }: any) => {
+    res.send({
+      ...data,
+      id: _id
+    });
+  }).catch((error: Error) => console.log(error));
 };
 
 module.exports = {
@@ -55,5 +78,5 @@ module.exports = {
   find,
   update,
   create,
-  deleteOffice
+  destroy
 }

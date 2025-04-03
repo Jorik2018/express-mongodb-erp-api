@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, Model } from 'mongoose';
+import { Schema, Document, Model, model } from 'mongoose';
 
 export interface ICompany extends Document {
   description: string;
@@ -12,7 +12,7 @@ const CompanySchema: Schema = new Schema({
   industry: { type: String, required: true },
 });
 
-const Campaign: Model<ICompany> = mongoose.model<ICompany>('Company', CompanySchema);
+const Campaign: Model<ICompany> = model<ICompany>('Company', CompanySchema);
 
 export default Campaign;
 

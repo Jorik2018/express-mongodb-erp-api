@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, Model } from 'mongoose';
+import { Schema, Document, model, Model } from 'mongoose';
 
 export interface IBrand extends Document {
   name: string;
@@ -10,15 +10,23 @@ export interface IBrand extends Document {
 
 const BrandSchema: Schema = new Schema({
   name: { type: String, required: true },
-  description: { type: String, required: true },
   slogan: { type: String },
+  description: { type: String },
   imageUrl: { type: String },
-  user: { type: String },
-  categories: { type: [String]},
-  canceled: { type: Boolean}
+  company: {
+    type: Schema.Types.ObjectId,
+    ref: 'Company'
+  },
+  user: {
+    required: true,
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  categories: { type: [String] },
+  canceled: { type: Boolean }
 });
 
-const Brand: Model<IBrand> = mongoose.model<IBrand>('Brand', BrandSchema);
+const Brand: Model<IBrand> = model<IBrand>('Brand', BrandSchema);
 
 export default Brand;
 

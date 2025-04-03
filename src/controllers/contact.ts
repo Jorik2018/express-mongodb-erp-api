@@ -5,7 +5,7 @@ const find = (req: Request, res: Response) => {
     Contact.findOne({
       _id: req.params.id
     })
-      .then((task: any) => res.send(task))
+      .then(({_doc:contact}: any) => res.send({rating:0,followersCount:0,...contact}))
       .catch((error: Error) => console.log(error));
   };
 

@@ -1,7 +1,7 @@
-import mongoose from 'mongoose';
+import { Schema, Document } from 'mongoose';
 import bcrypt from 'bcrypt';
 
-export interface IUser extends mongoose.Document {
+export interface IUser extends Document {
     password: string;
     date: Date;
     loggedOn: boolean;
@@ -9,7 +9,7 @@ export interface IUser extends mongoose.Document {
 }
 
 
-const UserSchema = new mongoose.Schema({
+const UserSchema = new Schema({
     password: {
         type: String,
         required: true,

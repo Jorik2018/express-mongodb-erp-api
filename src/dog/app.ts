@@ -1,24 +1,23 @@
-// Module dependencies.
-var express = require('express');
-var routes = require('./routes');
-var path = require('path');
+import express, { Application, Request, Response } from 'express';
+let routes = require('./routes');
+let path = require('path');
 
-var app = express();
+let app = express();
 
-var logger = require('morgan');
-var methodOverride = require('method-override');
-var session = require('express-session');
-var bodyParser = require('body-parser');
-var multer = require('multer');
-var errorHandler = require('errorhandler');
+let logger = require('morgan');
+let methodOverride = require('method-override');
+let session = require('express-session');
+let bodyParser = require('body-parser');
+let multer = require('multer');
+let errorHandler = require('errorhandler');
 
 // MongoClient
-var MongoClient = require('mongodb').MongoClient;
+let MongoClient = require('mongodb').MongoClient;
 // Database
-var db;
+let db;
 
 // setup mongo connection
-MongoClient.connect('mongodb://127.0.0.1:27017/myMongoDB', function(err, database) {
+MongoClient.connect('mongodb://127.0.0.1:27017/myMongoDB', (err, database) => {
 	if (err:any) {
 		throw err;
 	}
@@ -29,15 +28,13 @@ MongoClient.connect('mongodb://127.0.0.1:27017/myMongoDB', function(err, databas
 });
 
 // make our db accessible to our router
-app.use(function(req, res, next) {
+app.use((req:any, _res, next) => {
 	req.db = db;
 	next();
 });
 
 // all environments
 app.set('port', process.env.PORT || 3000);
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
 app.use(logger('dev'));
 app.use(methodOverride());
 app.use(session({

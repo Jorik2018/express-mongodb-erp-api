@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
+import { Schema, model } from 'mongoose';
 
-const EmployeeSchema = new mongoose.Schema({
+const EmployeeSchema = new Schema({
   firstName: {
     type: String,
     required: true,
@@ -10,7 +10,7 @@ const EmployeeSchema = new mongoose.Schema({
     required: true
   },
   office: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'Office'
   },
   phoneNumber: {
@@ -24,9 +24,9 @@ const EmployeeSchema = new mongoose.Schema({
   tags: [String]
 });
 
-EmployeeSchema.methods.saveAndPopulate = function(cb: any) {
+EmployeeSchema.methods.saveAndPopulate = function (cb: any) {
   return this.save().then((doc: any) => doc.populate('office').execPopulate())
 }
 
-const EmployeeModel = mongoose.model('Employee', EmployeeSchema);
+const EmployeeModel = model('Employee', EmployeeSchema);
 module.exports = EmployeeModel;

@@ -14,11 +14,6 @@ var inventoryDB = new Datastore( {
     autoload: true
 } );
 
-// GET inventory
-app.get( "/", function ( req, res ) {
-    res.send( "Inventory API" );
-} );
-
 // GET a product from inventory by _id
 app.get( "/product/:productId", function ( req, res ) {
     if ( !req.params.productId ) {

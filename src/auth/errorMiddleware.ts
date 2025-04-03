@@ -1,8 +1,7 @@
-const errorMiddleware = (err, req, res, next) => {
+const errorMiddleware = (err: any, _req: any, res: any, _next: any) => {
   const { statusCode, message } = err;
   console.log("Error status: ", statusCode);
   console.log("Message: ", message);
-
   res.status(statusCode || 500);
   res.json({
     statusCode,
@@ -10,6 +9,4 @@ const errorMiddleware = (err, req, res, next) => {
   });
 };
 
-module.exports = {
-  errorMiddleware,
-};
+export default errorMiddleware;
