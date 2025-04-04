@@ -5,15 +5,6 @@ import AWS from 'aws-sdk';
 import { SendEmailRequest, SendEmailResponse } from 'aws-sdk/clients/ses';
 import { Request, Response, NextFunction } from 'express';
 
-const awsConfig = {
-	accessKeyId: process.env.AWS_ACCESS_KEY,
-	secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-	region: process.env.AWS_REGION,
-	apiVersion: process.env.AWS_API_VERSION,
-};
-
-const SES = new AWS.SES(awsConfig);
-
 export const register = async (req: Request, res: Response) => {
 	// res.json('REGISTER USER RESPONSE FROM CONTROLLER');
 	try {
@@ -101,7 +92,7 @@ export const register = async (req: Request, res: Response) => {
 			const { profileImage, followers, name } = user;
 			return res.status(200).json({ profileImage, followers, name, token });
 		});
-	} catch (err:any) {
+	} catch (err: any) {
 		console.log(err);
 		return res.status(400).send(`ERROR: ${err}`);
 	}
@@ -235,18 +226,37 @@ export const sendTestEmail = async (req: Request, res: Response) => {
 	});
 };
 
+const awsConfig = {
+	accessKeyId: process.env.AWS_ACCESS_KEY,
+	secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+	region: process.env.AWS_REGION,
+	apiVersion: process.env.AWS_API_VERSION,
+};
+
+const SES = new AWS.SES(awsConfig);
+
 export const forgotPassword = async (req: Request, res: Response) => {
 	try {
 		const { email } = req.body;
 		// console.log(email);
-		const { nanoid } = await import('nanoid');
-		const shortCode = nanoid(6).toUpperCase();
+		//const { nanoid } = require('nanoid');
+		const crypto = require('crypto');
+		const nodemailer = require('nodemailer');
+		//const { nanoid } = await import('nanoid');
+		//const resetToken = nanoid(6).toUpperCase();
+		//PREPARAMOS PARA EL EMAIL
+
+
+		// Generate a unique reset token
+		const resetToken = crypto.randomBytes(32).toString('hex');
+		const tokenExpiration = Date.now() + 3600000; // Token valid for 1 hour
 		const user = await User.findOneAndUpdate(
 			{ email },
-			{ passwordResetCode: shortCode }
+			{ resetToken, tokenExpiration }
 		);
-		if (!user) return res.status(400).send(`USER NOT FOUND`);
-		//PREPARAMOS PARA EL EMAIL
+		if (!user) return res.status(404).send(`USER NOT FOUND`);
+		// Update user record with reset token and expiration
+		//usersDb[email] = { ...user, resetToken, tokenExpiration };
 		const params = {
 			Source: process.env.EMAIL_FROM,
 			Destination: {
@@ -261,7 +271,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
 							<html>
 								<h1>Reset password link</h1>
 								<p>Por favor, usa este codigo para resetear tu contraseña</p>
-								<h2>${shortCode}</h2>
+								<h2>${resetToken}</h2>
 							</html>`,
 					},
 				},
@@ -271,6 +281,33 @@ export const forgotPassword = async (req: Request, res: Response) => {
 				},
 			},
 		};
+		// Setup nodemailer transporter for sending emails
+		const transporter = nodemailer.createTransport({
+			service: 'Gmail', // Use a real service provider in production
+			auth: {
+				user: 'your-email@gmail.com',
+				pass: 'your-email-password',
+			},
+		});
+
+		// Email content
+		const mailOptions = {
+			from: 'your-email@gmail.com',
+			to: email,
+			subject: 'Password Reset Request',
+			text: `To reset your password, please click the link below:\n\nhttp://localhost:3000/reset-password/${resetToken}`,
+		};
+
+		try {
+			// Send the email
+			await transporter.sendMail(mailOptions);
+			res.status(200).json({ message: 'Password reset email sent' });
+		} catch (error) {
+			// Handle email sending errors
+			res.status(500).json({ message: 'Error sending email', error });
+		}
+
+		/*
 		SES.sendEmail(params as SendEmailRequest, (err, data) => {
 			if (err) {
 				console.log(err);
@@ -279,10 +316,10 @@ export const forgotPassword = async (req: Request, res: Response) => {
 				console.log(data);
 				return res.json({ ok: true });
 			}
-		});
+		});*/
 	} catch (error) {
-		res.send(`AN ERROR OCURRED`);
 		console.log(error);
+		res.status(500).send({ error });
 	}
 };
 

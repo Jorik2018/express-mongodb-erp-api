@@ -10,17 +10,24 @@ const CampaignSchema: Schema = new Schema({
   description: { type: String, required: true },
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
-  image: { type: String, required: true },
+  coverImage: { type: String, required: true },
   gallery: [{ type: String, required: true }],
-  brand: { type: mongoose.Schema.Types.ObjectId, ref: 'Brand' },
+  brand: {
+    required: true,
+    type: mongoose.Schema.Types.ObjectId, ref: 'Brand'
+  },
+  user: {
+    required: true,
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+  },
   sponsor: { type: mongoose.Schema.Types.ObjectId, ref: 'Company' }, // Assuming sponsor is a string; adjust if it's a reference
-  category: { type: String, required: true },
-
   categories: [{ type: String, required: true }],
-  requirements: [{ type: String, required: true }],
-  compensation: { type: String, required: true },
+  requirements: [{ type: String }],
+  deliverables: [{ type: String }],
+  budget: { type: String },
   applicants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], // Reference to User collection
-  status: { type: String, required: true, enum: ['active', 'upcoming', 'completed'] },
+  status: { type: String, required: true, enum: ['active', 'upcoming', 'completed', 'draft'] },
 });
 
 const Campaign: Model<ICampaign> = mongoose.model<ICampaign>('Campaign', CampaignSchema);

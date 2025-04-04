@@ -1,5 +1,9 @@
 import { Request, Response } from 'express';
 import Campaign, { ICampaign } from '../database/models/campaign';
+import { Types } from 'mongoose';
+interface RequestWithUserId extends Request {
+  userId: string;
+}
 
 const list = async (req: Request, res: Response) => {
   try {
@@ -28,10 +32,13 @@ const find = (req: Request, res: Response) => {
     .catch((error: Error) => console.log(error));
 };
 
-const create = (req: Request, res: Response) => {
-  new Campaign(req.body)
+//Property 'userId' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.ts(2339)
+const create = ({ body: { brandId, ...body }, userId }: RequestWithUserId, res: Response) => {
+  const user = Types.ObjectId.createFromHexString(userId);
+  const brand = Types.ObjectId.createFromHexString(brandId);
+  new Campaign({ ...body, user, brand })
     .save()
-    .then((campaign: ICampaign) => res.send(campaign))
+    .then(({ _doc: { _id, ...campaign } }: any) => res.send({ id: _id, ...campaign }))
     .catch((err: Error) => {
       res.send({
         err,

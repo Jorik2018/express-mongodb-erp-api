@@ -61,18 +61,20 @@ app.use(require("cors")());
 });*/
 const api = process.env.API || '/api';
 app.use(api, authRoute);
+app.use(`${api}/oauth`, require('./routes/facebook').default);
 const isAuth = require('./auth/is-auth');
 const employeeRoute = require('./routes/employee');
+
+app.use(isAuth);
 app.use(`${api}/users`, require('./routes/user').default);
-app.use(`${api}/applications`, isAuth, require('./routes/application').default);
+app.use(`${api}/applications`, require('./routes/application').default);
 app.use(`${api}/campaigns`, require('./routes/campaign').default);
-app.use(`${api}/oauth`, require('./routes/facebook').default);
 app.use(`${api}/contacts`, require('./routes/contact').default);
 app.use(`${api}/items`, itemRoutes);
 app.use(`${api}/employees`, employeeRoute.default);
 app.use(`${api}/offices`, require('./routes/office').default);
 app.use(`${api}/tasks`, require('./routes/task').default);
-app.use(`${api}/brands`, isAuth, require('./routes/brand').default);
+app.use(`${api}/brands`, require('./routes/brand').default);
 app.use(`${api}/persons`, require('./routes/person').default);
 app.use(`${api}/posts`, posts);
 /*
