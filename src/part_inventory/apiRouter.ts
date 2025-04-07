@@ -1,9 +1,9 @@
 import 'dotenv-flow/config';
-import { Router } from 'express';
+import { Router, Response } from 'express';
 import Gitrows from 'gitrows';
-import request from 'request';
 import cuid from 'cuid';
 import date from 'date-and-time';
+import axios from 'axios';
 
 const apiRouter = Router();
 
@@ -22,10 +22,6 @@ const gitrows = new Gitrows({
 
 
 const defaultRoute = (req, res, next) => {
-    console.log('SESSION: ', req.session);
-    console.log('TOKEN:', req.session.token);
-    console.log('AUTH:', req.isAuthenticated());
-    console.log('----');
     if (!req.session.token || req.session.token === '') {
         res.status(401).send({
             'status': 'unauthorized',
@@ -38,7 +34,7 @@ const defaultRoute = (req, res, next) => {
 
 apiRouter.get("/*", defaultRoute);
 
-apiRouter.get('/success', (req:any, res:any) => {
+apiRouter.get('/success', (req: any, res: any) => {
     res.status(200).send({
         'status': 'authorized',
         'message': 'user is authenticated',
@@ -47,75 +43,89 @@ apiRouter.get('/success', (req:any, res:any) => {
     });
 });
 
-apiRouter.get('/getuser', (req:any, res:any) => {
-    request({
-        method: 'get',
-        uri: `https://api.github.com/user`,
+const pipe = (res: any) => (response: any) => {
+    res.status(response.status);
+    response.data.pipe(res);
+};
+
+apiRouter.get('/getuser', (req: any, res: any) => {
+    axios.get('https://api.github.com/user', {
         headers: {
             Authorization: 'token ' + req.session.token,
             'User-Agent': req.headers['user-agent'],
-        }
-    }).pipe(res);
+        },
+        responseType: 'stream',
+    }).then(pipe(res)).catch((err) => {
+        console.error(err);
+        res.status(err.response?.status || 500).json({ error: 'Error fetching user' });
+    });
 });
 
-apiRouter.get('/oemsecret/:query?', (req:any, res:any) => {
-    request({
-        uri: 'https://beta.api.oemsecrets.com/partsearch',
-        qs: {
-            apiKey: process.env.OEMSECRET_API_KEY,
-            // currency: 'EUR',
-            // countryCode: 'DE',
-            // groupBy: 'distributor_name',
-            searchTerm: req.params.query
-        }
-    }).pipe(res);
+apiRouter.get('/oemsecret/:query?', (req: any, res: any) => {
+    axios.get('https://beta.api.oemsecrets.com/partsearch', {
+        params: {
+            qs: {
+                apiKey: process.env.OEMSECRET_API_KEY,
+                // currency: 'EUR',
+                // countryCode: 'DE',
+                // groupBy: 'distributor_name',
+                searchTerm: req.params.query
+            }
+        },
+        headers: {
+            'User-Agent': req.headers['user-agent'],
+        },
+        responseType: 'stream',
+    }).then(pipe(res)).catch((err) => {
+        console.error(err);
+        res.status(err.response?.status || 500).json({ error: 'Error fetching user' });
+    });
 });
 
-apiRouter.get('/mouser/:query?', (req:any, res:any) => {
-    request({
-        uri: 'https://api.mouser.com/api/v1.0/search/keyword',
-        method: 'post',
+apiRouter.get('/mouser/:query?', (req: any, res: any) => {
+
+    axios.post('https://api.mouser.com/api/v1.0/search/keyword?apikey=' + process.env.MOUSER_API_KEY, {
+        "SearchByKeywordRequest": {
+            "keyword": req.params.query,
+            "records": 0,
+            "startingRecord": 0,
+            // "searchOptions": "string",
+            // "searchWithYourSignUpLanguage": "string"
+        }
+    }, {
         headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         },
-        body: JSON.stringify({
-            "SearchByKeywordRequest": {
-                "keyword": req.params.query,
-                "records": 0,
-                "startingRecord": 0,
-                // "searchOptions": "string",
-                // "searchWithYourSignUpLanguage": "string"
-            }
-        }),
-        qs: {
-            apikey: process.env.MOUSER_API_KEY
-        }
-    }).pipe(res);
+        responseType: 'stream',
+    }).then(pipe(res)).catch((err) => {
+        console.error(err);
+        res.status(err.response?.status || 500).json({ error: 'Error fetching user' });
+    });
 });
 
-apiRouter.get('/parts', (req:any, res:any) => {
+apiRouter.get('/parts', (req: any, res: any) => {
     gitrows.get(userParts(req.userID))
         .then((data) => {
             res.status(200).send(data && data.reverse());
         });
 });
 
-apiRouter.get('/partcolumns', (req:any, res:any) => {
+apiRouter.get('/partcolumns', (req: any, res: any) => {
     gitrows.get(process.env.DB_PATH + 'structure.json')
         .then((data) => {
             res.status(200).send(data);
         });
 });
 
-apiRouter.post('/delete', (req:any, res:any) => {
-    gitrows.delete(userParts(req.userID), req.body,  { id: req.body.id })
+apiRouter.post('/delete', (req: any, res: any) => {
+    gitrows.delete(userParts(req.userID), req.body, { id: req.body.id })
         .then((response) => {
-            res.status(200).send({ ...response, ...{ id: req.body.id }});
+            res.status(200).send({ ...response, ...{ id: req.body.id } });
         });
 });
 
-apiRouter.post('/part', (req:any, res:any) => {
+apiRouter.post('/part', (req: any, res: any) => {
 
     const now = date.format(new Date(), 'YYYY-MM-DD HH:mm:ss');
 
@@ -132,14 +142,14 @@ apiRouter.post('/part', (req:any, res:any) => {
         });
 });
 
-apiRouter.get('/parts/:id?', (req:any, res:any) => {
+apiRouter.get('/parts/:id?', (req: any, res: any) => {
     gitrows.get(userParts(req.userID), { id: req.params.id })
         .then((data) => {
             res.status(200).send(data);
         });
 });
 
-apiRouter.post('/addpart', (req:any, res:any) => {
+apiRouter.post('/addpart', (req: any, res: any) => {
 
     const now = date.format(new Date(), 'YYYY-MM-DD HH:mm:ss');
 
@@ -158,7 +168,7 @@ apiRouter.post('/addpart', (req:any, res:any) => {
         });
 });
 
-apiRouter.get('/latestentries', (req:any, res:any) => {
+apiRouter.get('/latestentries', (req: any, res: any) => {
     gitrows.get(userParts(req.userID))
         .then((data) => {
             res.status(200).send(data && data.slice(-5).reverse());

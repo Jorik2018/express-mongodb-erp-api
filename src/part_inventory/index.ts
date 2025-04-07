@@ -70,10 +70,6 @@ app.use(passport.session());
 
 app.use(storageMiddleware);
 
-app.use((req, res, next) => {
-    next();
-});
-
 app.use('/api', authRouter);
 app.use('/api', apiRouter);
 
