@@ -1,8 +1,7 @@
 import { Request, Response } from 'express'
 import User from '../database/models/user'
 import jwt from 'jsonwebtoken'
-
-
+import { sendError } from '../utils/errors';
 
 const userByToken = (req: Request, res: Response) => {
   const decoded: any = jwt.verify(
@@ -18,25 +17,18 @@ const userByToken = (req: Request, res: Response) => {
     } else {
       res.send("Index does not exist");
     }
-  })
-    .catch((err: Error) => {
-      res.send(err);
-    });
+  }).catch(sendError(res));
 };
 
 const userById = (req: Request, res: Response) => {
   User.findOne({ _id: req.params.id }).then((user) => res.send(user))
-    .catch((err: Error) => {
-      res.send({
-        err
-      });
-    });
+    .catch(sendError(res));
 };
 
 const getUsers = (req: Request, res: Response) => {
   User.find({})
     .then((user: any) => res.send(user))
-    .catch((error: Error) => console.log(error));
+    .catch(sendError(res));
 };
 
 const addUser = (req: Request, res: Response) => {
@@ -60,12 +52,7 @@ const update = ({ body: { id, ...body } }: Request, res: Response) => {
     return User.findOneAndUpdate({ _id }, updatedValue, { new: true });
   }).then(({ _doc: { _id, ...data } }: any) => {
     res.send({ id: _id, ...data });
-  }).catch((err: Error) => {
-    console.error(err)
-    res.send({
-      err
-    });
-  });
+  }).catch(sendError(res));
 };
 
 module.exports = {

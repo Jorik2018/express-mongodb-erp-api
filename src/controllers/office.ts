@@ -1,4 +1,5 @@
 import { Request, Response} from 'express'
+import { sendError } from '../utils/errors';
 const Office = require("../database/models/office");
 
 const getOffices = async (req: Request, res: Response) => {
@@ -17,7 +18,7 @@ const getOfficeById = (req: Request, res: Response) => {
     _id: req.params.id
   })
     .then((task: any) => res.send(task))
-    .catch((error: Error) => console.log(error));
+    .catch(sendError(res));
 };
 
 const addOffice = (req: Request, res: Response) => {
@@ -42,7 +43,7 @@ const updateOffice = (req: Request, res: Response) => {
     { $set: req.body }
   )
     .then((office: any) => res.send(office))
-    .catch((error: Error) => console.log(error));
+    .catch(sendError(res));
 };
 
 const deleteOffice = (req: Request, res: Response) => {
@@ -50,7 +51,7 @@ const deleteOffice = (req: Request, res: Response) => {
     _id: req.params.id
   })
     .then((office: any) => res.send(office))
-    .catch((error: Error) => console.log(error));
+    .catch(sendError(res));
 };
 
 module.exports = {

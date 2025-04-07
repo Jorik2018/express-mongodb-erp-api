@@ -2,21 +2,18 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 import bcrypt from 'bcrypt';
 
 export interface IUser extends Document {
-	date: Date;
 	loggedOn: boolean;
 	verifyPassword(password: string): boolean;
 }
 
 const UserSchema = new Schema(
 	{
-		address: { type: String, required: true },
-		followers: { type: Number},
+		followers: { type: Number },
 		profileImage: { type: String, default: '' },
-		preferences: { type: [String]},
-		isAdvertiser: { type: Boolean, default: false },
+		preferences: { type: [String] },
 
 		name: { type: String, trim: true, required: true, min: 3, max: 64 },
-		lastname: { type: String, trim: true, required: true, min: 3, max: 64 },
+		lastname: { type: String, trim: true, min: 3, max: 64 },
 		email: {
 			type: String,
 			trim: true,
@@ -29,10 +26,10 @@ const UserSchema = new Schema(
 			type: String,
 			default: './avatar.png',
 		},
-		role: {
+		roles: {
 			type: [String],
 			default: ['Subscriber'],
-			enum: ['Subscriber', 'Instructor', 'Admin'],
+			enum: ['Subscriber', 'Instructor', 'Admin', 'Sponsor'],
 		},
 		confirmed: {
 			type: Boolean,
@@ -48,11 +45,6 @@ const UserSchema = new Schema(
 				ref: 'Contact'
 			}
 		],
-
-
-		uid: {
-			type: String,
-		},
 		displayName: {
 			type: String,
 		},
@@ -61,16 +53,22 @@ const UserSchema = new Schema(
 		},
 		membership: {
 			type: String,
-	
-		},
-		date: {
-			type: Date,
-			default: Date.now,
-		},
-	},
 
-	{ timestamps: true }
+		},
+		updateDate: { type: Date },
+	},
+	{
+		timestamps: true,
+		versionKey: false,
+	}
 );
+
+UserSchema.pre('save', function (next) {
+	if (this.isModified()) {
+		this.updateDate = new Date();
+	}
+	next();
+});
 
 UserSchema.methods.verifyPassword = function (password: string) {
 	return bcrypt.compareSync(password, this.password);

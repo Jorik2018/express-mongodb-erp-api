@@ -1,12 +1,13 @@
 import { Request, Response } from 'express'
 import Room, { IRoom } from '../database/models/room';
 import { Person, db } from '../database/objection_db';
+import { sendError } from '../utils/errors';
 
 const list = (_: Request, res: Response) => {
   db().then(() => Person.query()
     .orderBy('id')
     .then((persons: Person[]) => res.send({ data: persons }))
-  ).catch((error: Error) => console.log(error));
+  ).catch(sendError(res));
 }
 
 const find = (req: Request, res: Response) => {
@@ -14,7 +15,7 @@ const find = (req: Request, res: Response) => {
     .findById(req.params.id)
     .withGraphFetched('children')
     .then((person: Person) => res.send(person))
-  ).catch((error: Error) => console.log(error));
+  ).catch(sendError(res));
 };
 
 const create = (req: Request, res: Response) => {
@@ -33,7 +34,7 @@ const update = (req: Request, res: Response) => {
     { $set: req.body }
   )
     .then((office: any) => res.send(office))
-    .catch((error: Error) => console.log(error));
+    .catch(sendError(res));
 };
 
 const destroy = (req: Request, res: Response) => {
@@ -41,7 +42,7 @@ const destroy = (req: Request, res: Response) => {
     _id: req.params.id
   })
     .then((office: any) => res.send(office))
-    .catch((error: Error) => console.log(error));
+    .catch(sendError(res));
 };
 
 module.exports = {

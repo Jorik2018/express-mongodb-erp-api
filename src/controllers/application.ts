@@ -3,21 +3,38 @@ import { Types } from 'mongoose';
 import Application, { IApplication } from '../database/models/application';
 import Contact from '../database/models/contact';
 import User from '../database/models/user';
+import { sendError } from '../utils/errors';
 
-const list = ({ userId: user, from = 0, to = 10, query }: Request | any, res: Response) => {
-  const campaign = Types.ObjectId.createFromHexString(query.campaign);
-  const filter = { campaign };
-  Application.find(filter).populate('contact').then((data: any) => {
-    
-    res.send({data:data.map(({_doc:{ contact: {_doc:{ _id, ...contact }}, ...others }}:any)=>({
-      ...others,
-      contact: { id: _id, ...contact }
-    }))})
-  }).catch((err) => {
-    res.send({
-      err
-    })
-  })
+
+const list = ({ userId: user, from = 0, to = 10, query: { campaign, contact } }: Request | any, res: Response) => {
+  if (contact) {
+    contact = Types.ObjectId.createFromHexString(contact);
+    const filter = { contact };
+    Application.find(filter).populate({
+      path: 'campaign',
+      populate: {
+        path: 'brand' // Asegúrate de que 'brand' es el nombre correcto del campo en tu esquema
+      }
+    }).then((data: any) => {
+      res.send({
+        data: data.map(({ _doc: { campaign: { _doc: { _id, ...campaign } }, ...others } }: any) => ({
+          ...others,
+          campaign: { id: _id, ...campaign }
+        }))
+      })
+    }).catch(sendError(res))
+  } else {
+    campaign = Types.ObjectId.createFromHexString(campaign);
+    const filter = { campaign };
+    Application.find(filter).populate('contact').then((data: any) => {
+      res.send({
+        data: data.map(({ _doc: { contact: { _doc: { _id, ...contact } }, ...others } }: any) => ({
+          ...others,
+          contact: { id: _id, ...contact }
+        }))
+      })
+    }).catch(sendError(res))
+  }
 }
 
 const find = (req: Request, res: Response) => {
@@ -25,7 +42,7 @@ const find = (req: Request, res: Response) => {
     _id: req.params.id
   })
     .then((brand: any) => res.send(brand))
-    .catch((error: Error) => console.log(error));
+    .catch(sendError(res));
 };
 
 const create = ({ body, userId }: Request | any, res: Response) => {
@@ -43,11 +60,7 @@ const create = ({ body, userId }: Request | any, res: Response) => {
           id: _id
         });
       })
-      .catch((err: Error) => {
-        res.send({
-          err,
-        })
-      });
+      .catch(sendError(res));
   }
   Contact.findOne({ user }).then((contact) => {
     if (!contact) {
@@ -75,7 +88,7 @@ const update = ({ body: { id, ...body } }: Request, res: Response) => {
       ...data,
       id: _id
     });
-  }).catch((error: Error) => console.log(error));
+  }).catch(sendError(res));
 };
 
 const destroy = (req: Request, res: Response) => {
@@ -86,7 +99,7 @@ const destroy = (req: Request, res: Response) => {
       ...data,
       id: _id
     });
-  }).catch((error: Error) => console.log(error));
+  }).catch(sendError(res));
 };
 
 module.exports = {

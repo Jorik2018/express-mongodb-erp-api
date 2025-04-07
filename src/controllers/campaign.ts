@@ -1,74 +1,47 @@
-import { Request, Response } from 'express';
-import Campaign, { ICampaign } from '../database/models/campaign';
-import { Types } from 'mongoose';
+import { Request, Response, Router } from 'express';
+import captaignService from '../services/captaignService';
+import { sendError } from '../utils/errors';
+
 interface RequestWithUserId extends Request {
   userId: string;
 }
 
-const list = async (req: Request, res: Response) => {
-  try {
-    const campaign = (await Campaign.find({}).populate('sponsor')).map(({ _doc: doc }: any) => ({
-      ...doc,
-      id: doc._id,
-      _id: undefined, // Optionally remove _id
-    }));
-    res.send({ data: campaign })
-  } catch (err: any) {
-    res.send({
-      err,
-    })
-  }
+const list = ({ query, userId }: RequestWithUserId, res: Response) => {
+  captaignService.list({ userId, ...query })
+    .then(campaigns => res.send({ data: campaigns }))
+    .catch(sendError(res))
 }
 
 const find = (req: Request, res: Response) => {
-  Campaign.findOne({
-    _id: req.params.id
-  }).populate('sponsor')
-    .then(({ _doc: { _id, categories, category, gallery, image, ...campaign } }: any) => res.send({
-      id: _id,
-      categories: categories && categories.length ? categories : [category],
-      gallery: gallery && gallery.length ? gallery : [image, image, image, image], ...campaign
-    }))
-    .catch((error: Error) => console.log(error));
+  captaignService.find(req.params.id)
+    .then(campaign => res.send(campaign))
+    .catch(sendError(res));
 };
 
-//Property 'userId' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.ts(2339)
 const create = ({ body: { brandId, ...body }, userId }: RequestWithUserId, res: Response) => {
-  const user = Types.ObjectId.createFromHexString(userId);
-  const brand = Types.ObjectId.createFromHexString(brandId);
-  new Campaign({ ...body, user, brand })
-    .save()
-    .then(({ _doc: { _id, ...campaign } }: any) => res.send({ id: _id, ...campaign }))
-    .catch((err: Error) => {
-      res.send({
-        err,
-      })
-    });
+  captaignService.create({ ...body, userId, brandId })
+    .then(campaign => res.send(campaign))
+    .catch(sendError(res));
 };
 
 const update = (req: Request, res: Response) => {
-  Campaign.findOneAndUpdate(
-    {
-      _id: req.params.id
-    },
-    { $set: req.body }
-  )
-    .then((campaign: any) => res.send(campaign))
-    .catch((error: Error) => console.log(error));
+  captaignService.update(req.params.id, req.body)
+    .then((campaign) => res.send(campaign))
+    .catch(sendError(res));
 };
 
 const remove = (req: Request, res: Response) => {
-  Campaign.findOneAndDelete({
-    _id: req.params.id
-  })
-    .then((campaign: any) => res.send(campaign))
-    .catch((error: Error) => console.log(error));
+  captaignService.remove(req.params.id)
+    .then((campaign) => res.send(campaign))
+    .catch(sendError(res));
 };
 
-module.exports = {
-  list,
-  find,
-  update,
-  create,
-  remove
-}
+const router = Router();
+
+router.get('/', list as any);
+router.post('/', create as any);
+router.get('/:id', find);
+router.patch('/:id', update);
+router.delete('/:id', remove);
+
+export default router;

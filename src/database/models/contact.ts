@@ -25,6 +25,7 @@ const contactSchema = new Schema({
     location: {
         type: String
     },
+    address: { type: String },
     website: {
         type: String
     },

@@ -1,4 +1,5 @@
 import { Request, Response} from 'express'
+import { sendError } from '../utils/errors';
 const Employee = require("../database/models/employee");
 const _ = require('lodash');
 
@@ -19,14 +20,14 @@ const getEmployeeById = (req: Request, res: Response) => {
   })
     .populate('office')
     .then((task: any) => res.send(task))
-    .catch((error: Error) => console.log(error));
+    .catch(sendError(res));
 };
 
 const addEmployee =  (req: Request, res: Response) => {
   new Employee(req.body)
     .saveAndPopulate()
     .then((employee: any) => res.send(employee))
-    .catch((error: Error) => res.send(error));
+    .catch(sendError(res));
 };
 
 const updateEmployee = (req: Request, res: Response) => {
@@ -53,7 +54,7 @@ const deleteEmployee = (req: Request, res: Response) => {
     _id: req.params.id
   })
     .then((task: any) => res.send(task))
-    .catch((error: Error) => res.send(error));
+    .catch(sendError(res));
 };
 
 module.exports = {

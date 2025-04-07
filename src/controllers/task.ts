@@ -1,15 +1,9 @@
-import { Request, Response} from 'express';
+import { Request, Response } from 'express';
 import Task, { ITask } from '../database/models/task';
+import { sendError } from '../utils/errors';
 
-const list = async (req: Request, res: Response) => {
-  try {
-    const tasks = await Task.find({})
-    res.send({data:tasks})
-  } catch (err:any) {
-    res.send({
-      err,
-    })
-  }
+const list = (req: Request, res: Response) => {
+  Task.find({}).then((tasks) => res.send({ data: tasks })).catch(sendError(res))
 }
 
 const find = (req: Request, res: Response) => {
@@ -17,18 +11,14 @@ const find = (req: Request, res: Response) => {
     _id: req.params.id
   })
     .then((task: any) => res.send(task))
-    .catch((error: Error) => console.log(error));
+    .catch(sendError(res));
 };
 
 const create = (req: Request, res: Response) => {
   new Task(req.body)
     .save()
     .then((task: ITask) => res.send(task))
-    .catch((err: Error) => {
-      res.send({
-        err,
-      })
-    });
+    .catch(sendError(res));
 };
 
 const update = (req: Request, res: Response) => {
@@ -39,7 +29,7 @@ const update = (req: Request, res: Response) => {
     { $set: req.body }
   )
     .then((Task: any) => res.send(Task))
-    .catch((error: Error) => console.log(error));
+    .catch(sendError(res));
 };
 
 const deleteOffice = (req: Request, res: Response) => {
@@ -47,7 +37,7 @@ const deleteOffice = (req: Request, res: Response) => {
     _id: req.params.id
   })
     .then((Task: any) => res.send(Task))
-    .catch((error: Error) => console.log(error));
+    .catch(sendError(res));
 };
 
 module.exports = {

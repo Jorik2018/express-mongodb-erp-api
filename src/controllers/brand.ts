@@ -1,26 +1,21 @@
 import { Request, Response } from 'express';
 import { Types } from 'mongoose';
 import Brand, { IBrand } from '../database/models/brand';
+import { sendError } from '../utils/errors';
 
-const list = async ({ userId: user, from = 0, to = 10, query }: Request | any, res: Response) => {
-  try {
-    const filter = { user };
-    console.log('query=', query)
-    const brands = await Brand.find(filter)
-    const transformedBrands = brands.map((brand) => {
+const list = ({ userId: user, from = 0, to = 10, query }: Request | any, res: Response) => {
+  const filter = { user };
+  return Brand.find(filter).then((brands) =>
+    brands.map((brand) => {
       const { _id, ...data } = brand.toObject();
       return ({
         ...data,
         id: _id
       })
-    });
-    const total = await Brand.countDocuments(filter);
-    res.send({ data: transformedBrands, total })
-  } catch (err: any) {
-    res.send({
-      err,
     })
-  }
+  ).then((brands) => Brand.countDocuments(filter).then((total) => {
+    res.send({ data: brands, total })
+  })).catch(sendError(res));
 }
 
 const find = (req: Request, res: Response) => {
@@ -28,7 +23,7 @@ const find = (req: Request, res: Response) => {
     _id: req.params.id
   })
     .then((brand: any) => res.send(brand))
-    .catch((error: Error) => console.log(error));
+    .catch(sendError(res));
 };
 
 const create = ({ body, userId }: Request | any, res: Response) => {
@@ -42,11 +37,7 @@ const create = ({ body, userId }: Request | any, res: Response) => {
         id: _id
       });
     })
-    .catch((err: Error) => {
-      res.send({
-        err,
-      })
-    });
+    .catch(sendError(res));
 };
 
 const update = ({ body: { id, ...body } }: Request, res: Response) => {
@@ -59,7 +50,7 @@ const update = ({ body: { id, ...body } }: Request, res: Response) => {
       ...data,
       id: _id
     });
-  }).catch((error: Error) => console.log(error));
+  }).catch(sendError(res));
 };
 
 const destroy = (req: Request, res: Response) => {
@@ -70,7 +61,7 @@ const destroy = (req: Request, res: Response) => {
       ...data,
       id: _id
     });
-  }).catch((error: Error) => console.log(error));
+  }).catch(sendError(res));
 };
 
 module.exports = {

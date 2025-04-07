@@ -1,10 +1,11 @@
 import { Request, Response } from 'express'
 import Room, { IRoom } from '../database/models/room';
+import { sendError } from '../utils/errors';
 
 const list = async (req: Request, res: Response) => {
   Room.find()
     .then((rooms: IRoom[]) => res.send(rooms))
-    .catch((error: Error) => console.log(error));
+    .catch(sendError(res));
 }
 
 const find = (req: Request, res: Response) => {
@@ -12,7 +13,7 @@ const find = (req: Request, res: Response) => {
     _id: req.params.id
   })
     .then((room: any) => res.send(room))
-    .catch((error: Error) => console.log(error));
+    .catch(sendError(res));
 };
 
 const create = (req: Request, res: Response) => {
@@ -37,7 +38,7 @@ const update = (req: Request, res: Response) => {
     { $set: req.body }
   )
     .then((office: any) => res.send(office))
-    .catch((error: Error) => console.log(error));
+    .catch(sendError(res));
 };
 
 const destroy = (req: Request, res: Response) => {
@@ -45,7 +46,7 @@ const destroy = (req: Request, res: Response) => {
     _id: req.params.id
   })
     .then((office: any) => res.send(office))
-    .catch((error: Error) => console.log(error));
+    .catch(sendError(res));
 };
 
 module.exports = {

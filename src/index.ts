@@ -68,7 +68,7 @@ const employeeRoute = require('./routes/employee');
 app.use(isAuth);
 app.use(`${api}/users`, require('./routes/user').default);
 app.use(`${api}/applications`, require('./routes/application').default);
-app.use(`${api}/campaigns`, require('./routes/campaign').default);
+app.use(`${api}/campaigns`, require('./controllers/campaign').default);
 app.use(`${api}/contacts`, require('./routes/contact').default);
 app.use(`${api}/items`, itemRoutes);
 app.use(`${api}/employees`, employeeRoute.default);
@@ -114,20 +114,13 @@ mongoose.connect(process.env.DB_URI!, {})
         origin: '*',
       },
     });
-
     io.on('connection', (socket) => {
       configureSocket(socket)
     });
-
     io.listen(server);
-    // app.start = app.listen = function(){
-    //   return server.listen.apply(server, arguments)
-    // }
-    //app.listen(PORT, () => {
     server.listen(PORT, () => {
       console.log(`*** SERVER IS RUNNING ON PORT ${PORT} ***`);
     });
-  })
-  .catch((error) => {
+  }).catch((error) => {
     console.log(`*** DB CONNECTION ERROR ❌ => `, error);
   });

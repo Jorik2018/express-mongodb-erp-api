@@ -1,22 +1,25 @@
-import User from '../database/models/user';
+import User, { IUser } from '../database/models/user';
 import { hashPassword, comparePassword } from '../utils/auth';
 import jwt, { Secret } from 'jsonwebtoken';
 import AWS from 'aws-sdk';
 import { SendEmailRequest, SendEmailResponse } from 'aws-sdk/clients/ses';
 import { Request, Response, NextFunction } from 'express';
+import Company from '../database/models/company';
+import Brand from '../database/models/brand';
+import Contact from '../database/models/contact';
 
-export const register = async (req: Request, res: Response) => {
+export const register = async ({ body }: Request, res: Response) => {
 	// res.json('REGISTER USER RESPONSE FROM CONTROLLER');
 	try {
 
-		const { name, lastname, email, password } = req.body;
+		const { name, lastname, email, password, isAdvertiser, preferences, company, brand, slogan } = body;
 		//validacion
 		if (!name) {
 			return res.status(400).send(`NAME IS REQUIRED`);
 		}
-		if (!lastname) {
+		/*if (!lastname) {
 			return res.status(400).send(`LAST NAME IS REQUIRED`);
-		}
+		}*/
 		if (!password || password.length < 6) {
 			return res
 				.status(400)
@@ -27,76 +30,82 @@ export const register = async (req: Request, res: Response) => {
 		//valido que el usuario no exista por el email
 		let userExist = await User.findOne({ email }).select('-password').exec();
 		if (userExist) {
-			console.log(userExist);
-			return res.status(400).send(`EMAIL IS TAKEN`);
+			throw `EMAIL IS TAKEN`;
 		}
 
 		//hasheo el password
 		const hashedPassword = await hashPassword(password);
 
-		//register
-		const today = new Date();
 		const user = new User({
-			...req.body,
+			...body,
 			name,
 			lastname,
 			email,
 			password: hashedPassword,
-			date: today
+			roles: isAdvertiser ? ['Sponsor'] : []
 		});
 
-		//guardo el usuario
-		return await user.save().then(user => {
-			console.log(`SAVED USER: ${user}`);
-			const { password, ...other } = user;
-			const payload = {
-				fullName: user.lastname,
-				...other
-			};
-			let token = jwt.sign(payload, process.env.JWT_SECRET as Secret, {
-				expiresIn: 1440
-			});
-			const params: SendEmailRequest = {
-				Source: process.env.EMAIL_FROM!,
-				Destination: {
-					ToAddresses: [email],
-				},
-				ReplyToAddresses: [process.env.EMAIL_FROM!],
-				Message: {
-					Body: {
-						Html: {
-							Charset: 'UTF-8',
-							Data: `
-								<html>
-									<h1>Bienvenido!</h1>
-									<p>Gracias por registrarte!</p>
-	
-								</html>`,
-						},
-					},
-					Subject: {
-						Charset: 'UTF-8',
-						Data: 'Password Reset Code',
-					},
-				},
-			};
-			/*SES.sendEmail(params, (err, data) => {
-				if (err:any) {
-					console.log(err:any);
-					return res.json({ ok: false });
-				} else {
-					console.log(data);
-					return res.json({ ok: true });
-				}
-			});*/
-			const { profileImage, followers, name } = user;
-			return res.status(200).json({ profileImage, followers, name, token });
+		return await user.save().then(({ _doc: user }: any) => {
+			console.log(`SAVED USER:`, user);
+			if (isAdvertiser) {
+				return (new Company({ name: company, user: user._id })).save().then(({ _id }) =>
+					(new Brand({ name: brand, company: _id, categories: preferences, user: user._id, slogan })).save().then(({ _id }) => {
+						return createResponse(user, res);
+					})
+				)
+			} else {
+				return (new Contact({ name, categories: preferences, user: user._id })).save().then(({ _id }) => {
+					console.log(`Registrado ${user}`);
+					return createResponse(user, res);
+				})
+			}
 		});
 	} catch (err: any) {
-		console.log(err);
-		return res.status(400).send(`ERROR: ${err}`);
+		if (typeof err == 'string') {
+			return res.status(400).send({ error: err });
+		}
+		return res.status(400).send(err);
 	}
 };
+
+const createResponse = (user: any, res: Response) => {
+
+	const params: SendEmailRequest = {
+		Source: process.env.EMAIL_FROM!,
+		Destination: {
+			ToAddresses: [user.email],
+		},
+		ReplyToAddresses: [process.env.EMAIL_FROM!],
+		Message: {
+			Body: {
+				Html: {
+					Charset: 'UTF-8',
+					Data: `
+						<html>
+							<h1>Bienvenido!</h1>
+							<p>Gracias por registrarte!</p>
+
+						</html>`,
+				},
+			},
+			Subject: {
+				Charset: 'UTF-8',
+				Data: 'Password Reset Code',
+			},
+		},
+	};
+	/*SES.sendEmail(params, (err, data) => {
+		if (err:any) {
+			console.log(err:any);
+			return res.json({ ok: false });
+		} else {
+			console.log(data);
+			return res.json({ ok: true });
+		}
+	});*/
+
+	return generateToken(res, user);
+}
 
 export const login = (req: Request, res: Response, next: NextFunction) => {
 
@@ -125,39 +134,7 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
 				// throw error;
 				return res.status(400).send(`PASSWORD IS INCORRECT`);
 			}
-			const payload = {
-				id: user._id,
-				name: user.name,
-				lastname: user.lastname,
-				email: user.email
-			};
-			const { JWT_SECRET } = require('../config').default;
-			const token = jwt.sign(payload, JWT_SECRET as Secret, {
-				expiresIn: '7d',
-			}/*,
-				(err, token) => {
-					if (err:any) throw err;
-					res.json({ token });
-				}*/);
-			//return user and token to client, exclude hashed password
-
-			// send token in cookie
-			res.cookie('token', token, {
-				httpOnly: true,
-				// secure: true, //solo funciona en https
-			});
-			//send user as json response
-			//res.json({ token: token });
-			const { password, _id, ...other } = user;
-			console.log(other);
-			delete (user as any).password;
-			res.status(200).json(
-				{
-					token,
-					id: _id,
-					//userId: user._id.toString(),
-					...other
-				});
+			return generateToken(res, user)
 		});
 	}).catch(error => {
 		if (!error.statusCode) {
@@ -167,6 +144,30 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
 		res.status(400).send('ERROR. TRY AGAIN.');
 	});
 };
+
+const generateToken = (res: Response, user: any) => {
+	const { JWT_SECRET } = require('../config').default;
+	const token = jwt.sign({
+		id: user._id,
+		name: user.name,
+		lastname: user.lastname,
+		email: user.email
+	}, JWT_SECRET as Secret, {
+		expiresIn: '7d'
+	});
+	res.cookie('token', token, {
+		httpOnly: true,
+		// secure: true, //solo funciona en https
+	});
+	const { password, _id, roles, ...other } = user;
+	return res.status(200).json(
+		{
+			token,
+			id: _id,
+			perms:roles.includes('Sponsor')?{'CREATE_CAMPAIGNS':1}:{},
+			...other
+		});
+}
 
 export const logout = async (req: Request, res: Response) => {
 	try {
