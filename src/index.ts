@@ -4,7 +4,7 @@ import express, { Application, Request, Response } from 'express';
 //import { readdirSync } from 'fs';
 import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
-import itemRoutes from './routes/itemRoutes';
+
 import posts from "./routes/posts";
 import csrf from 'csurf';
 import { Server } from 'socket.io';
@@ -61,17 +61,18 @@ app.use(require("cors")());
 });*/
 const api = process.env.API || '/api';
 app.use(api, authRoute);
-app.use(`${api}/oauth`, require('./routes/facebook').default);
+app.use(`${api}/oauth`, require('./routes/oauth').default);
+
 const isAuth = require('./auth/is-auth');
-const employeeRoute = require('./routes/employee');
 
 app.use(isAuth);
 app.use(`${api}/users`, require('./routes/user').default);
 app.use(`${api}/applications`, require('./routes/application').default);
 app.use(`${api}/campaigns`, require('./controllers/campaign').default);
 app.use(`${api}/contacts`, require('./routes/contact').default);
+import itemRoutes from './routes/itemRoutes';
 app.use(`${api}/items`, itemRoutes);
-app.use(`${api}/employees`, employeeRoute.default);
+app.use(`${api}/employees`, require('./routes/employee').default);
 app.use(`${api}/offices`, require('./routes/office').default);
 app.use(`${api}/tasks`, require('./routes/task').default);
 app.use(`${api}/brands`, require('./routes/brand').default);
