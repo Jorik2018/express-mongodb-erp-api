@@ -22,15 +22,15 @@ app.all("/*", (req: Request, res: Response, next) => {
 app.use("/api/inventory", require("./api/inventory"));
 app.use("/api", require("./api/transactions"));
 
-let liveCart = [];
+let liveCart:any = [];
 // Websocket logic for Live Cart
-io.on("connection", (socket) => {
-  socket.on("cart-transaction-complete", function () {
+io.on("connection", (socket:any) => {
+  socket.on("cart-transaction-complete",  () =>{
     socket.broadcast.emit("update-live-cart-display", {});
   });
 
   // upon page load, give user current cart
-  socket.on("live-cart-page-loaded", function () {
+  socket.on("live-cart-page-loaded", ()=> {
     socket.emit("update-live-cart-display", liveCart);
   });
 
@@ -38,7 +38,7 @@ io.on("connection", (socket) => {
   socket.emit("update-live-cart-display", liveCart);
 
   // when the cart data is updated by the POS
-  socket.on("update-live-cart", function (cartData) {
+  socket.on("update-live-cart",  (cartData:any) =>{
     // keep track of it
     liveCart = cartData;
 

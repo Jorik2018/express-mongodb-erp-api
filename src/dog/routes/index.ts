@@ -2,10 +2,10 @@
 var ObjectId = require('mongodb').ObjectID;
 
 // index return all dogs
-exports.homeDog = function(req:any, res:any) {
+exports.homeDog = function (req: any, res: any) {
 	var db = req.db;
 	var collection = db.collection('dogs');
-	collection.find().toArray(function(err, dogsArray) {
+	collection.find().toArray(function (err: any, dogsArray: any) {
 		if (dogsArray) {
 			res.render('index', {
 				title: 'Dogs',
@@ -22,13 +22,13 @@ exports.homeDog = function(req:any, res:any) {
 };
 
 // get one dog
-exports.findByName = function(req:any, res:any) {
+exports.findByName = function (req: any, res: any) {
 	var db = req.db;
 	var collection = db.collection('dogs');
 	var name = req.params.name;
 	collection.findOne({
 		'name': name
-	}, function(err, item) {
+	}, function (err: any, item: any) {
 		if (item) {
 			res.render('dog', {
 				title: item.name,
@@ -44,13 +44,13 @@ exports.findByName = function(req:any, res:any) {
 };
 
 // create a new dog
-exports.createDog = function(req:any, res:any) {
+exports.createDog = function (req: any, res: any) {
 	var db = req.db;
 	var collection = db.collection('dogs');
 	var post = req.body;
 	collection.insert(post, {
 		safe: true
-	}, function(error, result) {
+	}, (error: any, result: any) => {
 		if (error) {
 			res.render('error', {
 				message: 'Dog Save Failed!'
@@ -63,7 +63,7 @@ exports.createDog = function(req:any, res:any) {
 };
 
 // update a dog
-exports.updateDog = function(req:any, res:any) {
+exports.updateDog = function (req: any, res: any) {
 	var db = req.db;
 	var collection = db.collection('dogs');
 	var id = req.body._id;
@@ -86,8 +86,8 @@ exports.updateDog = function(req:any, res:any) {
 			}
 		}, {
 			safe: true
-		}, function(err, item) {
-			if (err:any) {
+		}, (err: any, item: any) => {
+			if (err) {
 				res.render('error', {
 					message: 'Dog Update Failed! ' + err
 				});
@@ -105,7 +105,7 @@ exports.updateDog = function(req:any, res:any) {
 };
 
 // delete a dog
-exports.deleteDog = function(req:any, res:any) {
+exports.deleteDog = function (req: any, res: any) {
 	var db = req.db;
 	var collection = db.collection('dogs');
 	var _id = req.body._id;
@@ -116,7 +116,7 @@ exports.deleteDog = function(req:any, res:any) {
 			'_id': objectId
 		}, {
 			safe: true
-		}, function(error, result) {
+		}, function (error: any, result: any) {
 			if (error) {
 				res.render('error', {
 					message: 'Dog Delete failed!'

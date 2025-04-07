@@ -1,13 +1,14 @@
 import 'dotenv-flow/config';
-import { Router, Response } from 'express';
-import Gitrows from 'gitrows';
+import { Router, Response, NextFunction } from 'express';
 import cuid from 'cuid';
 import date from 'date-and-time';
 import axios from 'axios';
 
+let Gitrows = require("gitrows");
+
 const apiRouter = Router();
 
-const userParts = (id) => process.env.DB_PATH + id + '/parts.json';
+const userParts = (id:any) => process.env.DB_PATH + id + '/parts.json';
 
 const gitrows = new Gitrows({
     user: 'vlrmprjct',
@@ -21,7 +22,7 @@ const gitrows = new Gitrows({
 });
 
 
-const defaultRoute = (req, res, next) => {
+const defaultRoute = (req:any, res:Response, next:NextFunction) => {
     if (!req.session.token || req.session.token === '') {
         res.status(401).send({
             'status': 'unauthorized',
@@ -106,21 +107,21 @@ apiRouter.get('/mouser/:query?', (req: any, res: any) => {
 
 apiRouter.get('/parts', (req: any, res: any) => {
     gitrows.get(userParts(req.userID))
-        .then((data) => {
+        .then((data:any) => {
             res.status(200).send(data && data.reverse());
         });
 });
 
 apiRouter.get('/partcolumns', (req: any, res: any) => {
     gitrows.get(process.env.DB_PATH + 'structure.json')
-        .then((data) => {
+        .then((data:any) => {
             res.status(200).send(data);
         });
 });
 
 apiRouter.post('/delete', (req: any, res: any) => {
     gitrows.delete(userParts(req.userID), req.body, { id: req.body.id })
-        .then((response) => {
+        .then((response:any) => {
             res.status(200).send({ ...response, ...{ id: req.body.id } });
         });
 });
@@ -137,14 +138,14 @@ apiRouter.post('/part', (req: any, res: any) => {
     };
 
     gitrows.update(userParts(req.userID), data, { id: req.body.id })
-        .then((response) => {
+        .then((response:any) => {
             res.status(response.code).send(response);
         });
 });
 
 apiRouter.get('/parts/:id?', (req: any, res: any) => {
     gitrows.get(userParts(req.userID), { id: req.params.id })
-        .then((data) => {
+        .then((data:any) => {
             res.status(200).send(data);
         });
 });
@@ -163,14 +164,14 @@ apiRouter.post('/addpart', (req: any, res: any) => {
     };
 
     gitrows.put(userParts(req.userID), data)
-        .then((response) => {
+        .then((response:any) => {
             res.status(response.code).send({ response, data });
         });
 });
 
 apiRouter.get('/latestentries', (req: any, res: any) => {
     gitrows.get(userParts(req.userID))
-        .then((data) => {
+        .then((data:any) => {
             res.status(200).send(data && data.slice(-5).reverse());
         });
 });

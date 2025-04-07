@@ -1,4 +1,4 @@
-import express, { Application, Request, Response } from 'express';
+import express from 'express';
 let routes = require('./routes');
 let path = require('path');
 
@@ -14,11 +14,11 @@ let errorHandler = require('errorhandler');
 // MongoClient
 let MongoClient = require('mongodb').MongoClient;
 // Database
-let db;
+let db:any;
 
 // setup mongo connection
-MongoClient.connect('mongodb://127.0.0.1:27017/myMongoDB', (err, database) => {
-	if (err:any) {
+MongoClient.connect('mongodb://127.0.0.1:27017/myMongoDB', (err:any, database:any) => {
+	if (err) {
 		throw err;
 	}
 	else {
@@ -60,7 +60,3 @@ app.get('/dog/:name', routes.findByName);
 app.post('/create', routes.createDog);
 app.post('/update', routes.updateDog);
 app.post('/delete', routes.deleteDog);
-
-app.listen(app.get('port'), function() {
-	console.log('Express server listening on port ' + app.get('port'));
-});

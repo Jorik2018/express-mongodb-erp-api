@@ -1,8 +1,10 @@
-import Gitrows from 'gitrows';
+import express,{ Router, Response, NextFunction,Request } from 'express';
 import cuid from 'cuid';
 import date from 'date-and-time';
 
-const storageMiddleware = (req, res, next) => {
+let Gitrows = require("gitrows");
+
+const storageMiddleware = (req:any, res:Response, next:NextFunction) => {
 
     
     if (req.isAuthenticated()) {
@@ -24,11 +26,11 @@ const storageMiddleware = (req, res, next) => {
         });
 
         gitrows.get(process.env.DB_PATH + 'structure.json')
-            .then((data) => {
+            .then((data:any) => {
 
                 const getColumns = Object.fromEntries(
                     // eslint-disable-next-line no-unused-vars
-                    Object.entries(data).map(([key, value]) =>
+                    Object.entries(data).map(([key, value]:any) =>
                         [`${value.name}`, '']
                     )
                 );

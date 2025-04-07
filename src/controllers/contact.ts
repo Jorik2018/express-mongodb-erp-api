@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express'
+import { Request, Response } from 'express'
 import Contact from '../database/models/contact';
 import { sendError } from '../utils/errors';
 
@@ -11,7 +11,7 @@ const find = (req: Request, res: Response) => {
 };
 
 
-const list = (req: Request, res: Response, next: NextFunction) => {
+const list = (req: Request, res: Response) => {
     Contact.find({})
         .then((data: any[]) => {
             res.status(200).send({

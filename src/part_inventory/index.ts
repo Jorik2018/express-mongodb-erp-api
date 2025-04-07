@@ -1,12 +1,14 @@
 import 'dotenv-flow/config';
-import express from 'express';
-import session from 'express-session';
+import express, { Request, Router, Response, NextFunction } from 'express';
 import createMemoryStore from 'memorystore';
 import passport from 'passport';
-import { Strategy } from 'passport-github2';
 import storageMiddleware from './storageMiddleware';
 import authRouter from './authRouter';
 import apiRouter from './apiRouter';
+
+let session = require("express-session");
+
+let { Strategy } = require("passport-github2");
 
 const app = express();
 const MemoryStore = createMemoryStore(session);
@@ -16,21 +18,21 @@ passport.use(new Strategy({
     clientSecret: process.env.GITHUB_SECRET,
     callbackURL: "/api/login",
     passReqToCallback: true,
-},(req, accessToken, refreshToken, profile, cb) => {
+}, (req: any, accessToken: any, refreshToken: any, profile: any, cb: any) => {
     req.session.token = accessToken;
     return cb(null, profile);
 }));
 
 
-passport.serializeUser((user, cb) => {
+passport.serializeUser((user:any, cb:any) => {
     cb(null, user);
 });
 
-passport.deserializeUser((obj, cb) => {
+passport.deserializeUser((obj: any, cb:any) => {
     cb(null, obj);
 });
 
-app.use((req, res, next) => {
+app.use((req: Request, res: any, next:NextFunction) => {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
@@ -42,7 +44,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static('dist'));
 
-const sess = {
+const sess: any = {
     name: 'pia.sid',
     secret: process.env.SESSION_SECRET,
     resave: true,
