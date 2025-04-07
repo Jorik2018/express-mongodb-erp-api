@@ -1,6 +1,5 @@
-import express, { Application, Request, Response } from 'express';
+import express, { Application, json, Request, Response } from 'express';
 //import "express-async-errors";
-//import {json} from 'body-parser';
 //import { readdirSync } from 'fs';
 import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
@@ -20,7 +19,7 @@ import { createServer } from 'http';
 import { knexMiddleware } from './database/objection_db';
 import { configureSocket } from './quiz/server';
 
-app.use(express.json());
+app.use(json());
 app.use(express.urlencoded({ extended: true }));
 //app.use(json());
 
@@ -71,6 +70,7 @@ app.use(`${api}/applications`, require('./routes/application').default);
 app.use(`${api}/campaigns`, require('./controllers/campaign').default);
 app.use(`${api}/contacts`, require('./routes/contact').default);
 import itemRoutes from './routes/itemRoutes';
+import path from 'path';
 app.use(`${api}/items`, itemRoutes);
 app.use(`${api}/employees`, require('./routes/employee').default);
 app.use(`${api}/offices`, require('./routes/office').default);
@@ -104,7 +104,13 @@ app.use(require('morgan')('dev'));
 app.get('/api/csrf-token', (req: any, res: any) => {
   res.json({ csrfToken: req.csrfToken() });
 });
-
+const { FRONTEND } = process.env;
+if (FRONTEND) {
+  app.use(express.static(path.join(__dirname, `${FRONTEND}/dist`)));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, `${FRONTEND}/dist/index.html`));
+  });
+}
 // Connect to MongoDB
 mongoose.connect(process.env.DB_URI!, {})
   .then(() => {
