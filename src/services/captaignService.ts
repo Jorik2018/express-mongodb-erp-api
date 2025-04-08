@@ -15,7 +15,7 @@ const list = ({ userId }: any) => {
         } else {
             //si usuario ve todos los disponibles q estan no estan como borrador y si estan aplicando se ve el estado 
             //puede ver cuantos likes aporta
-            return Campaign.find({}).populate('sponsor').populate('brand').then(campaigns => campaigns.map(({ _doc: { _id, ...others } }: any) => ({
+            return Campaign.find({ status: { $ne: 'draft' } }).populate('sponsor').populate('brand').then(campaigns => campaigns.map(({ _doc: { _id, ...others } }: any) => ({
                 ...others,
                 id: _id
             })))
