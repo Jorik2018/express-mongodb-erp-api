@@ -1,12 +1,14 @@
-import mongoose, { Schema, Document, Model } from 'mongoose';
+import { Schema, Document, Model, model } from 'mongoose';
 import bcrypt from 'bcrypt';
 
 export interface IUser extends Document {
 	loggedOn: boolean;
 	verifyPassword(password: string): boolean;
+	roles: [String];
+	password: string;
 }
 
-const UserSchema = new Schema(
+const UserSchema: Schema = new Schema(
 	{
 		followers: { type: Number },
 		profileImage: { type: String, default: '' },
@@ -74,4 +76,7 @@ UserSchema.methods.verifyPassword = function (password: string) {
 	return bcrypt.compareSync(password, this.password);
 };
 
-export default mongoose.model('User', UserSchema);
+
+const User: Model<IUser> = model<IUser>('User', UserSchema);
+
+export default User;

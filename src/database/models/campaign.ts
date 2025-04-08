@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, Model } from 'mongoose';
+import { Schema, Document, Model, model } from 'mongoose';
 
 export interface ICampaign extends Document {
   description: string;
@@ -14,23 +14,23 @@ const CampaignSchema: Schema = new Schema({
   gallery: [{ type: String, required: true }],
   brand: {
     required: true,
-    type: mongoose.Schema.Types.ObjectId, ref: 'Brand'
+    type: Schema.Types.ObjectId, ref: 'Brand'
   },
   user: {
     required: true,
     type: Schema.Types.ObjectId,
     ref: 'User'
   },
-  sponsor: { type: mongoose.Schema.Types.ObjectId, ref: 'Company' }, // Assuming sponsor is a string; adjust if it's a reference
+  sponsor: { type: Schema.Types.ObjectId, ref: 'Company' }, // Assuming sponsor is a string; adjust if it's a reference
   categories: [{ type: String, required: true }],
   requirements: [{ type: String }],
   deliverables: [{ type: String }],
   budget: { type: String },
-  applicants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], // Reference to User collection
+  applicants: [{ type: Schema.Types.ObjectId, ref: 'User' }], // Reference to User collection
   status: { type: String, required: true, enum: ['active', 'upcoming', 'completed', 'draft'] },
 });
 
-const Campaign: Model<ICampaign> = mongoose.model<ICampaign>('Campaign', CampaignSchema);
+const Campaign: Model<ICampaign> = model<ICampaign>('Campaign', CampaignSchema);
 
 export default Campaign;
 

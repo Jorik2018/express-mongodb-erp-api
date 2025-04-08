@@ -1,15 +1,26 @@
 import { Types } from "mongoose";
 import Campaign from "../database/models/campaign";
+import User, { IUser } from "../database/models/user";
 
 const list = ({ userId }: any) => {
 
     const user = Types.ObjectId.createFromHexString(userId);
-
-    return Campaign.find({ user }).populate('sponsor').populate('brand').then(campaigns => campaigns.map(({ _doc: { _id, ...others } }: any) => ({
-        ...others,
-        id: _id
-    })))
-
+    return User.findOne({ _id: user }).then(({ roles }: any) => {
+        if (roles.length) {
+            //sponsor ve solo los propios cualquier estado, puede ver cuantos aplican a las campañas
+            return Campaign.find({ user }).populate('sponsor').populate('brand').then(campaigns => campaigns.map(({ _doc: { _id, ...others } }: any) => ({
+                ...others,
+                id: _id
+            })))
+        } else {
+            //si usuario ve todos los disponibles q estan no estan como borrador y si estan aplicando se ve el estado 
+            //puede ver cuantos likes aporta
+            return Campaign.find({}).populate('sponsor').populate('brand').then(campaigns => campaigns.map(({ _doc: { _id, ...others } }: any) => ({
+                ...others,
+                id: _id
+            })))
+        }
+    });
 }
 
 const find = (_id: string) => {
