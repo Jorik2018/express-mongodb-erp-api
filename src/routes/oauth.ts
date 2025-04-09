@@ -64,7 +64,7 @@ name: "Erik Alarcón Pinedo"
 
         if (cookies) provider = cookies.provider || provider
         console.log(code, 'provider=', provider, cookies)
-        res.send({code,provider});
+        res.send({cookies,code,provider});
         return;
         if (provider == 'tiktok') {
             const codeVerifier = cookies.verifier;
