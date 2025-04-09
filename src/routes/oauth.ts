@@ -6,7 +6,7 @@ const router = Router();
 const {
     FACEBOOK_APP_ID, FACEBOOK_APP_SECRET,
     FACEBOOK_REDIRECT_URI,
-    INSTAGRAM_APP_ID, INSTAGRAM_APP_SECRET,
+    INSTAGRAM_CLIENT_ID, INSTAGRAM_CLIENT_SECRET,
     INSTAGRAM_REDIRECT_URI,
     TIKTOK_CLIENT_KEY, TIKTOK_CLIENT_SECRET, TIKTOK_REDIRECT_URI
 } = process.env;
@@ -20,7 +20,7 @@ router.get('/facebook', (req, res) => {
 
 router.get('/instagram', (req, res) => {
     res.cookie('provider', 'instagram', { maxAge: 60000 });
-    const url = `https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_authentication=1&client_id=${INSTAGRAM_APP_ID}&redirect_uri=${INSTAGRAM_REDIRECT_URI}&response_type=code&scope=instagram_business_basic%2Cinstagram_business_manage_messages%2Cinstagram_business_manage_comments%2Cinstagram_business_content_publish%2Cinstagram_business_manage_insights`;
+    const url = `https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_authentication=1&client_id=${INSTAGRAM_CLIENT_ID}&redirect_uri=${INSTAGRAM_REDIRECT_URI}&response_type=code&scope=instagram_business_basic%2Cinstagram_business_manage_messages%2Cinstagram_business_manage_comments%2Cinstagram_business_content_publish%2Cinstagram_business_manage_insights`;
     res.redirect(url);
 });
 
@@ -87,6 +87,20 @@ name: "Erik Alarcón Pinedo"
                 },
             });
             res.send(userData);
+        } else if (provider == 'instagram') {
+            axios.post('https://api.instagram.com/oauth/access_token', {
+                client_id: INSTAGRAM_CLIENT_ID,
+                client_secret: INSTAGRAM_CLIENT_SECRET,
+                grant_type: 'authorization_code',
+                redirect_uri: INSTAGRAM_REDIRECT_URI,
+                code
+            }, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(({ data }) => {
+                res.send(data);
+            });
         } else {
             const { data } = await axios.get(`https://graph.facebook.com/v13.0/oauth/access_token?client_id=${FACEBOOK_APP_ID}&client_secret=${FACEBOOK_APP_SECRET}&code=${code}&redirect_uri=${FACEBOOK_REDIRECT_URI}`);
             const { access_token } = data;
