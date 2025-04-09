@@ -63,9 +63,6 @@ name: "Erik Alarcón Pinedo"
 */
 
         if (cookies) provider = cookies.provider || provider
-        console.log(code, 'provider=', provider, cookies)
-        res.send({cookies,code,provider});
-        return;
         if (provider == 'tiktok') {
             const codeVerifier = cookies.verifier;
             const params = new URLSearchParams();
@@ -92,7 +89,8 @@ name: "Erik Alarcón Pinedo"
             });
             res.send(userData);*/
         } else if (provider == 'instagram') {
-            res.send({code,provider});
+            console.log(code, 'provider=', provider, cookies)
+            res.send({cookies,code,provider,id:9});
             return;
             axios.post('https://api.instagram.com/oauth/access_token', {
                 client_id: INSTAGRAM_CLIENT_ID,
@@ -103,7 +101,8 @@ name: "Erik Alarcón Pinedo"
             }).then(({ data }) => {
                 res.send(data);
             });
-        } else {
+        } else if (provider == 'facebook') {
+            throw "No provider"
             /*const { data } = await axios.get(`https://graph.facebook.com/v13.0/oauth/access_token?client_id=${FACEBOOK_APP_ID}&client_secret=${FACEBOOK_APP_SECRET}&code=${code}&redirect_uri=${FACEBOOK_REDIRECT_URI}`);
             const { access_token } = data;
             // Use access_token to fetch user profile
