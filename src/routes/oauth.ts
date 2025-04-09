@@ -42,6 +42,7 @@ router.get("/tiktok", (req, res) => {
 });
 
 router.post('/token',({ body: { code, provider }, cookies }, res) => {
+
     // Mock successful social login
     /*const mockUser: User = {
       id: '2',
@@ -63,6 +64,8 @@ name: "Erik Alarcón Pinedo"
 
         if (cookies) provider = cookies.provider || provider
         console.log(code, 'provider=', provider, cookies)
+        res.send({code,provider});
+        return;
         if (provider == 'tiktok') {
             const codeVerifier = cookies.verifier;
             const params = new URLSearchParams();
