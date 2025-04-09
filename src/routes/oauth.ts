@@ -41,7 +41,7 @@ router.get("/tiktok", (req, res) => {
     res.redirect(url);
 });
 
-router.post('/token',({ body: { code, provider }, cookies }, res) => {
+router.post('/token', ({ body: { code, provider }, cookies }, res) => {
 
     // Mock successful social login
     /*const mockUser: User = {
@@ -61,7 +61,6 @@ router.post('/token',({ body: { code, provider }, cookies }, res) => {
          * id: "1650937281635586"
 name: "Erik Alarcón Pinedo" 
 */
-
         if (cookies) provider = cookies.provider || provider
         if (provider == 'tiktok') {
             const codeVerifier = cookies.verifier;
@@ -73,21 +72,20 @@ name: "Erik Alarcón Pinedo"
             params.append('redirect_uri', TIKTOK_REDIRECT_URI!);
             params.append('code_verifier', codeVerifier);
             console.log(Object.fromEntries(params))
-            /*const { data } = await axios.post(`https://open.tiktokapis.com/v2/oauth/token/`, params, {
+            axios.post(`https://open.tiktokapis.com/v2/oauth/token/`, params, {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-            });
-            console.log(data);
-            const { data: userData } = await axios.get('https://open.tiktokapis.com/v2/user/info/', {
+            }).then(({ data }) => axios.get('https://open.tiktokapis.com/v2/user/info/', {
                 headers: {
                     Authorization: `Bearer ${data.access_token}`,
                 },
                 params: {
                     fields: 'open_id,union_id,display_name,avatar_url',
                 },
-            });
-            res.send(userData);*/
+            }).then(({ data: userData }) => {
+                res.send(userData);
+            }));
         } else if (provider == 'instagram') {
             const formData = new FormData();
             formData.append('client_id', INSTAGRAM_CLIENT_ID!);
@@ -95,30 +93,29 @@ name: "Erik Alarcón Pinedo"
             formData.append('grant_type', 'authorization_code');
             formData.append('redirect_uri', INSTAGRAM_REDIRECT_URI!);
             formData.append('code', code);
-    
             axios.post('https://api.instagram.com/oauth/access_token', formData, {
-              headers: {
-                'Content-Type': 'multipart/form-data'
-              }
-            /*axios.post('https://api.instagram.com/oauth/access_token', {
-                client_id: INSTAGRAM_CLIENT_ID,
-                client_secret: INSTAGRAM_CLIENT_SECRET,
-                grant_type: 'authorization_code',
-                redirect_uri: INSTAGRAM_REDIRECT_URI,
-                code*/
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            }).then(({ data: { access_token } }) => axios.get('https://graph.instagram.com/v22.0/me', {
+                params: {
+                    access_token,
+                    fields: 'user_id,username,profile_picture_url,followers_count,media_count'
+                }
             }).then(({ data }) => {
                 res.send(data);
-            }).catch(sendError(res));
+            })
+            ).catch(sendError(res));
         } else if (provider == 'facebook') {
-            throw "No provider"
             /*const { data } = await axios.get(`https://graph.facebook.com/v13.0/oauth/access_token?client_id=${FACEBOOK_APP_ID}&client_secret=${FACEBOOK_APP_SECRET}&code=${code}&redirect_uri=${FACEBOOK_REDIRECT_URI}`);
             const { access_token } = data;
             // Use access_token to fetch user profile
             const { data: profile } = await axios.get(`https://graph.facebook.com/v13.0/me?fields=name,email&access_token=${access_token}`);
-
             res.send(profile);*/
+        } else {
+            throw "No provider"
         }
-    } catch (err:any) {
+    } catch (err: any) {
         sendError(err);
         //res.redirect('/login');
     }
