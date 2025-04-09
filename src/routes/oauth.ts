@@ -89,9 +89,6 @@ name: "Erik Alarcón Pinedo"
             });
             res.send(userData);*/
         } else if (provider == 'instagram') {
-            console.log(code, 'provider=', provider, cookies)
-            res.send({cookies,code,provider,id:9});
-            return;
             axios.post('https://api.instagram.com/oauth/access_token', {
                 client_id: INSTAGRAM_CLIENT_ID,
                 client_secret: INSTAGRAM_CLIENT_SECRET,
@@ -100,7 +97,7 @@ name: "Erik Alarcón Pinedo"
                 code
             }).then(({ data }) => {
                 res.send(data);
-            });
+            }).catch(sendError(res));
         } else if (provider == 'facebook') {
             throw "No provider"
             /*const { data } = await axios.get(`https://graph.facebook.com/v13.0/oauth/access_token?client_id=${FACEBOOK_APP_ID}&client_secret=${FACEBOOK_APP_SECRET}&code=${code}&redirect_uri=${FACEBOOK_REDIRECT_URI}`);
