@@ -46,7 +46,7 @@ const get_oauth_url = (res: Response, provider: string, redirect_uri?: any) => {
     throw "No oauth provider"
 }
 
-router.post('/token', ({ body: { code, provider, action }, cookies }, res) => {
+router.post('/token', ({ body: { code, provider, action, redirect_uri }, cookies }, res) => {
 
     // Mock successful social login
     /*const mockUser: User = {
@@ -77,7 +77,7 @@ name: "Erik Alarcón Pinedo"
             params.append('client_secret', TIKTOK_CLIENT_SECRET!);
             params.append('code', code);
             params.append('grant_type', 'authorization_code');
-            params.append('redirect_uri', TIKTOK_REDIRECT_URI!);
+            params.append('redirect_uri', redirect_uri || TIKTOK_REDIRECT_URI!);
             params.append('code_verifier', codeVerifier);
             console.log(Object.fromEntries(params))
             axios.post(`https://open.tiktokapis.com/v2/oauth/token/`, params, {
@@ -99,7 +99,7 @@ name: "Erik Alarcón Pinedo"
             formData.append('client_id', INSTAGRAM_CLIENT_ID!);
             formData.append('client_secret', INSTAGRAM_CLIENT_SECRET!);
             formData.append('grant_type', 'authorization_code');
-            formData.append('redirect_uri', INSTAGRAM_REDIRECT_URI!);
+            formData.append('redirect_uri', redirect_uri || INSTAGRAM_REDIRECT_URI!);
             formData.append('code', code);
             axios.post('https://api.instagram.com/oauth/access_token', formData, {
                 headers: {
