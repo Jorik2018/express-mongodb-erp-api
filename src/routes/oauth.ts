@@ -89,12 +89,23 @@ name: "Erik Alarcón Pinedo"
             });
             res.send(userData);*/
         } else if (provider == 'instagram') {
-            axios.post('https://api.instagram.com/oauth/access_token', {
+            const formData = new FormData();
+            formData.append('client_id', INSTAGRAM_CLIENT_ID!);
+            formData.append('client_secret', INSTAGRAM_CLIENT_SECRET!);
+            formData.append('grant_type', 'authorization_code');
+            formData.append('redirect_uri', INSTAGRAM_REDIRECT_URI!);
+            formData.append('code', code);
+    
+            axios.post('https://api.instagram.com/oauth/access_token', formData, {
+              headers: {
+                'Content-Type': 'multipart/form-data'
+              }
+            /*axios.post('https://api.instagram.com/oauth/access_token', {
                 client_id: INSTAGRAM_CLIENT_ID,
                 client_secret: INSTAGRAM_CLIENT_SECRET,
                 grant_type: 'authorization_code',
                 redirect_uri: INSTAGRAM_REDIRECT_URI,
-                code
+                code*/
             }).then(({ data }) => {
                 res.send(data);
             }).catch(sendError(res));
