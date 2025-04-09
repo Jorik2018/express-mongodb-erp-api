@@ -20,6 +20,13 @@ router.get('/:provider', ({ params, query: { redirect_uri } }, res) => {
     res.redirect(get_oauth_url(res, provider, redirect_uri));
 });
 
+router.get('/register/:provider', ({ params, query: { redirect_uri } }, res) => {
+    const provider = params.provider
+    res.cookie('provider', provider, { maxAge: 60000 });
+    res.cookie('action', 'register', { maxAge: 60000 });
+    res.redirect(get_oauth_url(res, provider, redirect_uri));
+});
+
 const get_oauth_url = (res: Response, provider: string, redirect_uri?: any) => {
     if (provider == 'facebook') {
         return `https://www.facebook.com/v13.0/dialog/oauth?client_id=${FACEBOOK_APP_ID}&redirect_uri=${redirect_uri || FACEBOOK_REDIRECT_URI}&scope=email`;
