@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Router } from 'express';
+import { Router, Response } from 'express';
 import generatePKCE from '../utils/pkce'
 import { sendError } from '../utils/errors';
 import Contact from '../database/models/contact';
@@ -14,33 +14,30 @@ const {
 } = process.env;
 
 // Initiates the Facebook Login flow
-router.get('/facebook', (req, res) => {
-    res.cookie('provider', 'facebook', { maxAge: 60000 });
-    const url = `https://www.facebook.com/v13.0/dialog/oauth?client_id=${FACEBOOK_APP_ID}&redirect_uri=${FACEBOOK_REDIRECT_URI}&scope=email`;
-    res.redirect(url);
+router.get('/:provider', ({ params, query: { redirect_uri } }, res) => {
+    const provider = params.provider
+    res.cookie('provider', provider, { maxAge: 60000 });
+    res.redirect(get_oauth_url(res, provider, redirect_uri));
 });
 
-router.get('/instagram', (req, res) => {
-    res.cookie('provider', 'instagram', { maxAge: 60000 });
-    const url = `https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_authentication=1&client_id=${INSTAGRAM_CLIENT_ID}&redirect_uri=${INSTAGRAM_REDIRECT_URI}&response_type=code&scope=instagram_business_basic%2Cinstagram_business_manage_messages%2Cinstagram_business_manage_comments%2Cinstagram_business_content_publish%2Cinstagram_business_manage_insights`;
-    res.redirect(url);
-});
-
-router.get("/tiktok", (req, res) => {
-    res.cookie('provider', 'tiktok', { maxAge: 60000 });
-    const csrfState = Math.random().toString(36).substring(2);
-    res.cookie('csrfState', csrfState, { maxAge: 60000 });
-    const { codeVerifier, codeChallenge } = generatePKCE();
-    res.cookie('verifier', codeVerifier, { maxAge: 60000 });
-    let url = 'https://www.tiktok.com/v2/auth/authorize';
-    url += `?client_key=${TIKTOK_CLIENT_KEY}`;
-    url += '&scope=user.info.basic,video.list';
-    url += '&response_type=code';
-    url += `&redirect_uri=${TIKTOK_REDIRECT_URI}`;
-    url += `&state=${csrfState}`;
-    url += `&code_challenge=${codeChallenge}&code_challenge_method=S256`;
-    res.redirect(url);
-});
+const get_oauth_url = (res: Response, provider: string, redirect_uri?: any) => {
+    if (provider == 'facebook') {
+        return `https://www.facebook.com/v13.0/dialog/oauth?client_id=${FACEBOOK_APP_ID}&redirect_uri=${redirect_uri || FACEBOOK_REDIRECT_URI}&scope=email`;
+    } else if (provider == 'tiktok') {
+        const csrfState = Math.random().toString(36).substring(2);
+        res.cookie('csrfState', csrfState, { maxAge: 60000 });
+        const { codeVerifier, codeChallenge } = generatePKCE();
+        res.cookie('verifier', codeVerifier, { maxAge: 60000 });
+        let url = `https://www.tiktok.com/v2/auth/authorize?client_key=${TIKTOK_CLIENT_KEY}`;
+        url += '&scope=user.info.basic,video.list&response_type=code';
+        url += `&redirect_uri=${redirect_uri || TIKTOK_REDIRECT_URI}&state=${csrfState}`;
+        url += `&code_challenge=${codeChallenge}&code_challenge_method=S256`;
+        return url;
+    } else if (provider == 'instagram') {
+        return `https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_authentication=1&client_id=${INSTAGRAM_CLIENT_ID}&redirect_uri=${redirect_uri || INSTAGRAM_REDIRECT_URI}&response_type=code&scope=instagram_business_basic%2Cinstagram_business_manage_messages%2Cinstagram_business_manage_comments%2Cinstagram_business_content_publish%2Cinstagram_business_manage_insights`;
+    }
+    throw "No oauth provider"
+}
 
 router.post('/token', ({ body: { code, provider, action }, cookies }, res) => {
 
