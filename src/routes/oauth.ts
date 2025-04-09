@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { Router } from 'express';
 import generatePKCE from '../utils/pkce'
+import { sendError } from '../utils/errors';
 const router = Router();
 
 const {
@@ -88,16 +89,14 @@ name: "Erik Alarcón Pinedo"
             });
             res.send(userData);
         } else if (provider == 'instagram') {
+            res.send({code,provider});
+            return;
             axios.post('https://api.instagram.com/oauth/access_token', {
                 client_id: INSTAGRAM_CLIENT_ID,
                 client_secret: INSTAGRAM_CLIENT_SECRET,
                 grant_type: 'authorization_code',
                 redirect_uri: INSTAGRAM_REDIRECT_URI,
                 code
-            }, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
             }).then(({ data }) => {
                 res.send(data);
             });
@@ -109,8 +108,8 @@ name: "Erik Alarcón Pinedo"
 
             res.send(profile);
         }
-    } catch (error: any) {
-        console.error('Error-token:', error.response);
+    } catch (err:any) {
+        sendError(err);
         //res.redirect('/login');
     }
 });
