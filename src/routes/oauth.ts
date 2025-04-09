@@ -114,7 +114,7 @@ name: "Erik Alarcón Pinedo"
                     return Contact.findOne({ 'socials.instagram.id': user_id })
                         .then(({ _doc: contact }: any) => {
                             if (!contact) {
-                                return res.status(404).send({ error: 'Contact not found' });
+                                res.status(404).send({ error: 'Contact not found' });
                             }
                             res.send({ rating: 0, ...contact })
                         })
