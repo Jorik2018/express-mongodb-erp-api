@@ -41,7 +41,7 @@ router.get("/tiktok", (req, res) => {
     res.redirect(url);
 });
 
-router.post('/token', async ({ body: { code, provider }, cookies }, res) => {
+router.post('/token',({ body: { code, provider }, cookies }, res) => {
     // Mock successful social login
     /*const mockUser: User = {
       id: '2',
@@ -73,7 +73,7 @@ name: "Erik Alarcón Pinedo"
             params.append('redirect_uri', TIKTOK_REDIRECT_URI!);
             params.append('code_verifier', codeVerifier);
             console.log(Object.fromEntries(params))
-            const { data } = await axios.post(`https://open.tiktokapis.com/v2/oauth/token/`, params, {
+            /*const { data } = await axios.post(`https://open.tiktokapis.com/v2/oauth/token/`, params, {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
@@ -87,7 +87,7 @@ name: "Erik Alarcón Pinedo"
                     fields: 'open_id,union_id,display_name,avatar_url',
                 },
             });
-            res.send(userData);
+            res.send(userData);*/
         } else if (provider == 'instagram') {
             res.send({code,provider});
             return;
@@ -101,12 +101,12 @@ name: "Erik Alarcón Pinedo"
                 res.send(data);
             });
         } else {
-            const { data } = await axios.get(`https://graph.facebook.com/v13.0/oauth/access_token?client_id=${FACEBOOK_APP_ID}&client_secret=${FACEBOOK_APP_SECRET}&code=${code}&redirect_uri=${FACEBOOK_REDIRECT_URI}`);
+            /*const { data } = await axios.get(`https://graph.facebook.com/v13.0/oauth/access_token?client_id=${FACEBOOK_APP_ID}&client_secret=${FACEBOOK_APP_SECRET}&code=${code}&redirect_uri=${FACEBOOK_REDIRECT_URI}`);
             const { access_token } = data;
             // Use access_token to fetch user profile
             const { data: profile } = await axios.get(`https://graph.facebook.com/v13.0/me?fields=name,email&access_token=${access_token}`);
 
-            res.send(profile);
+            res.send(profile);*/
         }
     } catch (err:any) {
         sendError(err);
