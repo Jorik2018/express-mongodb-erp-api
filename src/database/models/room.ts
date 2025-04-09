@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, Model } from 'mongoose';
+import { Schema, Document, Model, model } from 'mongoose';
 
 export interface IRoom extends Document {
   id?: string;
@@ -19,7 +19,7 @@ const mapping = (schema: Schema) => {
   return schema;
 }
 
-const Room: Model<IRoom> = mongoose.model<IRoom>('Room', mapping(new Schema({
+const Room: Model<IRoom> = model<IRoom>('Room', mapping(new Schema({
   name: { type: String, required: true },
   userId: { type: String, required: true },
   description: { type: String },

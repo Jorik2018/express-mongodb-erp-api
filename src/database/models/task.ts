@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, Model } from 'mongoose';
+import { Schema, Document, Model, model } from 'mongoose';
 
 export interface ITask extends Document {
   description: string;
@@ -7,10 +7,10 @@ export interface ITask extends Document {
 
 const TaskSchema: Schema = new Schema({
   description: { type: String, required: true },
-  completed: { type: Boolean}
+  completed: { type: Boolean }
 });
 
-const Task: Model<ITask> = mongoose.model<ITask>('Task', TaskSchema);
+const Task: Model<ITask> = model<ITask>('Task', TaskSchema);
 
 export default Task;
 

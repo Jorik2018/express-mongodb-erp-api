@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import { Schema, Document, model } from 'mongoose';
 
 export interface Item extends Document {
   name: string;
@@ -10,4 +10,4 @@ const ItemSchema: Schema = new Schema({
   description: { type: String, required: true }
 });
 
-export default mongoose.model<Item>('Item', ItemSchema);
+export default model<Item>('Item', ItemSchema);

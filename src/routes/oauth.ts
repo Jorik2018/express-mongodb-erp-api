@@ -6,6 +6,8 @@ const router = Router();
 const {
     FACEBOOK_APP_ID, FACEBOOK_APP_SECRET,
     FACEBOOK_REDIRECT_URI,
+    INSTAGRAM_APP_ID, INSTAGRAM_APP_SECRET,
+    INSTAGRAM_REDIRECT_URI,
     TIKTOK_CLIENT_KEY, TIKTOK_CLIENT_SECRET, TIKTOK_REDIRECT_URI
 } = process.env;
 
@@ -13,6 +15,12 @@ const {
 router.get('/facebook', (req, res) => {
     res.cookie('provider', 'facebook', { maxAge: 60000 });
     const url = `https://www.facebook.com/v13.0/dialog/oauth?client_id=${FACEBOOK_APP_ID}&redirect_uri=${FACEBOOK_REDIRECT_URI}&scope=email`;
+    res.redirect(url);
+});
+
+router.get('/instagram', (req, res) => {
+    res.cookie('provider', 'instagram', { maxAge: 60000 });
+    const url = `https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_authentication=1&client_id=${INSTAGRAM_APP_ID}&redirect_uri=${INSTAGRAM_REDIRECT_URI}&response_type=code&scope=instagram_business_basic%2Cinstagram_business_manage_messages%2Cinstagram_business_manage_comments%2Cinstagram_business_content_publish%2Cinstagram_business_manage_insights`;
     res.redirect(url);
 });
 
