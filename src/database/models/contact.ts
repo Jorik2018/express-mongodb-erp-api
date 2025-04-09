@@ -1,5 +1,11 @@
 import { Model, model, Schema } from 'mongoose';
 
+const socialMediaSchema = new Schema({
+    id: String,
+    followers: Number,
+    medias: Number,
+});
+
 const contactSchema = new Schema({
     name: {
         type: String,
@@ -29,22 +35,9 @@ const contactSchema = new Schema({
     website: {
         type: String
     },
-    social: {
-        youtube: {
-            type: String
-        },
-        twitter: {
-            type: String
-        },
-        facebook: {
-            type: String
-        },
-        linkedin: {
-            type: String
-        },
-        instagram: {
-            type: String
-        }
+    socials: {
+        type: Map,
+        of: socialMediaSchema
     },
     user: {
         type: Schema.Types.ObjectId,

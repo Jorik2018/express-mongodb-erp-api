@@ -2,6 +2,7 @@ import axios from 'axios';
 import { Router } from 'express';
 import generatePKCE from '../utils/pkce'
 import { sendError } from '../utils/errors';
+import Contact from '../database/models/contact';
 const router = Router();
 
 const {
@@ -41,7 +42,7 @@ router.get("/tiktok", (req, res) => {
     res.redirect(url);
 });
 
-router.post('/token', ({ body: { code, provider }, cookies }, res) => {
+router.post('/token', ({ body: { code, provider, action }, cookies }, res) => {
 
     // Mock successful social login
     /*const mockUser: User = {
@@ -61,7 +62,10 @@ router.post('/token', ({ body: { code, provider }, cookies }, res) => {
          * id: "1650937281635586"
 name: "Erik Alarcón Pinedo" 
 */
-        if (cookies) provider = cookies.provider || provider
+        if (cookies) {
+            provider = cookies.provider || provider;
+            action = cookies.action || action;
+        }
         if (provider == 'tiktok') {
             const codeVerifier = cookies.verifier;
             const params = new URLSearchParams();
@@ -103,9 +107,19 @@ name: "Erik Alarcón Pinedo"
                     fields: 'user_id,username,profile_picture_url,followers_count,media_count'
                 }
             }).then(({ data }) => {
-                res.send(data);
-            })
-            ).catch(sendError(res));
+                if (action == 'register') {
+                    res.send(data);
+                } else {
+                    const { user_id } = data;
+                    return Contact.findOne({ 'socials.instagram.id': user_id })
+                        .then(({ _doc: contact }: any) => {
+                            if (!contact) {
+                                return res.status(404).send({ error: 'Contact not found' });
+                            }
+                            res.send({ rating: 0, ...contact })
+                        })
+                }
+            })).catch(sendError(res));
         } else if (provider == 'facebook') {
             /*const { data } = await axios.get(`https://graph.facebook.com/v13.0/oauth/access_token?client_id=${FACEBOOK_APP_ID}&client_secret=${FACEBOOK_APP_SECRET}&code=${code}&redirect_uri=${FACEBOOK_REDIRECT_URI}`);
             const { access_token } = data;
