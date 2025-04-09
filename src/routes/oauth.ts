@@ -116,8 +116,9 @@ name: "Erik Alarcón Pinedo"
                         .then((contact) => {
                             if (!contact) {
                                 res.status(404).send({ error: 'Contact not found' });
+                            } else {
+                                res.send({ rating: 0, ...contact })
                             }
-                            res.send({ rating: 0, ...contact })
                         })
                 }
             })).catch(sendError(res));
