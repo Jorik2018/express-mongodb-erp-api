@@ -31,6 +31,7 @@ export const register = async ({ body }: Request, res: Response) => {
 		}
 
 		const bindContact = (user: any, contact: any) => {
+			if(contact)user.profileImage=contact.profileImage;
 			if (isAdvertiser) {
 				return (new Company({ name: company, user: user._id })).save().then(({ _id }) =>
 					(new Brand({ name: brand, company: _id, categories: preferences, user: user._id, slogan })).save()

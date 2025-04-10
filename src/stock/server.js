@@ -9,7 +9,7 @@ const {
 
 
 //mysql connection
-var connection = mysql.createConnection({
+let connection = mysql.createConnection({
   host: 'backend-db',
   port: '3306',
   user: 'manager',
@@ -291,8 +291,8 @@ app.get('/users/:user_id', (req:any, res:any) => {
 app.post('/products', (req:any, res:any) => {
   console.log(req.body);
 
-  var values_string = 'product_type_id, order_id, sale_id, exp_date, location';
-  var values = [req.body.product_type_id, req.body.order_id, req.body.sale_id, req.body.exp_date, req.body.location];
+  let values_string = 'product_type_id, order_id, sale_id, exp_date, location';
+  let values = [req.body.product_type_id, req.body.order_id, req.body.sale_id, req.body.exp_date, req.body.location];
 
   connection.query(`INSERT INTO db.products (${values_string}) VALUES(?, ?, ?, ?, ?)`, values, function (err, rows, fields) {
     if (err:any) {
@@ -308,8 +308,8 @@ app.post('/products', (req:any, res:any) => {
 app.post('/product_types', (req:any, res:any) => {
   console.log(req.body);
 
-  var values_string = 'dept_id, product_type_name, price';
-  var values = [req.body.dept_id, req.body.product_type_name, req.body.price];
+  let values_string = 'dept_id, product_type_name, price';
+  let values = [req.body.dept_id, req.body.product_type_name, req.body.price];
 
   connection.query(`INSERT INTO db.product_types (${values_string}) VALUES(?, ?, ?)`, values, function (err, rows, fields) {
     if (err:any) {
@@ -325,8 +325,8 @@ app.post('/product_types', (req:any, res:any) => {
 app.post('/departments', (req:any, res:any) => {
   console.log(req.body);
 
-  var values_string = 'dept_name, dept_mngr';
-  var values = [req.body.dept_name, req.body.dept_mngr];
+  let values_string = 'dept_name, dept_mngr';
+  let values = [req.body.dept_name, req.body.dept_mngr];
 
   connection.query(`INSERT INTO db.departments (${values_string}) VALUES(?, ?)`, values, function (err, rows, fields) {
     if (err:any) {
@@ -339,11 +339,10 @@ app.post('/departments', (req:any, res:any) => {
 });
 
 //POST /orders
-app.post('/orders', (req:any, res:any) => {
+app.post('/orders', (req, res:any) => {
   console.log(req.body);
-
-  var values_string = 'order_date';
-  var values = [req.body.order_date];
+  let values_string = 'order_date';
+  let values = [req.body.order_date];
 
   connection.query(`INSERT INTO db.orders (${values_string}) VALUES(?)`, values, function (err, rows, fields) {
     if (err:any) {
@@ -359,8 +358,8 @@ app.post('/orders', (req:any, res:any) => {
 app.post('/sales', (req:any, res:any) => {
   console.log(req.body);
 
-  var values_string = 'sale_date';
-  var values = [req.body.sale_date];
+  let values_string = 'sale_date';
+  let values = [req.body.sale_date];
 
   connection.query(`INSERT INTO db.sales (${values_string}) VALUES(?)`, values, function (err, rows, fields) {
     if (err:any) {
@@ -376,8 +375,8 @@ app.post('/sales', (req:any, res:any) => {
 app.post('/users', (req:any, res:any) => {
   console.log(req.body);
 
-  var values_string = 'type, dept_id, email, password, first, last';
-  var values = [req.body.type, req.body.dept_id, req.body.email, req.body.password, req.body.first, req.body.last]
+  let values_string = 'type, dept_id, email, password, first, last';
+  let values = [req.body.type, req.body.dept_id, req.body.email, req.body.password, req.body.first, req.body.last]
 
   connection.query(`INSERT INTO db.users (${values_string}) VALUES(?, ?, ?, ?, ?, ?)`, values, function (err, rows, fields) {
     if (err:any) {
@@ -397,7 +396,7 @@ app.post('/users', (req:any, res:any) => {
 app.put('/products/:product_id', (req:any, res:any) => {
   console.log(req.body);
 
-  var values = [req.body.product_type_id, req.body.order_id, req.body.sale_id, req.body.exp_date, req.body.location, req.params.product_id];
+  let values = [req.body.product_type_id, req.body.order_id, req.body.sale_id, req.body.exp_date, req.body.location, req.params.product_id];
 
   connection.query(`
       UPDATE db.products 
@@ -427,7 +426,7 @@ app.put('/products/:product_id', (req:any, res:any) => {
 app.put('/product_types/:product_type_id', (req:any, res:any) => {
   console.log(req.body);
 
-  var values = [req.body.dept_id, req.body.price, req.body.product_type_name, req.params.product_type_id];
+  let values = [req.body.dept_id, req.body.price, req.body.product_type_name, req.params.product_type_id];
 
   connection.query(`
       UPDATE db.product_types 
@@ -455,7 +454,7 @@ app.put('/product_types/:product_type_id', (req:any, res:any) => {
 app.put('/departments/:dept_id', (req:any, res:any) => {
   console.log(req.body);
 
-  var values = [req.body.dept_name, req.body.dept_mngr, req.params.dept_id];
+  let values = [req.body.dept_name, req.body.dept_mngr, req.params.dept_id];
 
   connection.query(`
       UPDATE db.departments 
@@ -482,7 +481,7 @@ app.put('/departments/:dept_id', (req:any, res:any) => {
 app.put('/orders/:order_id', (req:any, res:any) => {
   console.log(req.body);
 
-  var values = [req.body.order_date, req.params.order_id];
+  let values = [req.body.order_date, req.params.order_id];
 
   connection.query(`
       UPDATE db.orders 
@@ -508,7 +507,7 @@ app.put('/orders/:order_id', (req:any, res:any) => {
 app.put('/sales/:sale_id', (req:any, res:any) => {
   console.log(req.body);
 
-  var values = [req.body.sale_date, req.params.sale_id];
+  let values = [req.body.sale_date, req.params.sale_id];
 
   connection.query(`
       UPDATE db.sales 
@@ -534,7 +533,7 @@ app.put('/sales/:sale_id', (req:any, res:any) => {
 app.put('/users/:user_id', (req:any, res:any) => {
   console.log(req.body);
 
-  var values = [req.body.type, req.body.dept_id, req.body.email, req.body.password, req.body.first, req.body.last, req.params.user_id];
+  let values = [req.body.type, req.body.dept_id, req.body.email, req.body.password, req.body.first, req.body.last, req.params.user_id];
 
   connection.query(`
       UPDATE db.users 
