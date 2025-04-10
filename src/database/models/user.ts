@@ -17,7 +17,6 @@ const UserSchema: Schema = new Schema({
 			unique: true,
 			lowercase: true,
 		},
-		password: { type: String, required: true, min: 6, max: 64 },
 		roles: {
 			type: [String],
 			default: ['Subscriber'],
@@ -27,10 +26,15 @@ const UserSchema: Schema = new Schema({
 			type: Boolean,
 			default: false,
 		},
-		preferences: { type: [String] },
+		password: { type: String, required: true, min: 6, max: 64 },
 		passwordResetCode: {
 			type: String,
 			default: '',
+		},
+		loggedOn: {
+			type: Boolean,
+			required: true,
+			default: false
 		},
 		contacts: [
 			{
@@ -44,8 +48,7 @@ const UserSchema: Schema = new Schema({
 		membership: {
 			type: String,
 
-		},
-		updateDate: { type: Date },
+		}
 	},
 	{
 		timestamps: true,
