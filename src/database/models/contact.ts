@@ -11,11 +11,11 @@ const contactSchema = new Schema({
         type: String,
         required: true
     },
-    photoUrl: { type: String },
+    profileImage: { type: String },
     rating: { type: Number },
     categories: { type: [String], required: true },
     videosCount: { type: Number },
-    followersCount: { type: Number },
+    followers: { type: Number },
     bio: { type: String },
     email: {
         type: String
@@ -24,9 +24,6 @@ const contactSchema = new Schema({
         type: String,
         minlength: 8,
         maxlength: 12
-    },
-    imageURL: {
-        type: String
     },
     location: {
         type: String

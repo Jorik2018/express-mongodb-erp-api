@@ -3,6 +3,7 @@ import { Router, Response } from 'express';
 import generatePKCE from '../utils/pkce'
 import { sendError } from '../utils/errors';
 import Contact from '../database/models/contact';
+import Temporal from '../database/models/temporal';
 const router = Router();
 
 const {
@@ -112,7 +113,11 @@ name: "Erik Alarcón Pinedo"
                 }
             }).then(({ data }) => {
                 if (action == 'register') {
-                    res.send(data);
+                    const { user_id: uid, username: name, profile_picture_url: profileImage, followers_count: followers, media_count: medias } = data;
+                    const social = { uid, name, profileImage, followers, medias }
+                    return new Temporal({ content: JSON.stringify({ instagram: social }) }).save().then(({ _doc: { _id } }: any) => {
+                        res.send({ social: _id, ...social });
+                    })
                 } else {
                     const { user_id } = data;
                     return Contact.findOne({ 'socials.instagram.id': user_id })

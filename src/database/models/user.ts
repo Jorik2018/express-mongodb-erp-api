@@ -10,10 +10,6 @@ export interface IUser extends Document {
 
 const UserSchema: Schema = new Schema(
 	{
-		followers: { type: Number },
-		profileImage: { type: String, default: '' },
-		preferences: { type: [String] },
-
 		name: { type: String, trim: true, required: true, min: 3, max: 64 },
 		lastname: { type: String, trim: true, min: 3, max: 64 },
 		email: {
@@ -24,10 +20,6 @@ const UserSchema: Schema = new Schema(
 			lowercase: true,
 		},
 		password: { type: String, required: true, min: 6, max: 64 },
-		picture: {
-			type: String,
-			default: './avatar.png',
-		},
 		roles: {
 			type: [String],
 			default: ['Subscriber'],
@@ -37,6 +29,7 @@ const UserSchema: Schema = new Schema(
 			type: Boolean,
 			default: false,
 		},
+		preferences: { type: [String] },
 		passwordResetCode: {
 			type: String,
 			default: '',
@@ -48,9 +41,6 @@ const UserSchema: Schema = new Schema(
 			}
 		],
 		displayName: {
-			type: String,
-		},
-		avatar: {
 			type: String,
 		},
 		membership: {

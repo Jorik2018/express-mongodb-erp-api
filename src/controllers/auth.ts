@@ -7,25 +7,22 @@ import { Request, Response, NextFunction } from 'express';
 import Company from '../database/models/company';
 import Brand from '../database/models/brand';
 import Contact from '../database/models/contact';
+import Temporal from '../database/models/temporal';
+import { Types } from 'mongoose';
 
 export const register = async ({ body }: Request, res: Response) => {
 	// res.json('REGISTER USER RESPONSE FROM CONTROLLER');
 	try {
 
-		const { name, lastname, email, password, isAdvertiser, preferences, company, brand, slogan } = body;
-		//validacion
+		const { name, lastname, email, password, isAdvertiser, preferences, company, brand, slogan, social, profileImage } = body;
+
 		if (!name) {
-			return res.status(400).send(`NAME IS REQUIRED`);
+			throw `NAME IS REQUIRED`;
 		}
-		/*if (!lastname) {
-			return res.status(400).send(`LAST NAME IS REQUIRED`);
-		}*/
-		if (!password || password.length < 6) {
-			return res
-				.status(400)
-				.send(
-					`PASSWORD IS REQUIRED AND SHOULD BE MIN 6 CHARACTERS LONG`
-				);
+		if (!social) {
+			if (!password || password.length < 6) {
+				throw `PASSWORD IS REQUIRED AND SHOULD BE MIN 6 CHARACTERS LONG`
+			}
 		}
 		//valido que el usuario no exista por el email
 		let userExist = await User.findOne({ email }).select('-password').exec();
@@ -33,34 +30,47 @@ export const register = async ({ body }: Request, res: Response) => {
 			throw `EMAIL IS TAKEN`;
 		}
 
-		//hasheo el password
-		const hashedPassword = await hashPassword(password);
-
-		const user = new User({
-			...body,
-			name,
-			lastname,
-			email,
-			password: hashedPassword,
-			roles: isAdvertiser ? ['Sponsor'] : []
-		});
-
-		return await user.save().then(({ _doc: user }: any) => {
-			console.log(`SAVED USER:`, user);
+		const bindContact = (user: any, contact: any) => {
 			if (isAdvertiser) {
 				return (new Company({ name: company, user: user._id })).save().then(({ _id }) =>
-					(new Brand({ name: brand, company: _id, categories: preferences, user: user._id, slogan })).save().then(({ _id }) => {
-						return createResponse(user, res);
-					})
+					(new Brand({ name: brand, company: _id, categories: preferences, user: user._id, slogan })).save()
+						.then(() => {
+							return createResponse(user, res);
+						})
 				)
 			} else {
-				return (new Contact({ name, categories: preferences, user: user._id })).save().then(({ _id }) => {
-					console.log(`Registrado ${user}`);
+				return contact.save().then(() => {
 					return createResponse(user, res);
 				})
 			}
+		}
+
+		const { v4: uuidv4 } = require('uuid');
+
+		await hashPassword(password || uuidv4()).then(hashedPassword => {
+			const user = new User({
+				...body,
+				name,
+				lastname,
+				email,
+				password: hashedPassword,
+				roles: isAdvertiser ? ['Sponsor'] : []
+			});
+			return user.save().then(({ _doc: user }: any) => {
+				const contact = new Contact({ name, categories: preferences, user: user._id, profileImage });
+				if (social) {
+					Temporal.findOne({ _id: Types.ObjectId.createFromHexString(social) }).lean().then((temporal: any) => {
+						contact.socials = new Map(Object.entries(JSON.parse(temporal.content)));
+						return bindContact(user, contact);
+					})
+				} else {
+					return bindContact(user, contact);
+				}
+
+			});
 		});
-	} catch (err: any) {
+		
+	} catch (err) {
 		if (typeof err == 'string') {
 			return res.status(400).send({ error: err });
 		}
@@ -164,7 +174,7 @@ const generateToken = (res: Response, user: any) => {
 		{
 			token,
 			id: _id,
-			perms:roles.includes('Sponsor')?{'CREATE_CAMPAIGNS':1}:{},
+			perms: roles.includes('Sponsor') ? { 'CREATE_CAMPAIGNS': 1 } : {},
 			...other
 		});
 }
