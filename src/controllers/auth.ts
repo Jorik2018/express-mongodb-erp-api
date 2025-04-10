@@ -58,6 +58,7 @@ export const register = async ({ body }: Request, res: Response) => {
 				roles: isAdvertiser ? ['Sponsor'] : []
 			});
 			return user.save().then(({ _doc: user }: any) => {
+				user.preferences=preferences;
 				const contact = new Contact({ name, categories: preferences, user: user._id, profileImage });
 				if (social) {
 					Temporal.findOne({ _id: Types.ObjectId.createFromHexString(social) }).lean().then((temporal: any) => {
