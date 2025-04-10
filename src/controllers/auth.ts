@@ -157,7 +157,7 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
 	});
 };
 
-const generateToken = (res: Response, user: any) => {
+export const generateToken = (res: Response, user: any) => {
 	const { JWT_SECRET } = require('../config').default;
 	const token = jwt.sign({
 		id: user._id,

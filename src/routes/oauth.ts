@@ -4,6 +4,7 @@ import generatePKCE from '../utils/pkce'
 import { sendError } from '../utils/errors';
 import Contact from '../database/models/contact';
 import Temporal from '../database/models/temporal';
+import { generateToken } from '../controllers/auth';
 const router = Router();
 
 const {
@@ -121,12 +122,14 @@ name: "Erik Alarcón Pinedo"
                 } else {
                     const { user_id } = data;
                     return Contact.findOne({ 'socials.instagram.id': user_id })
+                    .populate('user')
                         .lean()
                         .then((contact) => {
                             if (!contact) {
                                 res.status(404).send({ error: 'Contact not found' });
                             } else {
-                                res.send({ rating: 0, ...contact })
+                                const {user,...others}=contact;
+                                generateToken(res,{ rating: 0, ...others,...user })
                             }
                         })
                 }
