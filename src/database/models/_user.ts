@@ -10,12 +10,6 @@ export interface IUser extends Document {
 
 
 const UserSchema = new Schema({
-    password: {
-        type: String,
-        required: true,
-        minlength: 5,
-        maxlength: 1024
-    },
     date: {
         type: Date,
         required: true,
@@ -25,9 +19,6 @@ const UserSchema = new Schema({
         type: Boolean,
         required: true,
         default: false
-    },
-    avatar: {
-        type: String
     }
 });
 

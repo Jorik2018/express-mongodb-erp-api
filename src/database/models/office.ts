@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
+import { Schema, Document, model } from 'mongoose';
 
-const OfficeSchema = new mongoose.Schema({
+const OfficeSchema = new Schema({
   name: {
     type: String,
     required: true
@@ -11,5 +11,5 @@ const OfficeSchema = new mongoose.Schema({
   }
 });
 
-const LocationModel = mongoose.model('Office', OfficeSchema);
-export default LocationModel;
+const Office = model('Office', OfficeSchema);
+export default Office;
