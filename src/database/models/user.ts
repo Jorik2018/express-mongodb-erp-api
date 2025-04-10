@@ -8,8 +8,7 @@ export interface IUser extends Document {
 	password: string;
 }
 
-const UserSchema: Schema = new Schema(
-	{
+const UserSchema: Schema = new Schema({
 		name: { type: String, trim: true, required: true, min: 3, max: 64 },
 		lastname: { type: String, trim: true, min: 3, max: 64 },
 		email: {

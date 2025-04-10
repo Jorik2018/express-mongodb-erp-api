@@ -2,6 +2,7 @@ import { Model, model, Schema } from 'mongoose';
 
 const socialMediaSchema = new Schema({
     id: String,
+    name: String,
     followers: Number,
     medias: Number,
 });

@@ -113,8 +113,8 @@ name: "Erik Alarcón Pinedo"
                 }
             }).then(({ data }) => {
                 if (action == 'register') {
-                    const { user_id: uid, username: name, profile_picture_url: profileImage, followers_count: followers, media_count: medias } = data;
-                    const social = { uid, name, profileImage, followers, medias }
+                    const { user_id: id, username: name, profile_picture_url: profileImage, followers_count: followers, media_count: medias } = data;
+                    const social = { id, name, profileImage, followers, medias }
                     return new Temporal({ content: JSON.stringify({ instagram: social }) }).save().then(({ _doc: { _id } }: any) => {
                         res.send({ social: _id, ...social });
                     })
