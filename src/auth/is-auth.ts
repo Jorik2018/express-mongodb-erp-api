@@ -35,10 +35,10 @@ const isAuth = (req: any, res: any, next: any) => {
         error.statusCode = 401;
         throw error;
     }
-    if (!req.userId) {
+    //if (!req.userId) {
         req.userId = decodedToken.id;
         next();
-    }
+    //}
 };
 
 module.exports = isAuth;
