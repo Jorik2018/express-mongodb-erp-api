@@ -9,6 +9,7 @@ import Brand from '../database/models/brand';
 import Contact from '../database/models/contact';
 import Temporal from '../database/models/temporal';
 import { Types } from 'mongoose';
+import { sendError } from '../utils/errors';
 
 interface RequestWithUserId extends Request {
 	userId: string;
@@ -183,12 +184,7 @@ console.log('user=',user);
 			return res.status(400).send(`NO USER FOUND`);
 		}
 		return res.status(400).send(`PASSWORD IS INCORRECT`);
-	}).catch(error => {
-		if (!error.statusCode) {
-			error.statusCode = 500;
-		}
-		next(error);
-	});
+	}).catch(sendError(res));
 };
 
 export const generateToken = (res: Response, user: any) => {
