@@ -15,17 +15,30 @@ const {
     INSTAGRAM_REDIRECT_URI,
     TIKTOK_CLIENT_KEY, TIKTOK_CLIENT_SECRET, TIKTOK_REDIRECT_URI
 } = process.env;
-
+/*
+{"instagram":{
+    "id":"17841445647686253",
+    "name":"jorikpak",
+    "profileImage":"https:","followers":1,
+    "medias":1,
+    "access_token":"IGAAHXz51WsjdUlZAmpudwZDZD"}
+}
+*/
 export const getSocial = (social: string) => Temporal.findOne({ _id: Types.ObjectId.createFromHexString(social) }).lean().then((temporal: any) => {
-    const { access_token, ...social } = JSON.parse(temporal.content);
 
-    return axios.get('https://graph.instagram.com/access_token', {
-        params: {
-            grant_type: 'ig_exchange_token', client_secret: INSTAGRAM_CLIENT_SECRET, access_token
-        }
-    }).then(({ data }) => {
-        return { ...social, ...data };
-    })
+    const [socialName, { access_token, ...social }]: any = Object.entries(JSON.parse(temporal.content))[0];
+    if (socialName == 'instagram') {
+        return axios.get('https://graph.instagram.com/access_token', {
+            params: {
+                grant_type: 'ig_exchange_token', client_secret: INSTAGRAM_CLIENT_SECRET, access_token
+            }
+        }).then(({ data }) => {
+            return { [socialName]: { ...social, ...data } };
+        })
+    } else {
+        throw `provider "${socialName}" unknow!`
+    }
+
 
 })
 
