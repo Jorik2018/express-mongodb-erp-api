@@ -84,6 +84,7 @@ readdirSync('./routes').map((route) => {
 */
 app.use((err: any, _req: Request, res: Response, _next: () => void) => {
   const status = err.statusCode || 500;
+  console.log(err)
   const message = err.message;
   const data = err.data || null;
   console.error(err.stack)
