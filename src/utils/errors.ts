@@ -4,8 +4,7 @@ export const sendError = (target: NextFunction | Response, code?: number) => (er
   if ((target as Response).send) {
     const status = code || err.statusCode || 500;
     const message = typeof err === 'string' ? err : err.message;
-    const stack = typeof err === 'string' ? null : err.stack;
-    const data = typeof err === 'string' ? null : err.data;
+    const data = typeof err === 'string' ? undefined : err.data;
     console.error(err);
     (target as Response).status(status).json(
       { message, data }
