@@ -165,7 +165,7 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
 export const changePassword = ({ body, userId }: RequestWithUserId, res: Response, next: NextFunction) => {
 
 	const { currentPassword, newPassword, confirmPassword } = body;
-
+	console.log('userId=',userId,body);
 	const user = Types.ObjectId.createFromHexString(userId);
 console.log('user=',user);
 	if (!newPassword || newPassword.length < 6) {
