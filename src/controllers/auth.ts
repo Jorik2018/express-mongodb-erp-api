@@ -189,7 +189,7 @@ export const changePassword = ({ body, userId }: RequestWithUserId, res: Respons
 			return hashPassword(newPassword).then(password => User.updateOne({ _id: user }, { password }))
 		}
 	})
-		.then(data => res.status(200).json(data))
+		.then(({modifiedCount}) => res.status(200).json({success:!!modifiedCount}))
 		.catch(sendError(res));
 };
 
