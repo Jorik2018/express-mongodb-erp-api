@@ -20,10 +20,10 @@ const build = (authMiddleware: any) => {
 	router.post('/forgot-password', forgotPassword);
 	router.post('/reset-password', resetPassword);
 
-	//router.use(authMiddleware)
+	router.use(authMiddleware)
 	router.get('/logout', logout);
 	router.get('/current-user', currentUser);
-	router.post('/change-password', authMiddleware,changePassword as any);
+	router.post('/change-password',changePassword as any);
 	return router;
 }
 export default build;

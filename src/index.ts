@@ -87,10 +87,6 @@ app.use((err: any, _req: Request, res: Response) => {
   sendError(res)(err)
 })
 
-
-
-
-
 app.use(require('morgan')('dev'));
 
 //app.use(csrf({ cookie: true }));
