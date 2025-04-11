@@ -166,9 +166,7 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
 export const changePassword = ({ body, userId }: RequestWithUserId, res: Response, next: NextFunction) => {
 
 	const { currentPassword, newPassword, confirmPassword } = body;
-	console.log('userId=',userId,body);
 	const user = Types.ObjectId.createFromHexString(userId);
-console.log('user=',user);
 	if (!newPassword || newPassword.length < 6) {
 		throw `NEW PASSWORD IS REQUIRED AND SHOULD BE MIN 6 CHARACTERS LONG`;
 	}
@@ -181,9 +179,9 @@ console.log('user=',user);
 			// const error = new Error('A user with this email could not be found');
 			// error.statusCode = 401;
 			// throw error;
-			return res.status(400).send(`NO USER FOUND`);
+			throw `NO USER FOUND`;
 		}
-		return res.status(400).send(`PASSWORD IS INCORRECT`);
+		throw `PASSWORD IS INCORRECT!`;
 	}).catch(sendError(res));
 };
 
