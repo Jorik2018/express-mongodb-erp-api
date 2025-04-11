@@ -1,10 +1,7 @@
 import { Request, Response, Router } from 'express';
 import captaignService from '../services/captaignService';
 import { sendError } from '../utils/errors';
-
-interface RequestWithUserId extends Request {
-  userId: string;
-}
+import { RequestWithUserId } from '../auth/is-auth';
 
 const list = ({ query, userId }: RequestWithUserId, res: Response) => {
   captaignService.list({ userId, ...query })

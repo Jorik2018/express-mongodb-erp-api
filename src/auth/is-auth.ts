@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken'
+import { Request } from 'express';
 
 const isAuth = (req: any, res: any, next: any) => {
     //const { authorization } = req.headers;
@@ -36,9 +37,13 @@ const isAuth = (req: any, res: any, next: any) => {
         throw error;
     }
     //if (!req.userId) {
-        req.userId = decodedToken.id;
-        next();
+    req.userId = decodedToken.id;
+    next();
     //}
 };
 
-module.exports = isAuth;
+export default isAuth;
+
+export interface RequestWithUserId extends Request {
+    userId: string;
+}

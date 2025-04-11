@@ -64,6 +64,7 @@ app.use(`${api}/oauth`, require('./routes/oauth').default);
 app.use(api, authRoute(isAuth));
 app.use(isAuth);
 app.use(`${api}/users`, require('./routes/user').default);
+app.use(`${api}/media`, require('./routes/media').default);
 app.use(`${api}/applications`, require('./routes/application').default);
 app.use(`${api}/campaigns`, require('./controllers/campaign').default);
 app.use(`${api}/contacts`, require('./routes/contact').default);

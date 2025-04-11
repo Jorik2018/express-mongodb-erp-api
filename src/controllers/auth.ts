@@ -12,10 +12,7 @@ import { Types } from 'mongoose';
 import { sendError } from '../utils/errors';
 import axios from 'axios';
 import { getSocial } from '../routes/oauth';
-
-interface RequestWithUserId extends Request {
-	userId: string;
-}
+import { RequestWithUserId } from '../auth/is-auth';
 
 export const register = async ({ body }: Request, res: Response) => {
 	// res.json('REGISTER USER RESPONSE FROM CONTROLLER');
@@ -130,11 +127,7 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
 	const { email, password } = req.body;
 
 	if (!password || password.length < 6) {
-		return res
-			.status(400)
-			.send(
-				`PASSWORD IS REQUIRED AND SHOULD BE MIN 6 CHARACTERS LONG`
-			);
+		throw `PASSWORD IS REQUIRED AND SHOULD BE MIN 6 CHARACTERS LONG`
 	}
 	//chequeo que exista el usuario
 	User.findOne({ email }).lean().exec().then(user => {
@@ -142,7 +135,7 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
 			// const error = new Error('A user with this email could not be found');
 			// error.statusCode = 401;
 			// throw error;
-			return res.status(400).send(`NO USER FOUND`);
+			throw `NO USER FOUND`;
 		}
 		//chequeo password
 		comparePassword(password, user.password).then((match: boolean) => {
