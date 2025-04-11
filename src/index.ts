@@ -14,7 +14,6 @@ const app: Application = express();
 
 const PORT = process.env.PORT || 3000;
 
-import authRoute from './routes/auth'
 import { createServer } from 'http';
 import { knexMiddleware } from './database/objection_db';
 import { configureSocket } from './quiz/server';
@@ -59,7 +58,7 @@ app.use(require("cors")());
   next();
 });*/
 const api = process.env.API || '/api';
-
+import authRoute from './routes/auth'
 const isAuth = require('./auth/is-auth');
 app.use(api, authRoute(isAuth));
 app.use(`${api}/oauth`, require('./routes/oauth').default);
