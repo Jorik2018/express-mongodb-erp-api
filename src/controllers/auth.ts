@@ -188,7 +188,9 @@ export const changePassword = ({ body, userId }: RequestWithUserId, res: Respons
 		} else { //debe ponerse una condicion fuerte porque usa oauth para iniciar session y no login de app
 			return hashPassword(newPassword).then(password => User.updateOne({ _id: user }, { password }))
 		}
-	}).catch(sendError(res));
+	})
+		.then(data => res.status(200).json(data))
+		.catch(sendError(res));
 };
 
 export const generateToken = (res: Response, user: any) => {
