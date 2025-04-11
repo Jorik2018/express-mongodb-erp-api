@@ -10,6 +10,10 @@ import Contact from '../database/models/contact';
 import Temporal from '../database/models/temporal';
 import { Types } from 'mongoose';
 
+interface RequestWithUserId extends Request {
+	userId: string;
+}
+
 export const register = async ({ body }: Request, res: Response) => {
 	// res.json('REGISTER USER RESPONSE FROM CONTROLLER');
 	try {
@@ -158,9 +162,11 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
 };
 
 
-export const changePassword = (req: Request, res: Response, next: NextFunction) => {
+export const changePassword = ({ body, userId }: RequestWithUserId, res: Response, next: NextFunction) => {
 
-	const { currentPassword, newPassword, confirmPassword } = req.body;
+	const { currentPassword, newPassword, confirmPassword } = body;
+
+	const user = Types.ObjectId.createFromHexString(userId);
 
 	if (!newPassword || newPassword.length < 6) {
 		throw `NEW PASSWORD IS REQUIRED AND SHOULD BE MIN 6 CHARACTERS LONG`;
@@ -169,23 +175,14 @@ export const changePassword = (req: Request, res: Response, next: NextFunction) 
 		throw `NEW PASSWORD IS REQUIRED AND SHOULD BE MIN 6 CHARACTERS LONG`;
 	}
 	//chequeo que exista el usuario
-	User.findOne({ email }).lean().exec().then(user => {
+	User.findOne({ _id: user }).lean().exec().then(user => {
 		if (!user) {
 			// const error = new Error('A user with this email could not be found');
 			// error.statusCode = 401;
 			// throw error;
 			return res.status(400).send(`NO USER FOUND`);
 		}
-		//chequeo password
-		comparePassword(password, user.password).then((match: boolean) => {
-			if (!match) {
-				// const error = new Error('Wrong Password');
-				// error.statusCode = 401;
-				// throw error;
-				return res.status(400).send(`PASSWORD IS INCORRECT`);
-			}
-			return generateToken(res, user)
-		});
+		return res.status(400).send(`PASSWORD IS INCORRECT`);
 	}).catch(error => {
 		if (!error.statusCode) {
 			error.statusCode = 500;
