@@ -69,6 +69,7 @@ app.use(`${api}/campaigns`, require('./controllers/campaign').default);
 app.use(`${api}/contacts`, require('./routes/contact').default);
 import itemRoutes from './routes/itemRoutes';
 import path from 'path';
+import { sendError } from './utils/errors';
 app.use(`${api}/items`, itemRoutes);
 app.use(`${api}/employees`, require('./routes/employee').default);
 app.use(`${api}/offices`, require('./routes/office').default);
@@ -82,14 +83,8 @@ readdirSync('./routes').map((route) => {
   //app.use('/api', require(`./routes/${route}`));
 });
 */
-app.use((err: any, _req: Request, res: Response, _next: () => void) => {
-  const status = err.statusCode || 500;
-  console.log(err)
-  const message = err.message;
-  const data = err.data || null;
-  console.error(err.stack)
-  res.status(status).json({ message, data });
-  //res.status(status).send('Something broke!')
+app.use((err: any, _req: Request, res: Response) => {
+  sendError(res)(err)
 })
 
 
