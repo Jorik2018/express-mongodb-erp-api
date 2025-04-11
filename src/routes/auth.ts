@@ -11,6 +11,7 @@ import {
 } from '../controllers/auth';
 import { requireSignin } from '../middlewares';
 
+
 const build = (authMiddleware?: any) => {
 	const router = Router();
 	router.post('/register', register);
