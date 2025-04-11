@@ -188,7 +188,6 @@ export const changePassword = ({ body, userId }: RequestWithUserId, res: Respons
 			error.statusCode = 500;
 		}
 		next(error);
-		res.status(400).send('ERROR. TRY AGAIN.');
 	});
 };
 
