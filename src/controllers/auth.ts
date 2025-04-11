@@ -167,7 +167,7 @@ export const changePassword = ({ body, userId }: RequestWithUserId, res: Respons
 	const { currentPassword, newPassword, confirmPassword } = body;
 
 	const user = Types.ObjectId.createFromHexString(userId);
-
+console.log('user=',user);
 	if (!newPassword || newPassword.length < 6) {
 		throw `NEW PASSWORD IS REQUIRED AND SHOULD BE MIN 6 CHARACTERS LONG`;
 	}
