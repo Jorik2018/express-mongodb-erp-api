@@ -10,6 +10,8 @@ import Contact from '../database/models/contact';
 import Temporal from '../database/models/temporal';
 import { Types } from 'mongoose';
 import { sendError } from '../utils/errors';
+import axios from 'axios';
+import { getSocial } from '../routes/oauth';
 
 interface RequestWithUserId extends Request {
 	userId: string;
@@ -66,14 +68,13 @@ export const register = async ({ body }: Request, res: Response) => {
 				user.preferences = preferences;
 				const contact = new Contact({ name, categories: preferences, user: user._id, profileImage });
 				if (social) {
-					Temporal.findOne({ _id: Types.ObjectId.createFromHexString(social) }).lean().then((temporal: any) => {
-						contact.socials = new Map(Object.entries(JSON.parse(temporal.content)));
+					getSocial(social).then((social) => {
+						contact.socials = new Map(Object.entries({ ...social }));
 						return bindContact(user, contact);
 					})
 				} else {
 					return bindContact(user, contact);
 				}
-
 			});
 		});
 
@@ -189,7 +190,7 @@ export const changePassword = ({ body, userId }: RequestWithUserId, res: Respons
 			return hashPassword(newPassword).then(password => User.updateOne({ _id: user }, { password }))
 		}
 	})
-		.then(({modifiedCount}) => res.status(200).json({success:!!modifiedCount}))
+		.then(({ modifiedCount }) => res.status(200).json({ success: !!modifiedCount }))
 		.catch(sendError(res));
 };
 

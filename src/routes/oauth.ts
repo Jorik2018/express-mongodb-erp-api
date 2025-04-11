@@ -5,6 +5,7 @@ import { sendError } from '../utils/errors';
 import Contact from '../database/models/contact';
 import Temporal from '../database/models/temporal';
 import { generateToken } from '../controllers/auth';
+import { Types } from 'mongoose';
 const router = Router();
 
 const {
@@ -14,6 +15,19 @@ const {
     INSTAGRAM_REDIRECT_URI,
     TIKTOK_CLIENT_KEY, TIKTOK_CLIENT_SECRET, TIKTOK_REDIRECT_URI
 } = process.env;
+
+export const getSocial = (social: string) => Temporal.findOne({ _id: Types.ObjectId.createFromHexString(social) }).lean().then((temporal: any) => {
+    const { access_token, ...social } = JSON.parse(temporal.content);
+
+    return axios.get('https://graph.instagram.com/access_token', {
+        params: {
+            grant_type: 'ig_exchange_token', client_secret: INSTAGRAM_CLIENT_SECRET, access_token
+        }
+    }).then(({ data }) => {
+        return { ...social, ...data };
+    })
+
+})
 
 // Initiates the Facebook Login flow
 router.get('/:provider', ({ params, query: { redirect_uri } }, res) => {
@@ -114,6 +128,7 @@ name: "Erik Alarcón Pinedo"
                 }
             }).then(({ data }) => {
                 if (action == 'register') {
+                    //tiene q verificarse si existe el socialnet con el id para evitar volver a
                     const { user_id: id, username: name, profile_picture_url: profileImage, followers_count: followers, media_count: medias } = data;
                     const social = { id, name, profileImage, followers, medias, access_token }
                     return new Temporal({ content: JSON.stringify({ instagram: social }) }).save().then(({ _doc: { _id } }: any) => {
@@ -122,14 +137,14 @@ name: "Erik Alarcón Pinedo"
                 } else {
                     const { user_id } = data;
                     return Contact.findOne({ 'socials.instagram.id': user_id })
-                    .populate('user')
+                        .populate('user')
                         .lean()
                         .then((contact) => {
                             if (!contact) {
                                 res.status(404).send({ error: 'Contact not found' });
                             } else {
-                                const {user,...others}=contact;
-                                generateToken(res,{ rating: 0, ...others,...user })
+                                const { user, ...others } = contact;
+                                generateToken(res, { rating: 0, ...others, ...user })
                             }
                         })
                 }
