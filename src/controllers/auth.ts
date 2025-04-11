@@ -176,12 +176,18 @@ export const changePassword = ({ body, userId }: RequestWithUserId, res: Respons
 	//chequeo que exista el usuario
 	User.findOne({ _id: user }).lean().exec().then(user => {
 		if (!user) {
-			// const error = new Error('A user with this email could not be found');
-			// error.statusCode = 401;
-			// throw error;
 			throw `NO USER FOUND`;
 		}
-		throw `PASSWORD IS INCORRECT!`;
+		if (currentPassword) {
+			return comparePassword(currentPassword, user.password).then((match: boolean) => {
+				if (!match) {
+					throw `PASSWORD IS INCORRECT`;
+				}
+				return hashPassword(newPassword).then(password => User.updateOne({ _id: user }, { password }))
+			});
+		} else { //debe ponerse una condicion fuerte porque usa oauth para iniciar session y no login de app
+			return hashPassword(newPassword).then(password => User.updateOne({ _id: user }, { password }))
+		}
 	}).catch(sendError(res));
 };
 
