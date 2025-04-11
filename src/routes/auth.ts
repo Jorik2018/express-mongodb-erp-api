@@ -7,18 +7,23 @@ import {
 	logout,
 	register,
 	sendTestEmail,
+	changePassword
 } from '../controllers/auth';
 import { requireSignin } from '../middlewares';
-import multer from 'multer';
 
-const router = Router();
+const build = (authMiddleware?: any) => {
+	const router = Router();
 
-router.post('/register', register);
-router.post('/login', login);
-router.get('/logout', logout);
-router.get('/current-user', requireSignin, currentUser);
-router.get('/send-email', sendTestEmail);
-router.post('/forgot-password', forgotPassword);
-router.post('/reset-password', resetPassword);
+	router.post('/register', register);
+	router.post('/login', login);
+	router.get('/send-email', sendTestEmail);
+	router.post('/forgot-password', forgotPassword);
+	router.post('/reset-password', resetPassword);
 
-export default router;
+	router.get('/logout', authMiddleware, logout);
+	router.get('/current-user', requireSignin, currentUser);
+	router.post('/change-password', authMiddleware, changePassword);
+
+	return router;
+}
+export default build;

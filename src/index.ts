@@ -59,11 +59,10 @@ app.use(require("cors")());
   next();
 });*/
 const api = process.env.API || '/api';
-app.use(api, authRoute);
-app.use(`${api}/oauth`, require('./routes/oauth').default);
 
 const isAuth = require('./auth/is-auth');
-
+app.use(api, authRoute(isAuth));
+app.use(`${api}/oauth`, require('./routes/oauth').default);
 app.use(isAuth);
 app.use(`${api}/users`, require('./routes/user').default);
 app.use(`${api}/applications`, require('./routes/application').default);

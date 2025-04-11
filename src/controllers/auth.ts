@@ -31,7 +31,7 @@ export const register = async ({ body }: Request, res: Response) => {
 		}
 
 		const bindContact = (user: any, contact: any) => {
-			if(contact)user.profileImage=contact.profileImage;
+			if (contact) user.profileImage = contact.profileImage;
 			if (isAdvertiser) {
 				return (new Company({ name: company, user: user._id })).save().then(({ _id }) =>
 					(new Brand({ name: brand, company: _id, categories: preferences, user: user._id, slogan })).save()
@@ -58,7 +58,7 @@ export const register = async ({ body }: Request, res: Response) => {
 				roles: isAdvertiser ? ['Sponsor'] : []
 			});
 			return user.save().then(({ _doc: user }: any) => {
-				user.preferences=preferences;
+				user.preferences = preferences;
 				const contact = new Contact({ name, categories: preferences, user: user._id, profileImage });
 				if (social) {
 					Temporal.findOne({ _id: Types.ObjectId.createFromHexString(social) }).lean().then((temporal: any) => {
@@ -71,7 +71,7 @@ export const register = async ({ body }: Request, res: Response) => {
 
 			});
 		});
-		
+
 	} catch (err) {
 		if (typeof err == 'string') {
 			return res.status(400).send({ error: err });
@@ -129,6 +129,44 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
 			.send(
 				`PASSWORD IS REQUIRED AND SHOULD BE MIN 6 CHARACTERS LONG`
 			);
+	}
+	//chequeo que exista el usuario
+	User.findOne({ email }).lean().exec().then(user => {
+		if (!user) {
+			// const error = new Error('A user with this email could not be found');
+			// error.statusCode = 401;
+			// throw error;
+			return res.status(400).send(`NO USER FOUND`);
+		}
+		//chequeo password
+		comparePassword(password, user.password).then((match: boolean) => {
+			if (!match) {
+				// const error = new Error('Wrong Password');
+				// error.statusCode = 401;
+				// throw error;
+				return res.status(400).send(`PASSWORD IS INCORRECT`);
+			}
+			return generateToken(res, user)
+		});
+	}).catch(error => {
+		if (!error.statusCode) {
+			error.statusCode = 500;
+		}
+		next(error);
+		res.status(400).send('ERROR. TRY AGAIN.');
+	});
+};
+
+
+export const changePassword = (req: Request, res: Response, next: NextFunction) => {
+
+	const { currentPassword, newPassword, confirmPassword } = req.body;
+
+	if (!newPassword || newPassword.length < 6) {
+		throw `NEW PASSWORD IS REQUIRED AND SHOULD BE MIN 6 CHARACTERS LONG`;
+	}
+	if (newPassword != confirmPassword) {
+		throw `NEW PASSWORD IS REQUIRED AND SHOULD BE MIN 6 CHARACTERS LONG`;
 	}
 	//chequeo que exista el usuario
 	User.findOne({ email }).lean().exec().then(user => {

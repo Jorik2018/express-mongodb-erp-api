@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken'
 
 const isAuth = (req: any, res: any, next: any) => {
+    //const { authorization } = req.headers;
     const authHeader = req.get('Authorization');
     if (!authHeader) {
         const error: any = new Error('Not authenticated.');
@@ -14,7 +15,16 @@ const isAuth = (req: any, res: any, next: any) => {
 
     try {
         const { JWT_SECRET } = require('../config').default;
-        decodedToken = jwt.verify(token, JWT_SECRET!);
+        decodedToken = jwt.verify(token, JWT_SECRET!/*, (err: any, decoded: any) => {
+            if (err && err.message === "jwt expired") {
+                next(new ErrorHandler(401, "Session expired"));
+            } else if (err) {
+                next(new ErrorHandler(401, "Unauthorized"));
+            } else {
+                req.userId = decodedToken.id;
+                next();
+            }
+        }*/);
     } catch (err: any) {
         err.statusCode = 500;
         throw err;
@@ -25,9 +35,10 @@ const isAuth = (req: any, res: any, next: any) => {
         error.statusCode = 401;
         throw error;
     }
-    //console.log('decodedToken', decodedToken)
-    req.userId = decodedToken.id;
-    next();
+    if (!req.userId) {
+        req.userId = decodedToken.id;
+        next();
+    }
 };
 
 module.exports = isAuth;
