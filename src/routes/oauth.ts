@@ -100,7 +100,7 @@ router.post('/token', ({ body: { code, provider, action, redirect_uri }, cookies
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-            }).then(({ data: { access_token, expires_in, refresh_token, refresh_expire_in, token_type } }) => axios.get('https://open.tiktokapis.com/v2/user/info/', {
+            }).then(({ data: { access_token, expires_in, refresh_token, refresh_expires_in, token_type } }) => axios.get('https://open.tiktokapis.com/v2/user/info/', {
                 /*
                 open_id:
                 scope:
@@ -131,7 +131,7 @@ router.post('/token', ({ body: { code, provider, action, redirect_uri }, cookies
                 if (action == 'register') {
                     //tiene q verificarse si existe el socialnet con el id para evitar volver a
                     const { union_id: id, username: name, avatar_url: profileImage, follower_count: followers, video_count: medias } = data;
-                    const social = { id, name, profileImage, followers, medias, expires_in, refresh_token, refresh_expire_in, token_type }
+                    const social = { id, name, profileImage, followers, medias, expires_in, refresh_token, refresh_expires_in, token_type }
                     return new Temporal({ content: JSON.stringify({ tiktok: social }) }).save().then(({ _doc: { _id } }: any) => {
                         res.send({ social: _id, ...social });
                     })
