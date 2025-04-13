@@ -110,4 +110,6 @@ const CourseSchema = new Schema({
 	},
 });
 
-export default model('Course', CourseSchema);
+const Course = model('Course', CourseSchema);
+
+export default Course;

@@ -1,4 +1,4 @@
-import User, { IUser } from '../database/models/user';
+import User from '../database/models/user';
 import { hashPassword, comparePassword } from '../utils/auth';
 import jwt, { Secret } from 'jsonwebtoken';
 import AWS from 'aws-sdk';
@@ -7,10 +7,8 @@ import { Request, Response, NextFunction } from 'express';
 import Company from '../database/models/company';
 import Brand from '../database/models/brand';
 import Contact from '../database/models/contact';
-import Temporal from '../database/models/temporal';
 import { Types } from 'mongoose';
 import { sendError } from '../utils/errors';
-import axios from 'axios';
 import { getSocial } from '../routes/oauth';
 import { RequestWithUserId } from '../auth/is-auth';
 

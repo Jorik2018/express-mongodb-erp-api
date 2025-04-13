@@ -53,4 +53,7 @@ const ProfileSchema = new Schema({
 	},
 });
 
-export default model("profile", ProfileSchema);
+
+const Profile = model('Course', ProfileSchema);
+
+export default Profile;

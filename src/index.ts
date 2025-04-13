@@ -1,9 +1,9 @@
-import express, { Application, json, Request, Response } from 'express';
+import express, { Application, json, Request, Response, urlencoded, static as _static } from 'express';
+//import bodyParser from 'body-parser';
 //import "express-async-errors";
 //import { readdirSync } from 'fs';
 import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
-
 import posts from "./routes/posts";
 import csrf from 'csurf';
 import { Server } from 'socket.io';
@@ -19,12 +19,15 @@ import { knexMiddleware } from './database/objection_db';
 import { configureSocket } from './quiz/server';
 
 app.use(json());
-app.use(express.urlencoded({ extended: true }));
-//app.use(json());
+app.use(urlencoded({ extended: true }));
+
+//app.use(bodyParser.json());
+//app.use(bodyParser.urlencoded({ extended: true }));
 
 const multer = require('multer');
 
-app.use('/public', express.static(require('path').join(__dirname, 'assets')));
+app.use('/public', _static(require('path').join(__dirname, 'assets')));
+//app.use(_static(require('path').join(__dirname, 'public')));
 
 const fileStorage = multer.diskStorage({
   destination: (req: Request, file: any, cb: any) => {

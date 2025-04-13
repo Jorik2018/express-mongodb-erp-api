@@ -1,3 +1,5 @@
+import { sendError } from "../../utils/errors";
+
 const express = require("express");
 const router = express.Router();
 const User = require("../models/UserSchema");
@@ -6,17 +8,16 @@ const jwt = require("jsonwebtoken");
 const JWT_SECRET_TOKEN = process.env.JWT_SECRET;
 const auth = require("../middelware/auth");
 
-router.get("/", auth, async (req:any, res:any) => {
+router.get("/", auth, async (req: any, res: any) => {
 	try {
 		const user = await Profile.findOne({ user: res.authToken.id });
 		res.json(user);
 	} catch (e) {
-		console.error(e.message);
-		res.status(500).send(e.message);
+		sendError(res)(e);
 	}
 });
 
-router.post("/signup", async (req:any, res:any) => {
+router.post("/signup", async (req: any, res: any) => {
 	try {
 		const { uid, displayName, email, avatar } = req.body;
 		const user = await Profile.findOne({ email: req.body.email });
@@ -45,8 +46,8 @@ router.post("/signup", async (req:any, res:any) => {
 			payload,
 			JWT_SECRET_TOKEN,
 			{ expiresIn: 35000000000000000 },
-			(err, token) => {
-				if (err:any) {
+			(err: any, token: any) => {
+				if (err) {
 					res.json({ msg: err });
 				} else {
 					res.json({ token });
@@ -54,12 +55,12 @@ router.post("/signup", async (req:any, res:any) => {
 			}
 		);
 	} catch (e) {
-		return res.status(404).json({ msg: e.message });
+		return sendError(res)(e);
 	}
 });
 
 // Sing IN
-router.post("/signin", async (req:any, res:any) => {
+router.post("/signin", async (req: any, res: any) => {
 	try {
 		// IF USER ALREADY EXISTS
 		let userData = await User.findOne({ email: req.body.email });
@@ -74,20 +75,20 @@ router.post("/signin", async (req:any, res:any) => {
 		const payload = {
 			id: userData.uid,
 		};
-		jwt.sign(payload, JWT_SECRET_TOKEN, { expiresIn: 3600 }, (err, token) => {
-			if (err:any) {
+		jwt.sign(payload, JWT_SECRET_TOKEN, { expiresIn: 3600 }, (err: any, token: string) => {
+			if (err) {
 				res.json({ msg: err });
 			} else {
 				res.json({ token });
 			}
 		});
 	} catch (e) {
-		res.status(500).send("SERVER ERROR!");
+		sendError(res)(e);
 	}
 });
 
 //authwithgoogle
-router.post("/authwithgoogle", async (req:any, res:any) => {
+router.post("/authwithgoogle", async (req: any, res: any) => {
 	const { uid, displayName, email, avatar } = req.body;
 	try {
 		//Get user and profile schema
@@ -118,8 +119,8 @@ router.post("/authwithgoogle", async (req:any, res:any) => {
 					payload,
 					JWT_SECRET_TOKEN,
 					{ expiresIn: 3500 },
-					(err, token) => {
-						if (err:any) {
+					(err: any, token: string) => {
+						if (err) {
 							res.json({ errors: err.message });
 						} else {
 							res.json({ token });
@@ -143,8 +144,8 @@ router.post("/authwithgoogle", async (req:any, res:any) => {
 					payload,
 					JWT_SECRET_TOKEN,
 					{ expiresIn: 3600 },
-					(err, token) => {
-						if (err:any) {
+					(err: any, token: string) => {
+						if (err) {
 							res.json({ msg: err });
 						} else {
 							res.json({ token });

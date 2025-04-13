@@ -1,11 +1,9 @@
-//Used for querying by _id
-var ObjectId = require('mongodb').ObjectID;
+import { ObjectId } from 'mongodb';
 
-// index return all dogs
-exports.homeDog = function (req: any, res: any) {
-	var db = req.db;
-	var collection = db.collection('dogs');
-	collection.find().toArray(function (err: any, dogsArray: any) {
+const list = (req: any, res: any) => {
+	let db = req.db;
+	let collection = db.collection('dogs');
+	collection.find().toArray((err: any, dogsArray: any) => {
 		if (dogsArray) {
 			res.render('index', {
 				title: 'Dogs',
@@ -22,13 +20,13 @@ exports.homeDog = function (req: any, res: any) {
 };
 
 // get one dog
-exports.findByName = function (req: any, res: any) {
-	var db = req.db;
-	var collection = db.collection('dogs');
-	var name = req.params.name;
+const find = (req: any, res: any) => {
+	let db = req.db;
+	let collection = db.collection('dogs');
+	let name = req.params.name;
 	collection.findOne({
 		'name': name
-	}, function (err: any, item: any) {
+	}, (err: any, item: any) => {
 		if (item) {
 			res.render('dog', {
 				title: item.name,
@@ -44,10 +42,10 @@ exports.findByName = function (req: any, res: any) {
 };
 
 // create a new dog
-exports.createDog = function (req: any, res: any) {
-	var db = req.db;
-	var collection = db.collection('dogs');
-	var post = req.body;
+const create = (req: any, res: any) => {
+	let db = req.db;
+	let collection = db.collection('dogs');
+	let post = req.body;
 	collection.insert(post, {
 		safe: true
 	}, (error: any, result: any) => {
@@ -63,19 +61,19 @@ exports.createDog = function (req: any, res: any) {
 };
 
 // update a dog
-exports.updateDog = function (req: any, res: any) {
-	var db = req.db;
-	var collection = db.collection('dogs');
-	var id = req.body._id;
-	var post = req.body;
+const update = (req: any, res: any) => {
+	let db = req.db;
+	let collection = db.collection('dogs');
+	let id = req.body._id;
+	let post = req.body;
 
-	var dname = req.body.name;
-	var dbreed = req.body.breed;
-	var dcolour = req.body.colour;
+	let dname = req.body.name;
+	let dbreed = req.body.breed;
+	let dcolour = req.body.colour;
 
-	var checkForHexRegExp = new RegExp("^[0-9a-fA-F]{24}$");
+	let checkForHexRegExp = new RegExp("^[0-9a-fA-F]{24}$");
 	if (id.match(checkForHexRegExp)) {
-		var objectId = new ObjectId(id);
+		let objectId = ObjectId.createFromHexString(id);
 		collection.update({
 			'_id': objectId
 		}, {
@@ -104,14 +102,13 @@ exports.updateDog = function (req: any, res: any) {
 	}
 };
 
-// delete a dog
-exports.deleteDog = function (req: any, res: any) {
-	var db = req.db;
-	var collection = db.collection('dogs');
-	var _id = req.body._id;
-	var checkForHexRegExp = new RegExp("^[0-9a-fA-F]{24}$");
+const destroy = (req: any, res: any) => {
+	let db = req.db;
+	let collection = db.collection('dogs');
+	let _id = req.body._id;
+	let checkForHexRegExp = new RegExp("^[0-9a-fA-F]{24}$");
 	if (_id.match(checkForHexRegExp)) {
-		var objectId = new ObjectId(_id);
+		let objectId = ObjectId.createFromHexString(_id);
 		collection.remove({
 			'_id': objectId
 		}, {
@@ -133,3 +130,5 @@ exports.deleteDog = function (req: any, res: any) {
 		});
 	}
 };
+
+export default { list, destroy, update, create, find }

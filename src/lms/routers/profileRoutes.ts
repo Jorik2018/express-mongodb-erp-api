@@ -1,10 +1,13 @@
+import User from "../../database/models/user";
+import { sendError } from "../../utils/errors";
+
 const express = require("express");
 const router = express.Router();
 const auth = require("../middelware/auth");
 const Profile = require("../models/ProfileSchema");
 const Course = require("../models/CourseSchema");
 
-router.get("/me", auth, async (req:any, res:any) => {
+router.get("/me", auth, async (req: any, res: any) => {
 	try {
 		const profile = await Profile.findOne({ user: res.authToken.id });
 		if (!profile) {
@@ -12,13 +15,13 @@ router.get("/me", auth, async (req:any, res:any) => {
 		}
 		res.json(profile);
 	} catch (error) {
-		res.status(500).json({ msg: error.message });
+		sendError(res)(error);
 	}
 });
 
-router.post("/", auth, async (req:any, res:any) => {
+router.post("/", auth, async (req: any, res: any) => {
 	const { address, bio, gender, twitter, facebook, github } = req.body;
-	const profileFields = {};
+	const profileFields = {} as any;
 	if (address) profileFields.address = address;
 	if (bio) profileFields.bio = bio;
 	if (gender) profileFields.gender = gender;
@@ -37,15 +40,15 @@ router.post("/", auth, async (req:any, res:any) => {
 			);
 			return res.json(profile);
 		}
-		await updateProfile.save();
-		res.json(updateProfile);
+		await profile.save();
+		res.json(profile);
 	} catch (e) {
-		return res.status(404).json({ msg: e.message });
+		sendError(res, 404)(e);
 	}
 });
 
 //Add Wishlist
-router.put("/wish/:courseId", auth, async (req:any, res:any) => {
+router.put("/wish/:courseId", auth, async (req: any, res: any) => {
 	try {
 		let profile = await Profile.findOne({ user: res.authToken.id });
 		const populateProfile = {
@@ -54,10 +57,10 @@ router.put("/wish/:courseId", auth, async (req:any, res:any) => {
 		};
 		let course = await Course.findById(req.params.courseId);
 		//profile
-		const wishArrayInProfile = profile.courses.wishlist.map((x) => x._id);
+		const wishArrayInProfile = profile.courses.wishlist.map((x: any) => x._id);
 		const courseIndxInProfile = wishArrayInProfile.indexOf(req.params.courseId);
 		//Course
-		const wishArrayInCourse = course.wishlist.map((x) => x._id);
+		const wishArrayInCourse = course.wishlist.map((x: any) => x._id);
 		const userIndxInCourse = wishArrayInCourse.indexOf(req.params.courseId);
 
 		if (courseIndxInProfile === -1 && userIndxInCourse === -1) {
@@ -73,12 +76,12 @@ router.put("/wish/:courseId", auth, async (req:any, res:any) => {
 		}
 		res.json(profile);
 	} catch (e) {
-		return res.status(404).json({ msg: e.message });
+		sendError(res, 404)(e);
 	}
 });
 
 // Add Review
-router.put("/review/:courseId", auth, async (req:any, res:any) => {
+router.put("/review/:courseId", auth, async (req: any, res: any) => {
 	const { rating, text } = req.body;
 	try {
 		const course = await Course.findById(req.params.courseId);
@@ -92,19 +95,19 @@ router.put("/review/:courseId", auth, async (req:any, res:any) => {
 		// course.save();
 		res.json(course);
 	} catch (error) {
-		return res.status(404).json({ msg: error.message });
+		sendError(res, 404)(error);
 	}
 });
 
 //Enrolled new Course
-router.put("/enrolled/:courseId", auth, async (req:any, res:any) => {
+router.put("/enrolled/:courseId", auth, async (req: any, res: any) => {
 	try {
 		//Get Course Schema by id
 		const course = await Course.findById(req.params.courseId);
 		//Get Profile schema by uid
 		const profile = await Profile.findOne({ user: res.authToken.id });
 		//Check profile enrolled if already course exists then return an msg
-		const enrolledCourse = profile.courses.enrolled.map((x) => x._id);
+		const enrolledCourse = profile.courses.enrolled.map((x: any) => x._id);
 		const enrolledCourseIdx = enrolledCourse.indexOf(req.params.courseId);
 		if (enrolledCourseIdx !== -1) {
 			return res.status(400).json({ errors: [{ msg: "Already Enrolled" }] });
@@ -124,7 +127,7 @@ router.put("/enrolled/:courseId", auth, async (req:any, res:any) => {
 			res.json(profile);
 		}
 	} catch (error) {
-		return res.status(404).json({ msg: error.message });
+		return sendError(res, 404)(error);
 	}
 });
 
