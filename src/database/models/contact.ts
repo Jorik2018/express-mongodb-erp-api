@@ -3,6 +3,9 @@ import { Model, model, Schema } from 'mongoose';
 const socialMediaSchema = new Schema({
     id: String,
     access_token: String,
+    refresh_token: String,
+    expires_in: Number,
+    refresh_expire_in: Number,
     name: String,
     followers: Number,
     medias: Number,

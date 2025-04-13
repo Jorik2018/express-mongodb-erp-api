@@ -18,12 +18,26 @@ const {
 
 export const getSocial = (social: string) => Temporal.findOne({ _id: Types.ObjectId.createFromHexString(social) }).lean().then((temporal: any) => {
 
-    const [socialName, { access_token, ...social }]: any = Object.entries(JSON.parse(temporal.content))[0];
+    const [socialName, { access_token, refresh_token, ...social }]: any = Object.entries(JSON.parse(temporal.content))[0];
     if (socialName == 'instagram') {
         return axios.get('https://graph.instagram.com/access_token', {
             params: {
                 grant_type: 'ig_exchange_token', client_secret: INSTAGRAM_CLIENT_SECRET, access_token
             }
+        }).then(({ data }) => {
+            return { [socialName]: { ...social, ...data } };
+        })
+    } else if (socialName == 'tiktok') {
+        //debe revisarse si ya ha expirado el token
+        const params = new URLSearchParams();
+        params.append('client_key', TIKTOK_CLIENT_KEY!);
+        params.append('client_secret', TIKTOK_CLIENT_SECRET!);
+        params.append('grant_type', 'refresh_token');
+        params.append('refresh_token', refresh_token);
+        return axios.post(`https://open.tiktokapis.com/v2/oauth/token/`, params, {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
         }).then(({ data }) => {
             return { [socialName]: { ...social, ...data } };
         })
@@ -100,7 +114,7 @@ router.post('/token', ({ body: { code, provider, action, redirect_uri }, cookies
                     Authorization: `Bearer ${access_token}`,
                 },
                 params: {
-                    fields: 'open_id,union_id,display_name,avatar_url,username,follower_count',//,username,bio_description,follower_count',
+                    fields: 'open_id,union_id,display_name,avatar_url,username,follower_count,bio_description',
                 },
             }).then(({ data: { data: { user: data }, error: { code } } }) => {
                 /*
@@ -112,7 +126,6 @@ router.post('/token', ({ body: { code, provider, action, redirect_uri }, cookies
                 video_count:
                 username:
                 bio_description:
-
                 */
                 //res.send(user);
                 if (action == 'register') {
