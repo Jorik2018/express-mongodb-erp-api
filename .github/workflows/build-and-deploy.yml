@@ -34,4 +34,4 @@ jobs:
       run: docker build -t jorik2020/express-erp-api:0.1 .
 
     - name: Push Docker image
-      run: docker push jorik2020/jorik2020/express-erp-api:0.1
+      run: docker push jorik2020/express-erp-api:0.1
