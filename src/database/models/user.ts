@@ -14,7 +14,7 @@ const UserSchema: Schema = new Schema({
 		email: {
 			type: String,
 			trim: true,
-			unique: true,
+			//unique: true,
 			lowercase: true,
 		},
 		roles: {
