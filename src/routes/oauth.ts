@@ -15,15 +15,7 @@ const {
     INSTAGRAM_REDIRECT_URI,
     TIKTOK_CLIENT_KEY, TIKTOK_CLIENT_SECRET, TIKTOK_REDIRECT_URI
 } = process.env;
-/*
-{"instagram":{
-    "id":"17841445647686253",
-    "name":"jorikpak",
-    "profileImage":"https:","followers":1,
-    "medias":1,
-    "access_token":"IGAAHXz51WsjdUlZAmpudwZDZD"}
-}
-*/
+
 export const getSocial = (social: string) => Temporal.findOne({ _id: Types.ObjectId.createFromHexString(social) }).lean().then((temporal: any) => {
 
     const [socialName, { access_token, ...social }]: any = Object.entries(JSON.parse(temporal.content))[0];
@@ -76,25 +68,7 @@ const get_oauth_url = (res: Response, provider: string, redirect_uri?: any) => {
 }
 
 router.post('/token', ({ body: { code, provider, action, redirect_uri }, cookies }, res) => {
-
-    // Mock successful social login
-    /*const mockUser: User = {
-      id: '2',
-      lastname:'',
-      name: provider === 'facebook' ? 'Facebook User' : 'TikTok User',
-      email: `${provider}user@example.com`,
-      profileImage: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?q=80&w=200&auto=format&fit=crop',
-      followers: provider === 'tiktok' ? 5600 : 890,
-      preferences: [],
-      isAdvertiser: false // Default as influencer
-    };*/
     try {
-        //facebook
-        /**
-         * email: "ea_pinedo@yahoo.es"
-         * id: "1650937281635586"
-name: "Erik Alarcón Pinedo" 
-*/
         if (cookies) {
             provider = cookies.provider || provider;
             action = cookies.action || action;
@@ -113,16 +87,57 @@ name: "Erik Alarcón Pinedo"
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-            }).then(({ data }) => axios.get('https://open.tiktokapis.com/v2/user/info/', {
+            }).then(({ data: { access_token, expires_in, refresh_token, refresh_expire_in, token_type } }) => axios.get('https://open.tiktokapis.com/v2/user/info/', {
+                /*
+                open_id:
+                scope:
+                access_token:
+                expires_in:
+                refresh_token:
+                refresh_expire_in:
+                token_type:
+                */
                 headers: {
-                    Authorization: `Bearer ${data.access_token}`,
+                    Authorization: `Bearer ${access_token}`,
                 },
                 params: {
-                    fields: 'open_id,union_id,display_name,avatar_url',
+                    fields: 'open_id,union_id,display_name,avatar_url,username,bio_description,follower_count',
                 },
-            }).then(({ data: userData }) => {
-                res.send(userData);
-            }));
+            }).then(({ data: { data: { user: data }, error: { code } } }) => {
+                /*
+                display_name:
+                open_id:user id en app
+                union_id:user id global
+                follower_count:
+                likes_count: 
+                video_count:
+                username:
+                bio_description:
+
+                */
+                //res.send(user);
+                if (action == 'register') {
+                    //tiene q verificarse si existe el socialnet con el id para evitar volver a
+                    const { union_id: id, username: name, avatar_url: profileImage, follower_count: followers, video_count: medias } = data;
+                    const social = { id, name, profileImage, followers, medias, expires_in, refresh_token, refresh_expire_in, token_type }
+                    return new Temporal({ content: JSON.stringify({ tiktok: social }) }).save().then(({ _doc: { _id } }: any) => {
+                        res.send({ social: _id, ...social });
+                    })
+                } else {
+                    const { union_id: user_id } = data;
+                    return Contact.findOne({ 'socials.tiktok.id': user_id })
+                        .populate('user')
+                        .lean()
+                        .then((contact) => {
+                            if (!contact) {
+                                res.status(404).send({ error: 'Contact not found' });
+                            } else {
+                                const { user, ...others } = contact;
+                                generateToken(res, { rating: 0, ...others, ...user })
+                            }
+                        })
+                }
+            })).catch(sendError(res));
         } else if (provider == 'instagram') {
             const formData = new FormData();
             formData.append('client_id', INSTAGRAM_CLIENT_ID!);
