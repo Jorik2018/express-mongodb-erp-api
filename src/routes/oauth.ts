@@ -101,7 +101,7 @@ router.post('/token', ({ body: { code, provider, action, redirect_uri }, cookies
                     Authorization: `Bearer ${access_token}`,
                 },
                 params: {
-                    fields: 'open_id,union_id,display_name,avatar_url,username,bio_description,follower_count',
+                    fields: 'open_id,union_id,display_name,avatar_url',//,username,bio_description,follower_count',
                 },
             }).then(({ data: { data: { user: data }, error: { code } } }) => {
                 /*
