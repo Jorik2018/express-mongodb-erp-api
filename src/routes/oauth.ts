@@ -57,7 +57,7 @@ const get_oauth_url = (res: Response, provider: string, redirect_uri?: any) => {
         const { codeVerifier, codeChallenge } = generatePKCE();
         res.cookie('verifier', codeVerifier, { maxAge: 60000 });
         let url = `https://www.tiktok.com/v2/auth/authorize?client_key=${TIKTOK_CLIENT_KEY}`;
-        url += '&scope=user.info.basic,video.list&response_type=code';
+        url += '&scope=user.info.basic,user.info.profile,user.info.stats,video.list&response_type=code';
         url += `&redirect_uri=${redirect_uri || TIKTOK_REDIRECT_URI}&state=${csrfState}`;
         url += `&code_challenge=${codeChallenge}&code_challenge_method=S256`;
         return url;
@@ -100,7 +100,7 @@ router.post('/token', ({ body: { code, provider, action, redirect_uri }, cookies
                     Authorization: `Bearer ${access_token}`,
                 },
                 params: {
-                    fields: 'open_id,union_id,display_name,avatar_url,follower_count',//,username,bio_description,follower_count',
+                    fields: 'open_id,union_id,display_name,avatar_url,username,follower_count',//,username,bio_description,follower_count',
                 },
             }).then(({ data: { data: { user: data }, error: { code } } }) => {
                 /*
