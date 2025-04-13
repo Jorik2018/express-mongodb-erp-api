@@ -27,13 +27,12 @@ export const register = async ({ body }: Request, res: Response) => {
 			if (!password || password.length < 6) {
 				throw `PASSWORD IS REQUIRED AND SHOULD BE MIN 6 CHARACTERS LONG`
 			}
+			//valido que el usuario no exista por el email
+			let userExist = await User.findOne({ email }).select('-password').exec();
+			if (userExist) {
+				throw `EMAIL IS TAKEN`;
+			}
 		}
-		//valido que el usuario no exista por el email
-		let userExist = await User.findOne({ email }).select('-password').exec();
-		if (userExist) {
-			throw `EMAIL IS TAKEN`;
-		}
-
 		const bindContact = (user: any, contact: any) => {
 			if (contact) user.profileImage = contact.profileImage;
 			if (isAdvertiser) {
