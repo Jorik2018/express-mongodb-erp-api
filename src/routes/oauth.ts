@@ -82,7 +82,6 @@ router.post('/token', ({ body: { code, provider, action, redirect_uri }, cookies
             params.append('grant_type', 'authorization_code');
             params.append('redirect_uri', redirect_uri || TIKTOK_REDIRECT_URI!);
             params.append('code_verifier', codeVerifier);
-            console.log(Object.fromEntries(params))
             axios.post(`https://open.tiktokapis.com/v2/oauth/token/`, params, {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
