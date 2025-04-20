@@ -63,6 +63,10 @@ app.use(require("cors")());
 const api = process.env.API || '/api';
 import authRoute from './routes/auth'
 const isAuth = require('./auth/is-auth').default;
+app.get(`${api}/hola/:name?`, (req, res) => {
+  const name = req.params.name || 'Mundo';
+  res.send(`Hola ${name}`);
+});
 app.use(`${api}/oauth`, require('./routes/oauth').default);
 app.use(api, authRoute(isAuth));
 app.use(isAuth);
