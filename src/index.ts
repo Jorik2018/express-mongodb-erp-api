@@ -128,4 +128,6 @@ mongoose.connect(process.env.DB_URI!, {})
     });
   }).catch((error) => {
     console.log(`*** DB CONNECTION ERROR ❌ => `, error);
+    console.log(process.env.DB_URI);
+    
   });
