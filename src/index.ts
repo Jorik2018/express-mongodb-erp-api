@@ -127,7 +127,6 @@ mongoose.connect(process.env.DB_URI!, {})
       console.log(`*** SERVER IS RUNNING ON PORT ${PORT} ***`);
     });
   }).catch((error) => {
-    console.log(`*** DB CONNECTION ERROR ❌ => `, error);
-    console.log(process.env.DB_URI);
+    console.log(`*** DB CONNECTION ERROR ❌ => [${process.env.DB_URI}]`, error);
     
   });
