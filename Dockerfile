@@ -10,6 +10,7 @@ COPY package*.json ./
 # Install app dependencies
 RUN npm install
 
+COPY prisma/ ./prisma/
 RUN npx prisma generate
 
 # Copy the rest of the application code to the container
