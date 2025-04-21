@@ -60,13 +60,16 @@ app.use(require("cors")());
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
 });*/
-const api = process.env.API || '/api';
-import authRoute from './routes/auth'
-const isAuth = require('./auth/is-auth').default;
+const api = process.env.API || '';
+
 app.get(`${api}/hola/:name?`, (req, res) => {
   const name = req.params.name || 'Mundo';
   res.send(`Hola ${name}`);
 });
+
+import authRoute from './routes/auth'
+const isAuth = require('./auth/is-auth').default;
+
 app.use(`${api}/oauth`, require('./routes/oauth').default);
 app.use(api, authRoute(isAuth));
 app.use(isAuth);
@@ -99,7 +102,7 @@ app.use(require('morgan')('dev'));
 
 //app.use(csrf({ cookie: true }));
 
-app.get('/api/csrf-token', (req: any, res: any) => {
+app.get(`${api}/csrf-token`, (req: any, res: any) => {
   res.json({ csrfToken: req.csrfToken() });
 });
 const { FRONTEND } = process.env;
