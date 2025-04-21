@@ -10,11 +10,8 @@ import moment from 'moment';
 const { v4: uuidv4 } = require('uuid');
 
 const prisma = new PrismaClient()
-const router = express.Router();
 
-router.get('/', (req: Request, res: Response) => {
-    res.status(200).send("Inventory API");
-});
+const router = express.Router();
 
 function getMonth(date: any) {
     let res = moment(date).format("MM");
@@ -59,10 +56,6 @@ function getMonth(date: any) {
     }
     return res;
 }
-
-router.get('/test', (req:any, res:any) => {
-    res.json({ message: 'Hello, World!' });
-});
 
 router.get('/report', validateToken, async (req: Request, res: Response) => {
     try {

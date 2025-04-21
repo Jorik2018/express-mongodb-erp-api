@@ -1,25 +1,27 @@
 import { Request, Response } from 'express';
+import { Knex } from 'knex';
 
 const { Model } = require('objection');
 
-type Transaction = { commit: () => Promise<void>, rollback: () => Promise<void> }
+//type Transaction = { commit: () => Promise<void>, rollback: () => Promise<void> }
 
-type Field = ((value?: string) => Field) & { primary: Field, references: Field };
+//type Field = ((value?: string) => Field) & { primary: Field, references: Field };
 
-type TableBuilder = { integer: Field, string: Field, increments: Field };
+//type TableBuilder = { integer: Field, string: Field, increments: Field };
 
-type Schema = {
+/*type Schema = {
     hasTable: (tableName: string) => Promise<boolean>,
     createTable: (tableName: string, buider: (tableBuilder: TableBuilder) => void) => Promise<void>
-}
-type Knex = {
+}*/
+/*type Knex = {
     transaction: () => Promise<Transaction>,
     schema: Schema,
-}
+    select: (...arg:string) => any
+}*/
 
 let knex: Knex;
 
-let transaction: Transaction;
+let transaction: Knex.Transaction;
 
 export class Person extends Model {
     static get tableName() {
@@ -64,22 +66,26 @@ function createKnex(): Promise<Knex> {
     })
 }
 
-const createTable = (schema: Schema, tableName: string, builder: (tableBuilder: TableBuilder) => void) =>
+const createTable = (schema: Knex.SchemaBuilder, tableName: string, builder: (tableBuilder: Knex.CreateTableBuilder) => void): Promise<Knex.SchemaBuilder | void> =>
     schema.hasTable(tableName).then(hasTable => {
         if (!hasTable) {
             return schema.createTable(tableName, builder)
         }
-    }).then(() => schema);
+        return schema;
+    });
 
-
+/*
+const knexfile = require("./db/knexfile");
+const db = require("knex")(knexfile[process.env.NODE_ENV]);
+*/
 const db = () => createKnex()
     .then((knex) => knex.schema.hasTable('persons').then(hasTable => {
         if (!hasTable) {
-            return createTable(knex.schema, 'persons', (tableBuilder: TableBuilder) => {
+            return createTable(knex.schema, 'persons', (tableBuilder: Knex.CreateTableBuilder) => {
                 tableBuilder.increments('id').primary();
                 tableBuilder.integer('parentId').references('persons.id');
                 tableBuilder.string('firstName');
-            }).then(schema => createTable(schema, 'companies', (tableBuilder: TableBuilder) => {
+            }).then(schema => createTable(schema!, 'companies', (tableBuilder: Knex.CreateTableBuilder) => {
                 tableBuilder.increments('id').primary();
                 tableBuilder.string('name');
             })).then(() => knex)
@@ -89,7 +95,7 @@ const db = () => createKnex()
     }))
     .then((knex: Knex) => {
         if (!transaction) {
-            return knex.transaction().then((t: Transaction) => { transaction = t; return knex; })
+            return knex.transaction().then((t: Knex.Transaction) => { transaction = t; return knex; })
         }
         return knex;
     }).catch((e: Error) => {
@@ -98,25 +104,25 @@ const db = () => createKnex()
     })
 
 const knexMiddleware = (req: Request, res: Response, next: () => void) => {
-    // knex.transaction()
-    //     .then((transaction:Transaction) => {
-    /*res.on('finish', () => {
-        transaction?.commit().then(() => {
-            console.log('transaction.commit()');
-        }).catch((error: Error) => {
-            console.error(error);
-        });
-    });
-    res.on('close', () => {
-        if (!res.writableEnded) {
-            transaction.rollback()
-                .then(() => console.log('Transaction rolled back due to connection closed'))
-                .catch((error: Error) => console.error('Transaction rollback failed due to connection closed:', error));
-        }
-    });
-    next();*/
-    // })
-    // .catch(next);
+    knex.transaction()
+        .then((transaction: Knex.Transaction) => {
+            res.on('finish', () => {
+                transaction?.commit().then(() => {
+                    console.log('transaction.commit()');
+                }).catch((error: Error) => {
+                    console.error(error);
+                });
+            });
+            res.on('close', () => {
+                if (!res.writableEnded) {
+                    transaction.rollback()
+                        .then(() => console.log('Transaction rolled back due to connection closed'))
+                        .catch((error: Error) => console.error('Transaction rollback failed due to connection closed:', error));
+                }
+            });
+            next();
+        })
+        .catch(next);
 }
 
 export { db, Knex as knex, knexMiddleware };

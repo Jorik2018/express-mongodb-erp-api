@@ -1,11 +1,12 @@
-const express = require("express");
-const router = express.Router();
+import { NextFunction, Request, Response, Router } from 'express'
+
 const regex = require("../helpers/regex");
+
 const { ErrorHandler } = require("../helpers/errorsHelper");
 
 module.exports = (
-  { getBookById },
-  { getBookstoreById },
+  { getBookById }: any,
+  { getBookstoreById }: any,
   {
     getBookstoresBooks,
     createBookstoresBooks,
@@ -13,17 +14,19 @@ module.exports = (
     getBookstoresBooksByContent,
     updateBookstoresBooks,
     deleteBookstoresBooksById,
-  }
+  }: any
 ) => {
-  router.get("/", (req, res, next) => {
+  const router = Router();
+
+  router.get("/", (req: Request, res: Response, next: NextFunction) => {
     getBookstoresBooks()
-      .then((result) => {
+      .then((result: any[]) => {
         res.json(result);
       })
-      .catch((err:any) => next(err:any));
+      .catch((err: any) => next(err));
   });
 
-  router.post("/", (req, res, next) => {
+  router.post("/", (req: Request, res: Response, next: NextFunction) => {
     const { book_id, bookstore_id, quantity } = req.body;
     if (!book_id || !bookstore_id || !quantity || Number(quantity) < 0) {
       next(new ErrorHandler(400, "Invalid field(s)"));
@@ -40,26 +43,26 @@ module.exports = (
           if (result[2].length)
             throw new ErrorHandler(403, "Already existing resource");
           createBookstoresBooks(book_id, bookstore_id, quantity).then(
-            (result) => {
+            (result: any[]) => {
               res.status(201).json(result[0]);
             }
           );
         })
-        .catch((err:any) => next(err:any));
+        .catch((err) => next(err));
     }
   });
 
-  router.get(`/:id(${regex.id})`, (req, res, next) => {
+  router.get(`/:id(${regex.id})`, (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
     getBookstoresBooksById(id)
-      .then((result) => {
+      .then((result: any[]) => {
         if (!result.length) throw new ErrorHandler(404, "Not found");
         res.json(result[0]);
       })
-      .catch((err:any) => next(err:any));
+      .catch((err: any) => next(err));
   });
 
-  router.patch(`/:id(${regex.id})`, (req, res, next) => {
+  router.patch(`/:id(${regex.id})`, (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
     const { quantity } = req.body;
 
@@ -67,26 +70,26 @@ module.exports = (
       next(new ErrorHandler(400, "Invalid field(s)"));
     } else {
       getBookstoresBooksById(id)
-        .then((result) => {
+        .then((result: any[]) => {
           if (!result.length) throw new ErrorHandler(404, "Not found");
-          updateBookstoresBooks(id, quantity).then((result) => {
+          updateBookstoresBooks(id, quantity).then((result: any[]) => {
             res.json(result[0]);
           });
         })
-        .catch((err:any) => next(err:any));
+        .catch((err: any) => next(err));
     }
   });
 
-  router.delete(`/:id(${regex.id})`, (req, res, next) => {
+  router.delete(`/:id(${regex.id})`, (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
     getBookstoresBooksById(id)
-      .then((result) => {
+      .then((result: any[]) => {
         if (!result.length) throw new ErrorHandler(404, "Not found");
-        deleteBookstoresBooksById(id).then((result) => {
+        deleteBookstoresBooksById(id).then((result: any[]) => {
           res.status(202).json(result[0]);
         });
       })
-      .catch((err:any) => next(err:any));
+      .catch((err: any) => next(err));
   });
 
   return router;

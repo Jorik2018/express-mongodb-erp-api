@@ -1,7 +1,8 @@
-const express = require("express");
-import { Request, Response, NextFunction } from 'express'
-const router = express.Router();
+import { Request, Response, NextFunction, Router } from 'express'
+
 const { ErrorHandler } = require("../helpers/errorsHelper");
+
+const router = Router();
 
 const send404 = (_req: Request, _res: Response, next: NextFunction) => {
   next(new ErrorHandler(404, "Not found"));
@@ -9,4 +10,4 @@ const send404 = (_req: Request, _res: Response, next: NextFunction) => {
 
 router.all("/", send404);
 
-module.exports = router;
+export default router;

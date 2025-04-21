@@ -1,36 +1,25 @@
 
-import { Router, Response, NextFunction,Request } from 'express';
-var app = require("express")();
-var server = require("http").Server(app);
-var bodyParser = require("body-parser");
-var Datastore = require("nedb");
+import { Router, Request, Response } from 'express';
 
-var Inventory = require("./inventory");
+let router = Router();
 
-app.use(bodyParser.json());
+let Datastore = require("nedb");
 
-module.exports = app;
+let Inventory = require("./inventory");
 
-// Create Database
-var Transactions = new Datastore({
+let Transactions = new Datastore({
   filename: "./server/databases/transactions.db",
   autoload: true
 });
 
-app.get("/", function (req: any, res: any) {
-  res.send("Transactions API");
-});
-
-// GET all transactions
-app.get("/all", function (req: any, res: any) {
+router.get("/all", (req: any, res: Response) => {
   Transactions.find({}, (err: any, docs: any) => {
     res.send(docs);
   });
 });
 
-// GET all transactions
-app.get("/limit", function (req: any, res: any) {
-  var limit = parseInt(req.query.limit, 10);
+router.get("/limit", ({query}: Request, res: Response) => {
+  let limit = parseInt(query.limit as string, 10);
   if (!limit) limit = 5;
 
   Transactions.find({})
@@ -41,34 +30,34 @@ app.get("/limit", function (req: any, res: any) {
     });
 });
 
-// GET total sales for the current day
-app.get("/day-total", function (req: any, res: any) {
-  // if date is provided
-  if (req.query.date) {
-    startDate = new Date(req.query.date);
+router.get("/day-total", ({query}: Request, res: Response) => {
+  let startDate: any;
+  let endDate: any;
+  if (query.date) {
+    startDate = new Date(query.date as string);
     startDate.setHours(0, 0, 0, 0);
 
-    endDate = new Date(req.query.date);
+    endDate = new Date(query.date as string);
     endDate.setHours(23, 59, 59, 999);
   } else {
     // beginning of current day
-    var startDate = new Date();
+    let startDate = new Date();
     startDate.setHours(0, 0, 0, 0);
 
     // end of current day
-    var endDate = new Date();
+    let endDate = new Date();
     endDate.setHours(23, 59, 59, 999);
   }
 
   Transactions.find(
     { date: { $gte: startDate.toJSON(), $lte: endDate.toJSON() } },
-    function (err: any, docs: any) {
-      var result: any = {
+    (err: any, docs: any) => {
+      let result: any = {
         date: startDate
       };
 
       if (docs) {
-        var total = docs.reduce((p: any, c: any) => {
+        let total = docs.reduce((p: any, c: any) => {
           return p + c.total;
         }, 0.0);
 
@@ -83,26 +72,23 @@ app.get("/day-total", function (req: any, res: any) {
   );
 });
 
-// GET transactions for a particular date
-app.get("/by-date", function (req: any, res: any) {
-  var startDate = new Date();
+router.get("/by-date", (req: any, res: Response) => {
+  let startDate = new Date();
   startDate.setHours(0, 0, 0, 0);
 
-  var endDate = new Date();
+  let endDate = new Date();
   endDate.setHours(23, 59, 59, 999);
 
   Transactions.find(
     { date: { $gte: startDate.toJSON(), $lte: endDate.toJSON() } },
-    function (err: any, docs: any) {
+    (err: any, docs: any) => {
       if (docs) res.send(docs);
     }
   );
 });
 
-// Add new transaction
-app.post("/new", function (req: any, res: any) {
-  var newTransaction = req.body;
-
+router.post("/new", (req: any, res: Response) => {
+  let newTransaction = req.body;
   Transactions.insert(newTransaction, (err: any, transaction: any) => {
     if (err) res.status(500).send(err);
     else {
@@ -112,9 +98,10 @@ app.post("/new", function (req: any, res: any) {
   });
 });
 
-// GET a single transaction
-app.get("/:transactionId", function (req: Request, res: Response) {
+router.get("/:transactionId", (req: Request, res: Response) => {
   Transactions.find({ _id: req.params.transactionId }, (err: any, doc: any) => {
     if (doc) res.send(doc[0]);
   });
 });
+
+export default router;

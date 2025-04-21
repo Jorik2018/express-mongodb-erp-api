@@ -1,15 +1,13 @@
 import { Request, Response, Router } from 'express'
-const router = Router();
-require("dotenv").config({ path: "../.env" });
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt';
+import { sendError } from '../../utils/errors';
+
 const { ErrorHandler } = require("../helpers/errorsHelper");
 
 export default ({ getUserByEmail }: any) => {
 
-  router.get("/", (req: Request, res: Response) => {
-    res.send("Hello World!");
-  });
+  const router = Router();
 
   router.post("/login", (req: Request, res: Response, next: any) => {
     const { email, password } = req.body;
@@ -33,9 +31,10 @@ export default ({ getUserByEmail }: any) => {
           );
           res.json({ token });
         })
-        .catch((err: any) => next(err));
+        .catch(sendError(next));
     }
   });
 
   return router;
+
 };

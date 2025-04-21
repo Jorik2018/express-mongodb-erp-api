@@ -144,13 +144,7 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
 			}
 			return generateToken(res, user)
 		});
-	}).catch(error => {
-		if (!error.statusCode) {
-			error.statusCode = 500;
-		}
-		next(error);
-		res.status(400).send('ERROR. TRY AGAIN.');
-	});
+	}).catch(sendError(next));
 };
 
 

@@ -1,23 +1,17 @@
 
-import { Router, Response, NextFunction,Request } from 'express';
-const app = require("express")();
-const server = require("http").Server(app);
-const bodyParser = require("body-parser");
-const Datastore = require("nedb");
+import { Router, Response, Request } from 'express';
+import Datastore from '@seald-io/nedb';
+
+const router = Router();
+
 const async = require("async");
 
-app.use(bodyParser.json());
-
-module.exports = app;
-
-// Creates  Database
-var inventoryDB = new Datastore({
+let inventoryDB = new Datastore({
     filename: "./server/databases/inventory.db",
     autoload: true
 });
 
-// GET a product from inventory by _id
-app.get("/product/:productId", (req: Request, res: any) => {
+router.get("/product/:productId", (req: Request, res: Response) => {
     if (!req.params.productId) {
         res.status(500).send("ID field is required.");
     } else {
@@ -30,16 +24,15 @@ app.get("/product/:productId", (req: Request, res: any) => {
 });
 
 // GET all inventory products
-app.get("/products", function (req: Request, res: any) {
-    inventoryDB.find({}, function (err: any, docs: any) {
+router.get("/products", function (req: Request, res: Response) {
+    inventoryDB.find({}, (err: any, docs: any) => {
         console.log("sending inventory products");
         res.send(docs);
     });
 });
 
-// post inventory product
-app.post("/product", function (req: Request, res: any) {
-    var newProduct = req.body;
+router.post("/product", function (req: Request, res: Response) {
+    let newProduct = req.body;
 
     inventoryDB.insert(newProduct, (err: any, product: any) => {
         if (err) res.status(500).send(err);
@@ -47,8 +40,7 @@ app.post("/product", function (req: Request, res: any) {
     });
 });
 
-//delete product using product id
-app.delete("/product/:productId", function (req: Request, res: any) {
+router.delete("/product/:productId", function (req: Request, res: Response) {
     inventoryDB.remove({
         _id: req.params.productId
     }, function (err: any, numRemoved: any) {
@@ -57,9 +49,8 @@ app.delete("/product/:productId", function (req: Request, res: any) {
     });
 });
 
-// Updates inventory product
-app.put("/product", (req: Request, res: any) => {
-    var productId = req.body._id;
+router.put("/product", (req: Request, res: Response) => {
+    let productId = req.body._id;
 
     inventoryDB.update({
         _id: productId
@@ -73,7 +64,7 @@ app.put("/product", (req: Request, res: any) => {
     });
 });
 
-app.decrementInventory = function (products: any) {
+(router as any).decrementInventory = (products: any) => {
     async.eachSeries(products, (transactionProduct: any, callback: any) => {
         inventoryDB.findOne({
             _id: transactionProduct._id
@@ -85,7 +76,7 @@ app.decrementInventory = function (products: any) {
             if (!product || !product.quantity_on_hand) {
                 callback();
             } else {
-                var updatedQuantity =
+                let updatedQuantity =
                     parseInt(product.quantity_on_hand) -
                     parseInt(transactionProduct.quantity);
 
@@ -102,3 +93,5 @@ app.decrementInventory = function (products: any) {
         });
     });
 };
+
+export default router;

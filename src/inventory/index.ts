@@ -1,80 +1,78 @@
-import 'dotenv-flow/config';
-import express, { Request, Router, Response, NextFunction } from 'express';
-import createMemoryStore from 'memorystore';
-import passport from 'passport';
-import storageMiddleware from './storageMiddleware';
-import authRouter from './authRouter';
-import apiRouter from './apiRouter';
+import { Socket } from "socket.io";
+import { Router } from 'express';
 
-let session = require("express-session");
+const configureSocket = (io: Socket) => {
+  let liveCart: any = [];
+  // Websocket logic for Live Cart
+  io.on("connection", (socket: any) => {
+    socket.on("cart-transaction-complete", () => {
+      socket.broadcast.emit("update-live-cart-display", {});
+    });
 
-let { Strategy } = require("passport-github2");
+    // upon page load, give user current cart
+    socket.on("live-cart-page-loaded", () => {
+      socket.emit("update-live-cart-display", liveCart);
+    });
 
-const app = express();
-const MemoryStore = createMemoryStore(session);
+    // upon connecting, make client update live cart
+    socket.emit("update-live-cart-display", liveCart);
 
-passport.use(new Strategy({
-    clientID: process.env.GITHUB_KEY,
-    clientSecret: process.env.GITHUB_SECRET,
-    callbackURL: "/api/login",
-    passReqToCallback: true,
-}, (req: any, accessToken: any, refreshToken: any, profile: any, cb: any) => {
-    req.session.token = accessToken;
-    return cb(null, profile);
-}));
-
-
-passport.serializeUser((user:any, cb:any) => {
-    cb(null, user);
-});
-
-passport.deserializeUser((obj: any, cb:any) => {
-    cb(null, obj);
-});
-
-app.use((req: Request, res: any, next:NextFunction) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    res.header("Access-Control-Allow-Credentials", true);
-    next();
-});
-
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-app.use(express.static('dist'));
-
-const sess: any = {
-    name: 'pia.sid',
-    secret: process.env.SESSION_SECRET,
-    resave: true,
-    rolling: true,
-    saveUninitialized: false,
-    store: new MemoryStore({
-        checkPeriod: 86400000,
-    }),
-    cookie: {
-        path: '/',
-        sameSite: 'strict',
-        // maxAge: 86400000,
-    }
-};
-
-if (app.get('env') === 'production') {
-    app.set('trust proxy', 1);
-    sess.cookie.secure = true;
+    // when the cart data is updated by the POS
+    socket.on("update-live-cart", (cartData: any) => {
+      // keep track of it
+      liveCart = cartData;
+      // broadcast updated live cart to all websocket clients
+      socket.broadcast.emit("update-live-cart-display", liveCart);
+    });
+  });
 }
 
-app.use(session(sess));
+export default configureSocket;
 
-app.use(passport.initialize());
-app.use(passport.session());
+const router = Router();
 
-app.use(storageMiddleware);
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+  const logger = require("morgan");
+  router.use(logger("dev"));
+}
 
-app.use('/api', authRouter);
-app.use('/api', apiRouter);
+const { authMiddleware } = require("./middlewares/authMiddleware");
 
-app.listen(process.env.PORT || 5000, () => {
-    console.info(`Listening on port ${process.env.PORT || 5000}! 👾`);
-});
+const { errorMiddleware } = require("./middlewares/errorMiddleware");
+
+const indexRouter = require("./routes/indexRoute");
+
+const usersController = require("./controllers/usersController")();
+
+router.use("/", indexRouter(usersController));
+
+router.use("/users", authMiddleware, require("./routes/usersRoute")(usersController));
+
+const bookstoresController = require("./controllers/bookstoresController")();
+
+router.use("/bookstores", authMiddleware, require("./routes/bookstoresRoute")(bookstoresController));
+
+const booksController = require("./controllers/booksController")();
+
+router.use("/books", authMiddleware, require("./routes/booksRoute")(booksController));
+
+const bookstoresBooksController = require("./controllers/bookstoresBooksController")();
+
+router.use(
+  "/bookstores-books",
+  authMiddleware,
+  require("./routes/bookstoresBooksRoute")(
+    booksController,
+    bookstoresController,
+    bookstoresBooksController
+  )
+);
+
+router.use("/status", authMiddleware, require("./routes/statusRoute")(require("./controllers/statusController")()));
+
+const Router404 = require("./routes/404Route");
+
+router.use("*", Router404);
+
+router.use(errorMiddleware);

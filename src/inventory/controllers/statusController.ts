@@ -1,7 +1,10 @@
-module.exports = (db) => {
+import { db } from '../../database/objection_db';
+
+export default () => {
+  
   const getBookstoresBooksStatus = () => {
     return (
-      db
+      db().then(db => db
         .select([
           "bookstores_books.*",
           "bookstores.name as bookstore_name",
@@ -17,8 +20,7 @@ module.exports = (db) => {
         .innerJoin("books", "bookstores_books.book_id", "books.id")
         .where("quantity", "<=", 0)
         // .groupBy("bookstores_books")
-        .then((result) => result)
-    );
+    ));
   };
 
   return {

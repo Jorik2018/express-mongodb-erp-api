@@ -8,4 +8,4 @@ const checkObjectId = (idToCheck: string) => (req: Request, res: Response, next:
   next();
 };
 
-module.exports = checkObjectId;
+export default checkObjectId;

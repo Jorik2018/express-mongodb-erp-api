@@ -1,6 +1,7 @@
 import { Router } from 'express';
 
 const { getEmployees, getEmployeeById, addEmployee, updateEmployee, deleteEmployee } = require("../controllers/employee");
+
 const router = Router();
 
 router.get('/', getEmployees);

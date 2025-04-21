@@ -1,47 +1,45 @@
-module.exports = (db) => {
+import { db } from '../../database/objection_db';
+
+export default () => {
+
   const getBookstores = () => {
-    return db
+    return db().then(db => db
       .select("*")
       .from("bookstores")
-      .orderBy("id")
-      .then((result) => result);
+      .orderBy("id"));
   };
 
-  const createBookstore = (name) => {
-    return db("bookstores")
+  const createBookstore = (name: string) => {
+    return db().then(db => db("bookstores")
       .insert({
         name,
       })
-      .returning("*")
-      .then((result) => result);
+      .returning("*"));
   };
 
-  const getBookstoreById = (id) => {
-    return db
+  const getBookstoreById = (id: string) => {
+    return db().then(db => db
       .select("*")
       .from("bookstores")
-      .where("id", id)
-      .then((result) => result);
+      .where("id", id));
   };
 
-  const getBookstoreByContent = (name) => {
-    return db
+  const getBookstoreByContent = (name: string) => {
+    return db().then(db => db
       .select("*")
       .from("bookstores")
-      .where({ name })
-      .then((result) => result);
+      .where({ name }));
   };
 
-  const deleteBookstoreById = (id) => {
-    return db("bookstores")
+  const deleteBookstoreById = (id: string) => {
+    return db().then(db => db("bookstores")
       .where({ id })
       .del()
-      .returning("*")
-      .then((result) => result);
+      .returning("*"));
   };
 
-  const getBooksForBookstoreById = (id) => {
-    return db
+  const getBooksForBookstoreById = (id: string) => {
+    return db().then(db => db
       .select([
         "books.*",
         "bookstores_books.id as stock_id",
@@ -50,8 +48,7 @@ module.exports = (db) => {
       .from("books")
       .innerJoin("bookstores_books", "books.id", "bookstores_books.book_id")
       .where("bookstore_id", id)
-      .orderBy("books.id")
-      .then((result) => result);
+      .orderBy("books.id"));
   };
 
   return {

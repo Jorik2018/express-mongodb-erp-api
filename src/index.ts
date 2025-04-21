@@ -12,8 +12,6 @@ require('dotenv').config();
 
 const app: Application = express();
 
-const PORT = process.env.PORT || 3000;
-
 import { createServer } from 'http';
 import { knexMiddleware } from './database/objection_db';
 import { configureSocket } from './quiz/server';
@@ -53,13 +51,20 @@ app.use(
 );
 
 app.use(cookieParser());
-app.use(require("cors")());
-/*app.use((req, res, next) => {
+app.use(require("cors")({ origin: '*' }));
+/*
+app.all("/*", (req: Request, res: Response, next) => {
+app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, DELETE, PATCH');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  next();
-});*/
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, X-Access-Token, X-Key');
+  if (req.method == "OPTIONS") {
+    res.status(200).end();
+  } else {
+    next();
+  }
+});
+*/
 const api = process.env.API || '/api';
 import authRoute from './routes/auth'
 const isAuth = require('./auth/is-auth').default;
@@ -91,6 +96,7 @@ app.use((err: any, _req: Request, res: Response) => {
   sendError(res)(err)
 })
 
+//app.use(require('morgan')('tiny'));
 app.use(require('morgan')('dev'));
 
 //app.use(csrf({ cookie: true }));
@@ -119,9 +125,18 @@ mongoose.connect(process.env.DB_URI!, {})
       configureSocket(socket)
     });
     io.listen(server);
+    const PORT = process.env.PORT || 3000;
     server.listen(PORT, () => {
       console.log(`*** SERVER IS RUNNING ON PORT ${PORT} ***`);
     });
+    /*
+        router.listen(config.port, config.host, (e: any) => {
+          if (e) {
+            throw new Error('Internal Server Error');
+          }
+          logger.info(`${config.name} running on ${config.host}:${config.port}`);
+        });
+        */
   }).catch((error) => {
     console.log(`*** DB CONNECTION ERROR ❌ => `, error);
   });
