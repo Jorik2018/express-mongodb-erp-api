@@ -57,20 +57,22 @@ app.all("/*", (req: Request, res: Response, next) => {
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, DELETE, PATCH');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, X-Access-Token, X-Key');
-  if (req.method == "OPTIONS") {
-    res.status(200).end();
-  } else {
-    next();
-  }
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  next();
+});*/
+const api = process.env.API || '';
+
+app.get(`${api}/hola/:name?`, (req, res) => {
+  const name = req.params.name || 'Mundo';
+  res.send(`Hola ${name}`);
 });
-*/
-const api = process.env.API || '/api';
+
 import authRoute from './routes/auth'
 const isAuth = require('./auth/is-auth').default;
+
 app.use(`${api}/oauth`, require('./routes/oauth').default);
 app.use(api, authRoute(isAuth));
-app.use(isAuth);
+//app.use(isAuth);
 app.use(`${api}/users`, require('./routes/user').default);
 app.use(`${api}/media`, require('./routes/media').default);
 app.use(`${api}/applications`, require('./routes/application').default);
@@ -101,7 +103,7 @@ app.use(require('morgan')('dev'));
 
 //app.use(csrf({ cookie: true }));
 
-app.get('/api/csrf-token', (req: any, res: any) => {
+app.get(`${api}/csrf-token`, (req: any, res: any) => {
   res.json({ csrfToken: req.csrfToken() });
 });
 const { FRONTEND } = process.env;
@@ -138,5 +140,6 @@ mongoose.connect(process.env.DB_URI!, {})
         });
         */
   }).catch((error) => {
-    console.log(`*** DB CONNECTION ERROR ❌ => `, error);
+    console.log(`*** DB CONNECTION ERROR ❌ => [${process.env.DB_URI}]`, error);
+    
   });
