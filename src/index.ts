@@ -95,6 +95,7 @@ readdirSync('./routes').map((route) => {
 });
 */
 app.use((err: any, _req: Request, res: Response) => {
+  console.log(err);
   sendError(res)(err)
 })
 
@@ -129,7 +130,7 @@ mongoose.connect(process.env.DB_URI!, {})
     io.listen(server);
     const PORT = process.env.PORT || 3000;
     server.listen(PORT, () => {
-      console.log(`*** SERVER IS RUNNING ON PORT ${PORT} ***`);
+      console.log(`*** SERVER IS RUNNING ON PORT ${PORT} ***1`);
     });
     /*
         router.listen(config.port, config.host, (e: any) => {
