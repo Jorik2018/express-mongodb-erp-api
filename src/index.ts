@@ -68,11 +68,11 @@ app.get(`${api}/hola/:name?`, (req, res) => {
 });
 
 import authRoute from './routes/auth'
-const isAuth = require('./auth/is-auth').default;
+const isAuth = require('./auth/is-auth').defaul
 
 app.use(`${api}/oauth`, require('./routes/oauth').default);
-//app.use(api, authRoute(isAuth));
-//app.use(isAuth);
+app.use(api, authRoute(isAuth));
+app.use(isAuth);
 app.use(`${api}/users`, require('./routes/user').default);
 app.use(`${api}/media`, require('./routes/media').default);
 app.use(`${api}/applications`, require('./routes/application').default);
