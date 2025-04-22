@@ -71,8 +71,8 @@ import authRoute from './routes/auth'
 const isAuth = require('./auth/is-auth').default;
 
 app.use(`${api}/oauth`, require('./routes/oauth').default);
-//app.use(api, authRoute(isAuth));
-//app.use(isAuth);
+app.use(api, authRoute(isAuth));
+app.use(isAuth);
 app.use(`${api}/users`, require('./routes/user').default);
 app.use(`${api}/media`, require('./routes/media').default);
 app.use(`${api}/applications`, require('./routes/application').default);
@@ -95,7 +95,6 @@ readdirSync('./routes').map((route) => {
 });
 */
 app.use((err: any, _req: Request, res: Response) => {
-  console.log('err:',err);
   sendError(res)(err)
 })
 

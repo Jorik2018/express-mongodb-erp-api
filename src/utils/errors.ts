@@ -6,6 +6,12 @@ export const sendError = (target: NextFunction | Response, code?: number) => (er
     const message = typeof err === 'string' ? err : err.message;
     const data = typeof err === 'string' ? undefined : err.data;
     console.error(err);
+    console.log("Error detallado:", {
+      message: err.message,
+      stack: err.stack,
+      path: req.path,
+      headers: req.headers,
+    })
     (target as Response).status(status).json(
       { message, data }
     );
