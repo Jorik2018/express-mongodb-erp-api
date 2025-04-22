@@ -95,7 +95,7 @@ readdirSync('./routes').map((route) => {
 });
 */
 app.use((err: any, _req: Request, res: Response) => {
-  console.log(err);
+  console.log('err:',err);
   sendError(res)(err)
 })
 
