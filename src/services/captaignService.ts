@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
 import Campaign from "../database/models/campaign";
 import User, { IUser } from "../database/models/user";
+import { moveTmp } from "../controllers/upload";
 
 const list = ({ userId }: any) => {
 
@@ -36,12 +37,20 @@ const find = (_id: string) => {
 
 }
 
-const create = ({ brandId, userId, ...body }: any) => {
+const create = ({ brandId, userId, coverImage, gallery, ...body }: any) => {
     const user = Types.ObjectId.createFromHexString(userId);
     const brand = Types.ObjectId.createFromHexString(brandId);
-    return new Campaign({ ...body, user, brand })
+    return new Campaign({ ...body, user, brand, gallery: [], coverImage: '?' })
         .save()
-        .then(({ _doc: { _id, ...campaign } }: any) => ({ id: _id, ...campaign }));
+        .then(({ _doc: { _id, ...campaign } }: any) => {
+            const id = _id.toHexString();
+            return moveTmp([coverImage], 'campaign', id).then(([coverImage]: any) =>
+                moveTmp(gallery, 'campaign', id).then((gallery) =>
+                    Campaign.findOneAndUpdate({ _id },
+                        { $set: { coverImage, gallery } }).then(() => ({ id, ...campaign }))
+                )
+            )
+        });
 };
 
 const update = (_id: string, body: any) => {

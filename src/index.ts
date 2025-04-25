@@ -46,9 +46,9 @@ const fileFilter = (req: Request, file: { mimetype: string }, cb: Function) => {
 
 //app.use(knexMiddleware);
 
-app.use(
-  multer({ storage: fileStorage, fileFilter }).single('image')
-);
+//app.use(
+ // multer({ storage: fileStorage, fileFilter }).single('image')
+//);
 
 app.use(cookieParser());
 app.use(require("cors")({ origin: '*' }));
@@ -68,8 +68,8 @@ app.get(`${api}/hola/:name?`, (req, res) => {
 });
 
 import authRoute from './routes/auth'
-const isAuth = require('./auth/is-auth').defaul
-
+const isAuth = require('./auth/is-auth').default
+app.use(`${api}/file`, require('./controllers/upload').default);
 app.use(`${api}/oauth`, require('./routes/oauth').default);
 app.use(api, authRoute(isAuth));
 app.use(isAuth);
