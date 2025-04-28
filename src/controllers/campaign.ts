@@ -15,14 +15,25 @@ const find = (req: Request, res: Response) => {
     .catch(sendError(res));
 };
 
-const create = ({ body: { brandId, ...body }, userId }: RequestWithUserId, res: Response) => {
-  captaignService.create({ ...body, userId, brandId })
-    .then(campaign => res.send(campaign))
-    .catch(sendError(res));
+const create = ({ body: { id, brandId, ...body }, userId }: RequestWithUserId, res: Response) => {
+  if (id) {
+    captaignService.update(id, { ...body, userId, brandId })
+      .then((campaign) => res.send(campaign))
+      .catch(sendError(res));
+  } else
+    captaignService.create({ ...body, userId, brandId })
+      .then(campaign => res.send(campaign))
+      .catch(sendError(res));
 };
 
 const update = (req: Request, res: Response) => {
   captaignService.update(req.params.id, req.body)
+    .then((campaign) => res.send(campaign))
+    .catch(sendError(res));
+};
+
+const activate = (req: Request, res: Response) => {
+  captaignService.activate(req.params.id)
     .then((campaign) => res.send(campaign))
     .catch(sendError(res));
 };
@@ -39,6 +50,6 @@ router.get('/', list as any);
 router.post('/', create as any);
 router.get('/:id', find);
 router.patch('/:id', update);
+router.patch('/activate/:id', activate);
 router.delete('/:id', remove);
-
 export default router;

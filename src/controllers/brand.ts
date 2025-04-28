@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { Types } from 'mongoose';
 import Brand, { IBrand } from '../database/models/brand';
 import { sendError } from '../utils/errors';
+import { moveTmp } from './upload';
 
 const list = ({ userId: user, from = 0, to = 10, query }: Request | any, res: Response) => {
   const filter = { user };
@@ -26,30 +27,29 @@ const find = (req: Request, res: Response) => {
     .catch(sendError(res));
 };
 
-const create = ({ body, userId }: Request | any, res: Response) => {
+const create = ({ body: { imageUrl, ...body }, userId }: Request | any, res: Response) => {
   const user = Types.ObjectId.createFromHexString(userId);
   new Brand({ ...body, user })
     .save()
     .then((brand: IBrand) => {
       const { _id, ...data } = brand.toObject();
-      res.send({
-        ...data,
-        id: _id
-      });
+      console.log('_id==',_id)
+      return moveTmp([imageUrl], 'brands').then(([imageUrl]) =>
+        Brand.updateOne({ _id },
+          { $set: { imageUrl } }).then(() => res.send({ ...data, imageUrl, id: _id }))
+      )
     })
     .catch(sendError(res));
 };
 
-const update = ({ body: { id, ...body } }: Request, res: Response) => {
-  Brand.findOneAndUpdate(
-    { _id: id },
-    { $set: body },
-    { new: true }
-  ).then(({ _doc: { _id, ...data } }: any) => {
-    res.send({
-      ...data,
-      id: _id
-    });
+const update = ({ body: { id, imageUrl, ...body }, userId }: any, res: Response) => {
+  Brand.findOne({ _id: id }).lean().then(({ _id, ...brand }: any) => {
+    const user = Types.ObjectId.createFromHexString(userId);
+    return moveTmp([imageUrl], 'brands').then(([imageUrl]: any) =>
+      Brand.updateOne({ _id },
+        { $set: { ...body, imageUrl, user } }).then(() => res.send({ ...brand, imageUrl, id: _id }))
+
+    )
   }).catch(sendError(res));
 };
 

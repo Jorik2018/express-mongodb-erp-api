@@ -8,6 +8,8 @@ export interface ICampaign extends Document {
 const CampaignSchema: Schema = new Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
+  longDescription: { type: String },
+  location: { type: String },
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
   coverImage: { type: String, required: true },

@@ -87,6 +87,7 @@ app.use(`${api}/offices`, require('./routes/office').default);
 app.use(`${api}/tasks`, require('./routes/task').default);
 app.use(`${api}/brands`, require('./routes/brand').default);
 app.use(`${api}/persons`, require('./routes/person').default);
+app.use(`${api}/dashboard`, require('./controllers/dashboard').default);
 app.use(`${api}/posts`, posts);
 /*
 readdirSync('./routes').map((route) => {

@@ -2,6 +2,10 @@ import { Request, Response } from 'express'
 import User from '../database/models/user'
 import jwt from 'jsonwebtoken'
 import { sendError } from '../utils/errors';
+import { RequestWithUserId } from '../auth/is-auth';
+import { Types } from 'mongoose';
+import Contact from '../database/models/contact';
+import { moveTmp } from './upload';
 
 const userByToken = (req: Request, res: Response) => {
   const decoded: any = jwt.verify(
@@ -43,15 +47,25 @@ const addUser = (req: Request, res: Response) => {
     .catch((error: any) => console.log(error));
 };
 
-const update = ({ body: { id, ...body } }: Request, res: Response) => {
+
+const update = ({ body: { id, profileImage, socials, bio, ...body }, userId }: RequestWithUserId, res: Response) => {
+  //el userId pertenece a un admin es posible editar cualquier id en caso contrario debe actualizar el propio
+  id = id || userId;
   User.findOne({
     _id: id
-  }).then((data: any) => {
-    const { _doc: { _id, ...others } } = data;
-    const updatedValue = { ...others, ...body };
-    return User.findOneAndUpdate({ _id }, updatedValue, { new: true });
-  }).then(({ _doc: { _id, ...data } }: any) => {
-    res.send({ id: _id, ...data });
+  }).lean().then(({ _id: user }: any) => Contact.findOne({
+    user: user.toHexString()
+  }).lean().then((contact) => moveTmp([profileImage], 'profiles').then(([profileImage]) => {
+    if (contact) {
+      const { _id } = contact;
+      return Contact.updateOne({ _id }, { $set: { bio, profileImage } }, { new: true })
+        .then(() => ({ ...body, profileImage, bio }))
+    } else {
+      return new Contact({ bio, profileImage, user: Types.ObjectId.createFromHexString(userId), ...body }).save()
+        .then(({ _doc: { _id, ...others } }: any) => (others))
+    }
+  }))).then(({ _id, ...data }: any) => {
+    res.send({ ...data });
   }).catch(sendError(res));
 };
 

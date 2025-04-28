@@ -67,7 +67,6 @@ UserSchema.methods.verifyPassword = function (password: string) {
 	return bcrypt.compareSync(password, this.password);
 };
 
-
 const User: Model<IUser> = model<IUser>('User', UserSchema);
 
 export default User;

@@ -1,4 +1,5 @@
 import User from '../database/models/user';
+import Contact from '../database/models/contact';
 import { hashPassword, comparePassword } from '../utils/auth';
 import jwt, { Secret } from 'jsonwebtoken';
 import AWS from 'aws-sdk';
@@ -6,7 +7,6 @@ import { SendEmailRequest, SendEmailResponse } from 'aws-sdk/clients/ses';
 import { Request, Response, NextFunction } from 'express';
 import Company from '../database/models/company';
 import Brand from '../database/models/brand';
-import Contact from '../database/models/contact';
 import { Types } from 'mongoose';
 import { sendError } from '../utils/errors';
 import { getSocial } from '../routes/oauth';
@@ -36,14 +36,10 @@ export const register = async ({ body }: Request, res: Response) => {
 			if (isAdvertiser) {
 				return (new Company({ name: company, user: user._id })).save().then(({ _id }) =>
 					(new Brand({ name: brand, company: _id, categories: preferences, user: user._id, slogan })).save()
-						.then(() => {
-							return createResponse(user, res);
-						})
+						.then(() => createResponse(user, res))
 				)
 			} else {
-				return contact.save().then(() => {
-					return createResponse(user, res);
-				})
+				return contact.save().then(() => createResponse(user, res))
 			}
 		}
 
@@ -65,9 +61,13 @@ export const register = async ({ body }: Request, res: Response) => {
 					getSocial(social).then((social) => {
 						contact.socials = new Map(Object.entries({ ...social }));
 						return bindContact(user, contact);
-					})
+					}).then((data: any) => {
+						res.status(200).json(data)
+					});
 				} else {
-					return bindContact(user, contact);
+					return bindContact(user, contact).then((data: any) => {
+						res.status(200).json(data)
+					});
 				}
 			});
 		});
@@ -80,7 +80,7 @@ export const register = async ({ body }: Request, res: Response) => {
 	}
 };
 
-const createResponse = (user: any, res: Response) => {
+const createResponse = (user: any, res: Response): Promise<any> => {
 
 	const params: SendEmailRequest = {
 		Source: process.env.EMAIL_FROM!,
@@ -140,9 +140,17 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
 				// const error = new Error('Wrong Password');
 				// error.statusCode = 401;
 				// throw error;
+
 				return res.status(400).send(`PASSWORD IS INCORRECT`);
 			}
-			return generateToken(res, user)
+			Contact.findOne({ user: user._id }).then((contact) => {
+				if (contact) {
+					(user as any).profileImage = contact.profileImage;
+				}
+				return generateToken(res, user).then(res => ({ ...res }))
+			}).then((data) => {
+				res.status(200).json(data)
+			})
 		});
 	}).catch(sendError(next));
 };
@@ -193,13 +201,12 @@ export const generateToken = (res: Response, user: any) => {
 		// secure: true, //solo funciona en https
 	});
 	const { password, _id, roles, ...other } = user;
-	return res.status(200).json(
-		{
-			token,
-			id: _id,
-			perms: roles.includes('Sponsor') ? { 'CREATE_CAMPAIGNS': 1 } : {},
-			...other
-		});
+	return Promise.resolve({
+		token,
+		id: _id,
+		perms: roles.includes('Sponsor') ? { 'CREATE_CAMPAIGNS': 1 } : {},
+		...other
+	});
 }
 
 export const logout = async (req: Request, res: Response) => {

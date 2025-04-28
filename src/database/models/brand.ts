@@ -4,6 +4,7 @@ export interface IBrand extends Document {
   name: string;
   description: string;
   user: string;
+  imageUrl: String,
   slogan: string;
   canceled: boolean;
 }

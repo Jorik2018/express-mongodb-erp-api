@@ -1,4 +1,4 @@
-import { Model, model, Schema } from 'mongoose';
+import { InferSchemaType, Model, model, Schema } from 'mongoose';
 
 const socialMediaSchema = new Schema({
     id: String,
@@ -45,9 +45,10 @@ const contactSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     }
-
 });
 
-const Contact = model('Contact', contactSchema);
+export type IContact = InferSchemaType<typeof contactSchema>;
+
+const Contact: Model<IContact> = model<IContact>('Contact', contactSchema);
 
 export default Contact;
