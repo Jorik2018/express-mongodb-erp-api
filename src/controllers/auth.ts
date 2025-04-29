@@ -119,31 +119,19 @@ const createResponse = (user: any, res: Response): Promise<any> => {
 	return generateToken(res, user);
 }
 
-export const login = (req: Request, res: Response, next: NextFunction) => {
-
-	const { email, password } = req.body;
-
+export const login = ({ body: { email, password } }: Request, res: Response) => {
 	if (!password || password.length < 6) {
-		throw `PASSWORD IS REQUIRED AND SHOULD BE MIN 6 CHARACTERS LONG`
+		sendError(res)(`PASSWORD IS REQUIRED AND SHOULD BE MIN 6 CHARACTERS LONG`)
 	}
-	//chequeo que exista el usuario
 	User.findOne({ email }).lean().exec().then(user => {
 		if (!user) {
-			// const error = new Error('A user with this email could not be found');
-			// error.statusCode = 401;
-			// throw error;
-			throw `NO USER FOUND`;
+			throw { message: `NO USER FOUND`, statusCode: 404 };
 		}
-		//chequeo password
-		comparePassword(password, user.password).then((match: boolean) => {
+		return comparePassword(password, user.password).then((match: boolean) => {
 			if (!match) {
-				// const error = new Error('Wrong Password');
-				// error.statusCode = 401;
-				// throw error;
-
-				return res.status(400).send(`PASSWORD IS INCORRECT`);
+				throw { message: `PASSWORD IS INCORRECT`, statusCode: 400 };
 			}
-			Contact.findOne({ user: user._id }).then((contact) => {
+			return Contact.findOne({ user: user._id }).then((contact) => {
 				if (contact) {
 					(user as any).profileImage = contact.profileImage;
 				}
@@ -152,11 +140,11 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
 				res.status(200).json(data)
 			})
 		});
-	}).catch(sendError(next));
+	}).catch(sendError(res));
 };
 
 
-export const changePassword = ({ body, userId }: RequestWithUserId, res: Response, next: NextFunction) => {
+export const changePassword = ({ body, userId }: RequestWithUserId, res: Response) => {
 
 	const { currentPassword, newPassword, confirmPassword } = body;
 	const user = Types.ObjectId.createFromHexString(userId);

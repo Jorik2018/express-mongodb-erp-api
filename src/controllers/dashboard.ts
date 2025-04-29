@@ -73,14 +73,13 @@ const list = async ({ userId }: RequestWithUserId, res: Response) => {
 
     res.json({
       drafts: draftCampaignsCount,
-      upcomingActive: upcomingActiveCampaignsCount,
-      ongoingActive: ongoingActiveCampaignsCount,
-      pastActive: pastActiveCampaignsCount,
+      upcomingCampaigns: upcomingActiveCampaignsCount,
+      activeCampaigns: ongoingActiveCampaignsCount,
+      completedCampaigns: pastActiveCampaignsCount,
       pendingApplications: pendingApplicationsCount,
       acceptedApplications: acceptedApplicationsCount,
       campaignsByCategories
     });
-
   } catch (error) {
     sendError(res)(error)
   }

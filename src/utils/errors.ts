@@ -12,13 +12,18 @@ export const sendError = (target: NextFunction | Response, code?: number) => (er
       const data = err.data;
       const stack = err.stack;
       err = { message, data, stack }
-      console.error(err);
+      console.error('ooooooo=',err);
       (target as Response).status(status).json(err);
     }
   } else {
+    
+    if (typeof err === 'string') {
+      err = { message: err }
+    }
     if (!err.statusCode) {
       err.statusCode = code || 500;
     }
+    
     (target as NextFunction)(err);
   }
 }
