@@ -77,7 +77,7 @@ app.use(`${api}/users`, require('./routes/user').default);
 app.use(`${api}/media`, require('./routes/media').default);
 app.use(`${api}/applications`, require('./routes/application').default);
 app.use(`${api}/campaigns`, require('./controllers/campaign').default);
-app.use(`${api}/contacts`, require('./routes/contact').default);
+app.use(`${api}/contacts`, require('./controllers/contact').default);
 import itemRoutes from './routes/itemRoutes';
 import path from 'path';
 import { sendError } from './utils/errors';

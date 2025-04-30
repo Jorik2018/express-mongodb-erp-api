@@ -10,9 +10,9 @@ const list = ({ userId }: any) => {
 
 const find = (_id: string, userId: string) => {
     const _user = Types.ObjectId.createFromHexString(userId);
-    return Contact.findOne({
+    return Contact.findOne(_id?{
         _id
-    }).populate('user').lean()
+    }:{user:_user}).populate('user').lean()
         .then(({ user, _id, ...contact }: any) => {
             if (!user._id.equals(_user)) {
                 throw { code: 401, message: "Unauthorized" };
