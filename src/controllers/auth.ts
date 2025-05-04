@@ -46,11 +46,12 @@ export const register = async ({ body }: Request, res: Response) => {
 		const { v4: uuidv4 } = require('uuid');
 
 		await hashPassword(password || uuidv4()).then(hashedPassword => {
+			
 			const user = new User({
 				...body,
 				name,
 				lastname,
-				email,
+				email:email||`?${uuidv4()}`,
 				password: hashedPassword,
 				roles: isAdvertiser ? ['Sponsor'] : []
 			});
