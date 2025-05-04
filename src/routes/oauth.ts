@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Router, Response } from 'express';
 import generatePKCE from '../utils/pkce'
-import { sendError } from '../utils/errors';
+import { sendError } from '../utils/responses';
 import Contact from '../database/models/contact';
 import Temporal from '../database/models/temporal';
 import { generateToken } from '../controllers/auth';
@@ -76,7 +76,7 @@ const get_oauth_url = (res: Response, provider: string, redirect_uri?: any) => {
         url += `&code_challenge=${codeChallenge}&code_challenge_method=S256`;
         return url;
     } else if (provider == 'instagram') {
-        return `https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_authentication=1&client_id=${INSTAGRAM_CLIENT_ID}&redirect_uri=${redirect_uri || INSTAGRAM_REDIRECT_URI}&response_type=code&scope=instagram_business_basic%2Cinstagram_business_manage_messages%2Cinstagram_business_manage_comments%2Cinstagram_business_content_publish%2Cinstagram_business_manage_insights`;
+        return `https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_authentication=1&client_id=${INSTAGRAM_CLIENT_ID}&redirect_uri=${redirect_uri || INSTAGRAM_REDIRECT_URI}&response_type=code&scope=instagram_business_basic%2Cinstagram_business_content_publish%2Cinstagram_business_manage_insights`;
     }
     throw "No oauth provider"
 }

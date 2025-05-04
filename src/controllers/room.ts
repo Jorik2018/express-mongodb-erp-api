@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import Room, { IRoom } from '../database/models/room';
-import { sendError } from '../utils/errors';
+import { sendError } from '../utils/responses';
 
 const list = async (req: Request, res: Response) => {
   Room.find()

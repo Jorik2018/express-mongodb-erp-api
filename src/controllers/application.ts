@@ -3,7 +3,7 @@ import { Types } from 'mongoose';
 import Application, { IApplication } from '../database/models/application';
 import Contact from '../database/models/contact';
 import User from '../database/models/user';
-import { sendError } from '../utils/errors';
+import { sendError } from '../utils/responses';
 
 
 const list = ({ userId: user, from = 0, to = 10, query: { campaign, contact } }: Request | any, res: Response) => {

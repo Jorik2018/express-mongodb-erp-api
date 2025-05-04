@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response, Router } from 'express'
-import { sendError } from '../../utils/errors';
+import { sendError } from '../../utils/responses';
 
 const regex = require("../helpers/regex");
 const { ErrorHandler } = require("../helpers/errorsHelper");

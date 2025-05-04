@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import User from '../database/models/user'
 import jwt from 'jsonwebtoken'
-import { sendError } from '../utils/errors';
+import { sendError } from '../utils/responses';
 import { RequestWithUserId } from '../auth/is-auth';
 import { Types } from 'mongoose';
 import Contact from '../database/models/contact';

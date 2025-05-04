@@ -1,5 +1,5 @@
 import { Request, Response} from 'express'
-import { sendError } from '../utils/errors';
+import { sendError } from '../utils/responses';
 const Office = require("../database/models/office");
 
 const getOffices = async (req: Request, res: Response) => {

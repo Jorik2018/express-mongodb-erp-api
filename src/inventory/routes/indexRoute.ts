@@ -1,7 +1,7 @@
 import { Request, Response, Router } from 'express'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt';
-import { sendError } from '../../utils/errors';
+import { sendError } from '../../utils/responses';
 
 const { ErrorHandler } = require("../helpers/errorsHelper");
 

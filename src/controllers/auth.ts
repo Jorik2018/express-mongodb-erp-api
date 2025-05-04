@@ -8,7 +8,7 @@ import { Request, Response, NextFunction } from 'express';
 import Company from '../database/models/company';
 import Brand from '../database/models/brand';
 import { Types } from 'mongoose';
-import { sendError } from '../utils/errors';
+import { sendError } from '../utils/responses';
 import { getSocial } from '../routes/oauth';
 import { RequestWithUserId } from '../auth/is-auth';
 

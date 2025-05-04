@@ -1,5 +1,5 @@
 import User from "../../database/models/user";
-import { sendError } from "../../utils/errors";
+import { sendError } from "../../utils/responses";
 
 const express = require("express");
 const router = express.Router();

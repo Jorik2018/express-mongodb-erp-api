@@ -1,7 +1,7 @@
 import { Request, Router, Response } from 'express';
 import bcrypt from 'bcrypt';
 import User from '../../../database/models/user';
-import { sendError } from '../../../utils/errors';
+import { sendError } from '../../../utils/responses';
 
 const router = Router();
 const gravatar = require('gravatar');

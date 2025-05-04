@@ -1,7 +1,7 @@
 import { Router, Response } from 'express';
 import { RequestWithUserId } from '../auth/is-auth';
 import Contact from '../database/models/contact';
-import { sendError } from '../utils/errors';
+import { sendError } from '../utils/responses';
 import { Types } from 'mongoose';
 import axios from 'axios';
 

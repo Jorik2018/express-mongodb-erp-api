@@ -80,7 +80,7 @@ app.use(`${api}/campaigns`, require('./controllers/campaign').default);
 app.use(`${api}/contacts`, require('./controllers/contact').default);
 import itemRoutes from './routes/itemRoutes';
 import path from 'path';
-import { sendError } from './utils/errors';
+import { sendError } from './utils/responses';
 app.use(`${api}/items`, itemRoutes);
 app.use(`${api}/employees`, require('./routes/employee').default);
 app.use(`${api}/offices`, require('./routes/office').default);

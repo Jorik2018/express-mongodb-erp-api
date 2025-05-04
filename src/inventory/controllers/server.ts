@@ -1,4 +1,4 @@
-import { sendError } from "../../utils/errors";
+import { sendError } from "../../utils/responses";
 import { Request, Router, Response } from 'express';
 
 const mysql = require('mysql');

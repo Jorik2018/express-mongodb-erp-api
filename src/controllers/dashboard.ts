@@ -2,7 +2,7 @@ import { Response, Router } from 'express';
 import { RequestWithUserId } from '../auth/is-auth';
 import Campaign from '../database/models/campaign';
 import Application from '../database/models/application';
-import { sendError } from '../utils/errors';
+import { sendError } from '../utils/responses';
 
 const list = async ({ userId }: RequestWithUserId, res: Response) => {
 

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import Task, { ITask } from '../database/models/task';
-import { sendError } from '../utils/errors';
+import { sendError } from '../utils/responses';
 
 const list = (req: Request, res: Response) => {
   Task.find({}).then((tasks) => res.send({ data: tasks })).catch(sendError(res))

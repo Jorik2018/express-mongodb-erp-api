@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import Room, { IRoom } from '../database/models/room';
 import { Person, db } from '../database/objection_db';
-import { sendError } from '../utils/errors';
+import { sendError } from '../utils/responses';
 
 const list = (_: Request, res: Response) => {
   db().then(() => Person.query()

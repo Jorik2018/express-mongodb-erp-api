@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { Types } from 'mongoose';
 import Brand, { IBrand } from '../database/models/brand';
-import { sendError } from '../utils/errors';
+import { sendError } from '../utils/responses';
 import { moveTmp } from './upload';
 
 const list = ({ userId: user, from = 0, to = 10, query }: Request | any, res: Response) => {

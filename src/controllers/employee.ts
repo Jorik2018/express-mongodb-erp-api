@@ -1,5 +1,5 @@
 import { Request, Response} from 'express'
-import { sendError } from '../utils/errors';
+import { sendError } from '../utils/responses';
 const Employee = require("../database/models/employee");
 const _ = require('lodash');
 
