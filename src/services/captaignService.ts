@@ -33,7 +33,7 @@ const find = (_id: string) => {
             const { _id: brandId, __v, ...brandOther } = brand || {};
             return {
                 id: _id,
-                categories: categories && categories.length ? categories : [category],
+                categories: categories && Array.isArray(categories) ? categories : [category],
                 gallery: gallery && gallery.length ? gallery : [image, image, image, image], brand: brandId ? { id: brandId, ...brandOther } : null, ...campaign
             }
         })

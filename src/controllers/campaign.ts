@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express';
 import captaignService from '../services/captaignService';
-import { sendError } from '../utils/responses';
+import { sendError, sendJson } from '../utils/responses';
 import { RequestWithUserId } from '../auth/is-auth';
 
 const list = ({ query, userId }: RequestWithUserId, res: Response) => {
@@ -9,21 +9,17 @@ const list = ({ query, userId }: RequestWithUserId, res: Response) => {
     .catch(sendError(res))
 }
 
-const find = (req: Request, res: Response) => {
-  captaignService.find(req.params.id)
-    .then(campaign => res.send(campaign))
-    .catch(sendError(res));
+const find = ({params:{id}}: Request, res: Response) => {
+  captaignService.find(id).then(sendJson(res)).catch(sendError(res));
 };
 
 const create = ({ body: { id, brandId, ...body }, userId }: RequestWithUserId, res: Response) => {
   if (id) {
     captaignService.update(id, { ...body, userId, brandId })
-      .then((campaign) => res.send(campaign))
-      .catch(sendError(res));
+      .then(sendJson(res)).catch(sendError(res));
   } else
     captaignService.create({ ...body, userId, brandId })
-      .then(campaign => res.send(campaign))
-      .catch(sendError(res));
+      .then(sendJson(res)).catch(sendError(res));
 };
 
 const update = (req: Request, res: Response) => {
@@ -34,14 +30,12 @@ const update = (req: Request, res: Response) => {
 
 const activate = (req: Request, res: Response) => {
   captaignService.activate(req.params.id)
-    .then((campaign) => res.send(campaign))
-    .catch(sendError(res));
+    .then(sendJson(res)).catch(sendError(res));
 };
 
 const remove = (req: Request, res: Response) => {
   captaignService.remove(req.params.id)
-    .then((campaign) => res.send(campaign))
-    .catch(sendError(res));
+    .then(sendJson(res)).catch(sendError(res));
 };
 
 const router = Router();
