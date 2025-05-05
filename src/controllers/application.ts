@@ -26,11 +26,12 @@ const list = ({ userId: user, from = 0, to = 10, query: { campaign, contact } }:
   } else {
     campaign = Types.ObjectId.createFromHexString(campaign);
     const filter = { campaign };
-    Application.find(filter).populate('contact').then((data: any) => {
+    Application.find(filter).populate('contact').lean().then((contacts) => {
+      console.log('contacts=', contacts)
       res.send({
-        data: data.map(({ _doc: { contact: { _doc: { _id, ...contact } }, ...others } }: any) => ({
+        data: contacts.filter(({ contact }) => contact).map(({ contact: { _id: id, ...contact }, ...others }: any) => ({
           ...others,
-          contact: { id: _id, ...contact }
+          contact: { id, ...contact }
         }))
       })
     }).catch(sendError(res))
@@ -50,7 +51,6 @@ const create = ({ body, userId }: Request | any, res: Response) => {
   const user = Types.ObjectId.createFromHexString(userId);
   const campaign = Types.ObjectId.createFromHexString(body.campaign);
   const applyToCampaign = (contact: any) => {
-    console.log('contact=', contact);
     return new Application({ campaign, contact: contact._id })
       .save()
       .then((brand: IApplication) => {

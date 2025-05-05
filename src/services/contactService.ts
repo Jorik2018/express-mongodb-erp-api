@@ -1,18 +1,18 @@
 import { Types } from "mongoose";
 import Campaign from "../database/models/campaign";
-import User, { IUser } from "../database/models/user";
 import { moveTmp } from "../controllers/upload";
 import Contact from "../database/models/contact";
 
 const list = ({ userId }: any) => {
-
+    return Contact.find({ userId }).lean()
+        .then(data => ({ data: data.map(({ _id, ...item }) => ({ id: _id, ...item })) }))
 }
 
 const find = (_id: string, userId: string) => {
     const _user = Types.ObjectId.createFromHexString(userId);
-    return Contact.findOne(_id?{
+    return Contact.findOne(_id ? {
         _id
-    }:{user:_user}).populate('user').lean()
+    } : { user: _user }).populate('user').lean()
         .then(({ user, _id, ...contact }: any) => {
             if (!user._id.equals(_user)) {
                 throw { code: 401, message: "Unauthorized" };

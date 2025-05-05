@@ -184,9 +184,12 @@ router.post('/token', ({ body: { code, provider, action, redirect_uri }, cookies
                                 res.status(404).send({ error: 'Contact not found' });
                             } else {
                                 const { user, ...others } = contact;
-                                generateToken(res, { rating: 0, ...others, ...user })
+                                generateToken(res, { rating: 0, ...others, ...user }).then((data) => {
+                                    res.status(200).json(data)
+                                })
                             }
                         })
+
                 }
             })).catch(sendError(res));
         } else if (provider == 'facebook') {
