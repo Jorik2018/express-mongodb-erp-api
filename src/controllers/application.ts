@@ -3,7 +3,7 @@ import { Types } from 'mongoose';
 import Application, { IApplication } from '../database/models/application';
 import Contact from '../database/models/contact';
 import User from '../database/models/user';
-import { sendError } from '../utils/responses';
+import { sendError, sendJson } from '../utils/responses';
 
 
 const list = ({ userId: user, from = 0, to = 10, query: { campaign, contact } }: Request | any, res: Response) => {
@@ -27,10 +27,10 @@ const list = ({ userId: user, from = 0, to = 10, query: { campaign, contact } }:
     campaign = Types.ObjectId.createFromHexString(campaign);
     const filter = { campaign };
     Application.find(filter).populate('contact').lean().then((contacts) => {
-      console.log('contacts=', contacts)
       res.send({
-        data: contacts.filter(({ contact }) => contact).map(({ contact: { _id: id, ...contact }, ...others }: any) => ({
+        data: contacts.filter(({ contact }) => contact).map(({ _id: application, contact: { _id: id, ...contact }, ...others }: any) => ({
           ...others,
+          id: application,
           contact: { id, ...contact }
         }))
       })
@@ -41,8 +41,9 @@ const list = ({ userId: user, from = 0, to = 10, query: { campaign, contact } }:
 const find = (req: Request, res: Response) => {
   Application.findOne({
     _id: req.params.id
-  })
-    .then((brand: any) => res.send(brand))
+  }).lean()
+    .then(({ ...application }: any) => ({ ...application, status: 'pending' }))
+    .then(sendJson(res))
     .catch(sendError(res));
 };
 
@@ -53,7 +54,7 @@ const create = ({ body, userId }: Request | any, res: Response) => {
   const applyToCampaign = (contact: any) => {
     return new Application({ campaign, contact: contact._id })
       .save()
-      .then((brand: IApplication) => {
+      .then((brand) => {
         const { _id, ...data } = brand.toObject();
         res.send({
           ...data,

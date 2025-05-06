@@ -9,8 +9,8 @@ const list = ({ query, userId }: RequestWithUserId, res: Response) => {
     .catch(sendError(res))
 }
 
-const find = ({params:{id}}: Request, res: Response) => {
-  captaignService.find(id).then(sendJson(res)).catch(sendError(res));
+const find = ({params:{id},userId}: RequestWithUserId, res: Response) => {
+  captaignService.find(id,userId).then(sendJson(res)).catch(sendError(res));
 };
 
 const create = ({ body: { id, brandId, ...body }, userId }: RequestWithUserId, res: Response) => {
@@ -42,7 +42,7 @@ const router = Router();
 
 router.get('/', list as any);
 router.post('/', create as any);
-router.get('/:id', find);
+router.get('/:id', find as any);
 router.patch('/:id', update);
 router.patch('/activate/:id', activate);
 router.delete('/:id', remove);

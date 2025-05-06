@@ -2,6 +2,8 @@ import { Types } from "mongoose";
 import Campaign from "../database/models/campaign";
 import User, { IUser } from "../database/models/user";
 import { moveTmp } from "../controllers/upload";
+import Contact from "../database/models/contact";
+import Application from "../database/models/application";
 
 const list = ({ userId }: any) => {
 
@@ -24,20 +26,24 @@ const list = ({ userId }: any) => {
     });
 }
 
-const find = (_id: string) => {
-
-    return Campaign.findOne({
-        _id
-    }).populate('sponsor').populate('brand').lean()
-        .then(({ _id, categories, category, gallery, image, brand, ...campaign }: any) => {
-            const { _id: brandId, __v, ...brandOther } = brand || {};
-            return {
-                id: _id,
-                categories: categories && Array.isArray(categories) ? categories : [category],
-                gallery: gallery && gallery.length ? gallery : [image, image, image, image], brand: brandId ? { id: brandId, ...brandOther } : null, ...campaign
-            }
-        })
-
+const find = (_id: string, userId: string) => {
+    const user = Types.ObjectId.createFromHexString(userId);
+    //Se debe procurar q cada usuario tenga solo un perfil
+    return Contact.findOne({ user }).lean().then(({ _id: contact }: any) =>
+        Application.findOne({ contact, campaign: _id }).lean().then((application: any) => {
+            return Campaign.findOne({
+                _id
+            }).populate('sponsor').populate('brand').lean()
+                .then(({ _id, categories, category, gallery, image, brand, ...campaign }: any) => {
+                    const { _id: brandId, __v, ...brandOther } = brand || {};
+                    return {
+                        id: _id,
+                        taken: !!application,
+                        categories: categories && Array.isArray(categories) ? categories : [category],
+                        gallery: gallery && gallery.length ? gallery : [image, image, image, image], brand: brandId ? { id: brandId, ...brandOther } : null, ...campaign
+                    }
+                })
+        }))
 }
 
 const create = ({ brandId, userId, coverImage, gallery, ...body }: any) => {
@@ -69,7 +75,7 @@ const update = (_id: string, { brandId, userId, coverImage, gallery, ...body }: 
 };
 
 const activate = (_id: string) => {
-    return Campaign.findByIdAndUpdate({ _id },{ $set: { status:'active'}}, {new: true},).lean().then(({status}:any
+    return Campaign.findByIdAndUpdate({ _id }, { $set: { status: 'active' } }, { new: true },).lean().then(({ status }: any
 
     ) => ({ status }))
 

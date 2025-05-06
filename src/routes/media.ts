@@ -9,6 +9,7 @@ const get_media = ({ params: { provider }, userId }: RequestWithUserId, res: Res
     const user = Types.ObjectId.createFromHexString(userId);
     return Contact.findOne({ user }).lean()
         .then(({ socials }: any) => {
+            if(!socials) throw 'User no binding to social provider';
             const { access_token, id } = socials[provider];
             if (provider == 'instagram') {
                 return axios.get(`https://graph.instagram.com/v22.0/${id}/media`, {

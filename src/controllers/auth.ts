@@ -120,6 +120,9 @@ const createResponse = (user: any, res: Response): Promise<any> => {
 	return generateToken(res, user);
 }
 
+export const can=(userId:string, perms:any):Promise<boolean>=>{
+	return Promise.resolve(true);
+}
 export const login = ({ body: { email, password } }: Request, res: Response) => {
 	if (!password || password.length < 6) {
 		sendError(res)(`PASSWORD IS REQUIRED AND SHOULD BE MIN 6 CHARACTERS LONG`)
