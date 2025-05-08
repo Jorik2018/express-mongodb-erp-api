@@ -85,7 +85,7 @@ const update = ({ id, content: newContent, ...body }: any, userId: string) => {
   const _id = Types.ObjectId.createFromHexString(id);
   return Application.findOne({ _id }).lean()
     .then(({ _id, content = [] }: any) => {
-      (newContent || []).array.forEach((nc: any) => {
+      (newContent || []).forEach((nc: any) => {
         const v = content.find((oc: any) => (oc.id == nc.id && oc.provider == nc.provider));
         if (!v) {
           content.push(nc)
