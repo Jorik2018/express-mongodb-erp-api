@@ -50,34 +50,6 @@ const create = ({ body, userId }: Request | any, res: Response) => {
   applicationService.create(body, userId)
     .then(sendJson(res))
     .catch(sendError(res));
-
-  const user = Types.ObjectId.createFromHexString(userId);
-  const campaign = Types.ObjectId.createFromHexString(body.campaign);
-  const applyToCampaign = (contact: any) => {
-    return new Application({ campaign, contact: contact._id })
-      .save()
-      .then((brand) => {
-        const { _id, ...data } = brand.toObject();
-        return {
-          ...data,
-          id: _id
-        };
-      });
-  }
-  Contact.findOne({ user }).then((contact) => {
-    if (!contact) {
-      return User.findOne({ _id: user }).then((user: any) => {
-        contact = new Contact({
-          name: user.name,
-          categories: [],
-          user, // Asegúrate de que `user` sea un array como en el esquema
-        });
-        return contact.save().then((contact) => applyToCampaign(contact));
-      })
-    } else {
-      return applyToCampaign(contact);
-    }
-  })
 };
 
 const update = ({ body: { id, ...body } }: Request, res: Response) => {
