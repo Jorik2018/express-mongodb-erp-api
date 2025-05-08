@@ -38,13 +38,17 @@ const list = ({ userId: user, from = 0, to = 10, query: { campaign, contact } }:
   }
 }
 
-const find = (req: Request, res: Response) => {
-  Application.findOne({
-    _id: req.params.id
-  }).lean()
-    .then(({ ...application }: any) => ({ ...application, status: 'pending' }))
-    .then(sendJson(res))
-    .catch(sendError(res));
+const find = (_id: string, userId: string) => {
+  return Application.findOne({
+    _id
+  }).populate('contact').lean()
+    .then(({ contact, ...application }: any) => {
+      const socials = Object.entries(contact?.socials || {}).map(([key, { name, medias, followers }]: any) => ({
+        key,
+        name
+      }));
+      return { ...application, socials, status: 'pending' }
+    })
 };
 
 const create = ({ body, userId }: Request | any, res: Response) => {
@@ -103,7 +107,7 @@ const destroy = (req: Request, res: Response) => {
   }).catch(sendError(res));
 };
 
-module.exports = {
+export default {
   list,
   find,
   update,
