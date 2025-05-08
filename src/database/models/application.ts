@@ -1,5 +1,15 @@
 import { Schema, model, Model, InferSchemaType } from 'mongoose';
 
+
+const mediaSchema: Schema = new Schema({
+  id: { type: String, required: true },
+  provider: { type: String, required: true },
+  thumbnail: { type: String, required: true },
+  type: { type: String, required: true },
+  likes: { type: Number, default: 0 },
+  shared: { type: Number, default: 0 }
+});
+
 const applicationSchema: Schema = new Schema({
   contact: {
     required: true,
@@ -11,7 +21,8 @@ const applicationSchema: Schema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Campaign'
   },
-  canceled: { type: Boolean }
+  canceled: { type: Boolean },
+  content: [{ type: mediaSchema, default: [] }]
 });
 
 export type IApplication = InferSchemaType<typeof applicationSchema>;

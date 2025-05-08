@@ -52,17 +52,10 @@ const create = ({ body, userId }: RequestWithUserId, res: Response) => {
     .catch(sendError(res));
 };
 
-const update = ({ body: { id, ...body } }: Request, res: Response) => {
-  Application.findOneAndUpdate(
-    { _id: id },
-    { $set: body },
-    { new: true }
-  ).then(({ _doc: { _id, ...data } }: any) => {
-    res.send({
-      ...data,
-      id: _id
-    });
-  }).catch(sendError(res));
+const update = ({ body, userId }: RequestWithUserId, res: Response) => {
+  applicationService.update(body, userId)
+    .then(sendJson(res))
+    .catch(sendError(res));
 };
 
 const destroy = (req: Request, res: Response) => {

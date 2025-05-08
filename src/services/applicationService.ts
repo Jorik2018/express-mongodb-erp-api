@@ -81,17 +81,21 @@ const create = (body: any, userId: string) => {
   })
 };
 
-const update = ({ body: { id, ...body } }: Request, res: Response) => {
-  Application.findOneAndUpdate(
-    { _id: id },
-    { $set: body },
-    { new: true }
-  ).then(({ _doc: { _id, ...data } }: any) => {
-    res.send({
-      ...data,
-      id: _id
+const update = ({ id, content: newContent, ...body }: any, userId: string) => {
+  const _id = Types.ObjectId.createFromHexString(id);
+  return Application.findOne({ _id }).lean()
+    .then(({ _id, content = [] }: any) => {
+      (newContent || []).array.forEach((nc: any) => {
+        const v = content.find((c2: any) => (c2.id == nc.id && c2.provider == nc.provider));
+        if (!v) {
+          content.push(nc)
+        }
+      });
+      return Application.updateOne({ _id }, { $set: { content } }).lean().then(data => ({
+        ...data,
+        id: _id
+      }))
     });
-  }).catch(sendError(res));
 };
 
 const destroy = (req: Request, res: Response) => {
