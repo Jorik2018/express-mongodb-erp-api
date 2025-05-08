@@ -1,6 +1,6 @@
 import { Router } from 'express';
+const { list, find, create, update, destroy } = require("../controllers/applicationController").default;
 
-const { list, find, create, update, destroy } = require("../controllers/applicationController");
 const router = Router();
 
 router.get('/', list);
