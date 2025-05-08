@@ -46,7 +46,7 @@ const find = ({ params, userId }: RequestWithUserId, res: Response) => {
     .catch(sendError(res));
 };
 
-const create = ({ body, userId }: Request | any, res: Response) => {
+const create = ({ body, userId }: RequestWithUserId, res: Response) => {
   applicationService.create(body, userId)
     .then(sendJson(res))
     .catch(sendError(res));
@@ -76,7 +76,7 @@ const destroy = (req: Request, res: Response) => {
   }).catch(sendError(res));
 };
 
-module.exports = {
+export default {
   list,
   find,
   update,

@@ -43,13 +43,13 @@ const find = (_id: string, userId: string) => {
   return Application.findOne({
     _id
   }).populate('contact').populate('campaign').lean()
-    .then(({ contact, campaign, ...application }: any) => {
+    .then(({ contact, _id: applicationId, campaign, ...application }: any) => {
       const socials = contact.user.equals(user) ? Object.entries(contact?.socials || {}).map(([key, { name }]: any) => ({
         key,
         name
       })) : undefined;
       return Brand.countDocuments({ user, _id: campaign.brand }).then(count => {
-        return { ...application, socials, campaign: campaign._id, approve: count ? true : undefined, status: 'pending' }
+        return { ...application, id: applicationId, socials, campaign: campaign._id, approve: count ? true : undefined, status: 'pending' }
       })
     })
 };
