@@ -54,7 +54,7 @@ const find = (_id: string, userId: string) => {
     })
 };
 
-const create = ({ body, userId }: Request | any, res: Response) => {
+const create = (body: any, userId: string) => {
   const user = Types.ObjectId.createFromHexString(userId);
   const campaign = Types.ObjectId.createFromHexString(body.campaign);
   const applyToCampaign = (contact: any) => {
