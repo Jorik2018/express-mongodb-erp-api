@@ -86,7 +86,7 @@ const update = ({ id, content: newContent, ...body }: any, userId: string) => {
   return Application.findOne({ _id }).lean()
     .then(({ _id, content = [] }: any) => {
       (newContent || []).array.forEach((nc: any) => {
-        const v = content.find((c2: any) => (c2.id == nc.id && c2.provider == nc.provider));
+        const v = content.find((oc: any) => (oc.id == nc.id && oc.provider == nc.provider));
         if (!v) {
           content.push(nc)
         }
