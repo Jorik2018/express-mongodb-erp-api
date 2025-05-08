@@ -47,7 +47,10 @@ const find = ({ params, userId }: RequestWithUserId, res: Response) => {
 };
 
 const create = ({ body, userId }: Request | any, res: Response) => {
-  console.log(body);
+  applicationService.create(body, userId)
+    .then(sendJson(res))
+    .catch(sendError(res));
+
   const user = Types.ObjectId.createFromHexString(userId);
   const campaign = Types.ObjectId.createFromHexString(body.campaign);
   const applyToCampaign = (contact: any) => {
@@ -55,12 +58,11 @@ const create = ({ body, userId }: Request | any, res: Response) => {
       .save()
       .then((brand) => {
         const { _id, ...data } = brand.toObject();
-        res.send({
+        return {
           ...data,
           id: _id
-        });
-      })
-      .catch(sendError(res));
+        };
+      });
   }
   Contact.findOne({ user }).then((contact) => {
     if (!contact) {

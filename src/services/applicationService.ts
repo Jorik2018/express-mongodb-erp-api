@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import { Types } from 'mongoose';
-import Application, { IApplication } from '../database/models/application';
+import Application from '../database/models/application';
 import Contact from '../database/models/contact';
 import User from '../database/models/user';
-import { sendError, sendJson } from '../utils/responses';
-
+import { sendError } from '../utils/responses';
+import Brand from '../database/models/brand';
 
 const list = ({ userId: user, from = 0, to = 10, query: { campaign, contact } }: Request | any, res: Response) => {
   if (contact) {
@@ -39,20 +39,22 @@ const list = ({ userId: user, from = 0, to = 10, query: { campaign, contact } }:
 }
 
 const find = (_id: string, userId: string) => {
+  const user = Types.ObjectId.createFromHexString(userId);
   return Application.findOne({
     _id
-  }).populate('contact').lean()
-    .then(({ contact, ...application }: any) => {
-      const socials = Object.entries(contact?.socials || {}).map(([key, { name, medias, followers }]: any) => ({
+  }).populate('contact').populate('campaign').lean()
+    .then(({ contact, campaign, ...application }: any) => {
+      const socials = contact.user.equals(user) ? Object.entries(contact?.socials || {}).map(([key, { name }]: any) => ({
         key,
         name
-      }));
-      return { ...application, socials, status: 'pending' }
+      })) : undefined;
+      return Brand.countDocuments({ user, _id: campaign.brand }).then(count => {
+        return { ...application, socials, campaign: campaign._id, approve: count ? true : undefined, status: 'pending' }
+      })
     })
 };
 
 const create = ({ body, userId }: Request | any, res: Response) => {
-  console.log(body);
   const user = Types.ObjectId.createFromHexString(userId);
   const campaign = Types.ObjectId.createFromHexString(body.campaign);
   const applyToCampaign = (contact: any) => {
@@ -60,23 +62,19 @@ const create = ({ body, userId }: Request | any, res: Response) => {
       .save()
       .then((brand) => {
         const { _id, ...data } = brand.toObject();
-        res.send({
+        return {
           ...data,
           id: _id
-        });
-      })
-      .catch(sendError(res));
+        };
+      });
   }
-  Contact.findOne({ user }).then((contact) => {
+  return Contact.findOne({ user }).then((contact) => {
     if (!contact) {
-      return User.findOne({ _id: user }).then((user: any) => {
-        contact = new Contact({
-          name: user.name,
-          categories: [],
-          user, // Asegúrate de que `user` sea un array como en el esquema
-        });
-        return contact.save().then((contact) => applyToCampaign(contact));
-      })
+      return User.findOne({ _id: user }).then((user: any) => new Contact({
+        name: user.name,
+        categories: [],
+        user, // Asegúrate de que `user` sea un array como en el esquema
+      }).save().then((contact) => applyToCampaign(contact)))
     } else {
       return applyToCampaign(contact);
     }
