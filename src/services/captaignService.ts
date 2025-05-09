@@ -26,6 +26,8 @@ const list = ({ userId }: any) => {
     });
 }
 
+
+
 const find = (_id: string, userId: string) => {
     const user = Types.ObjectId.createFromHexString(userId);
     //Se debe procurar q cada usuario tenga solo un perfil
@@ -36,12 +38,40 @@ const find = (_id: string, userId: string) => {
             }).populate('sponsor').populate('brand').lean()
                 .then(({ _id, categories, category, gallery, image, brand, ...campaign }: any) => {
                     const { _id: brandId, __v, ...brandOther } = brand || {};
-                    return {
-                        id: _id,
-                        taken: !!application,
-                        categories: categories && Array.isArray(categories) ? categories : [category],
-                        gallery: gallery && gallery.length ? gallery : [image, image, image, image], brand: brandId ? { id: brandId, ...brandOther } : null, ...campaign
-                    }
+
+
+                    return Application.aggregate([
+                        { $match: { campaign: _id } },
+                        {
+                          $lookup: {
+                            from: 'contacts',
+                            localField: 'contact',
+                            foreignField: '_id',
+                            pipeline:[{$project:{_id:1,name:1}}],
+                            as: 'contact'
+                          }
+                        },
+                        { $unwind: '$contact' },
+                        { $unwind: '$content' },
+                        {
+                          $replaceWith: {
+                            $mergeObjects: [
+                              '$content',
+                              { contact: '$contact' }
+                            ]
+                          }
+                        }
+                      ]).then((content: any) => {
+
+                        //return Application.findOne({ campaign: _id }).lean().then((application: any) => {
+                        return {
+                            id: _id,
+                            content,
+                            taken: !!application,
+                            categories: categories && Array.isArray(categories) ? categories : [category],
+                            gallery: gallery && gallery.length ? gallery : [image, image, image, image], brand: brandId ? { id: brandId, ...brandOther } : null, ...campaign
+                        }
+                    })
                 })
         }))
 }

@@ -49,6 +49,7 @@ const find = (_id: string, userId: string) => {
         name
       })) : undefined;
       return Brand.countDocuments({ user, _id: campaign.brand }).then(count => {
+        
         return { ...application, id: applicationId, socials, campaign: campaign._id, approve: count ? true : undefined, status: 'pending' }
       })
     })
@@ -93,6 +94,7 @@ const update = ({ id, content: newContent, ...body }: any, userId: string) => {
       });
       return Application.updateOne({ _id }, { $set: { content } }).lean().then(data => ({
         ...data,
+        content,
         id: _id
       }))
     });
