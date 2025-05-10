@@ -33,25 +33,24 @@ export const register = async ({ body }: Request, res: Response) => {
 		}
 		const bindContact = (user: any, contact: any) => {
 			if (contact) user.profileImage = contact.profileImage;
-			if (isAdvertiser) {
-				return (new Company({ name: company, user: user._id })).save().then(({ _id }) =>
-					(new Brand({ name: brand, company: _id, categories: preferences, user: user._id, slogan })).save()
-						.then(() => createResponse(user, res))
-				)
-			} else {
-				return contact.save().then(() => createResponse(user, res))
-			}
+			return contact.save().then(() => {
+				if (isAdvertiser) {
+					return (new Company({ name: company, user: user._id })).save().then(({ _id }) =>
+						(new Brand({ name: brand, company: _id, categories: preferences, user: user._id, slogan })).save()
+					)
+				}
+			}).then(() => createResponse(user, res))
 		}
 
 		const { v4: uuidv4 } = require('uuid');
 
 		await hashPassword(password || uuidv4()).then(hashedPassword => {
-			
+
 			const user = new User({
 				...body,
 				name,
 				lastname,
-				email:email||`?${uuidv4()}`,
+				email: email || `?${uuidv4()}`,
 				password: hashedPassword,
 				roles: isAdvertiser ? ['Sponsor'] : []
 			});
@@ -120,7 +119,7 @@ const createResponse = (user: any, res: Response): Promise<any> => {
 	return generateToken(res, user);
 }
 
-export const can=(userId:string, perms:any):Promise<boolean>=>{
+export const can = (userId: string, perms: any): Promise<boolean> => {
 	return Promise.resolve(true);
 }
 export const login = ({ body: { email, password } }: Request, res: Response) => {

@@ -62,7 +62,7 @@ const find = (_id: string, userId: string) => {
                           }
                         }
                       ]).then((content: any) => {
-
+                        
                         //return Application.findOne({ campaign: _id }).lean().then((application: any) => {
                         return {
                             id: _id,
