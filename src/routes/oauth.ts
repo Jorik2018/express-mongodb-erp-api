@@ -231,7 +231,7 @@ const build = (authMiddleware: any) => {
         }
     });
 
-    router.use(authMiddleware)
+
 
     const connect = ({ body: { code, provider, action, redirect_uri }, userId, cookies }: RequestWithUserId, res: Response) => {
 
@@ -340,7 +340,7 @@ const build = (authMiddleware: any) => {
         }
     };
 
-    router.post('/connect', connect as any)
+    router.post('/connect', authMiddleware, connect as any)
 
     router.get('/logout', (req, res) => {
         // Code to handle user logout
