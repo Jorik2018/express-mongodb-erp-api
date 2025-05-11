@@ -296,6 +296,9 @@ const build = (authMiddleware: any) => {
                 }
             })).catch(sendError(res));
         } else if (provider == 'instagram') {
+sendJson(res)({code,redirect_uri})
+
+            return;
             const formData = new FormData();
             formData.append('client_id', INSTAGRAM_CLIENT_ID!);
             formData.append('client_secret', INSTAGRAM_CLIENT_SECRET!);
