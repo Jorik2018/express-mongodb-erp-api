@@ -239,6 +239,7 @@ const build = (authMiddleware: any) => {
             provider = cookies.provider || provider;
             action = cookies.action || action;
         }
+        sendJson(res)({code,redirect_uri,provider})
         if (provider == 'tiktok') {
             const codeVerifier = cookies.verifier;
             const params = new URLSearchParams();
@@ -296,7 +297,7 @@ const build = (authMiddleware: any) => {
                 }
             })).catch(sendError(res));
         } else if (provider == 'instagram') {
-sendJson(res)({code,redirect_uri})
+
 
             return;
             const formData = new FormData();
