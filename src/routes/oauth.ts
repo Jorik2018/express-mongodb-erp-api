@@ -239,7 +239,7 @@ const build = (authMiddleware: any) => {
             provider = cookies.provider || provider;
             action = cookies.action || action;
         }
-       
+
         if (provider == 'tiktok') {
             const codeVerifier = cookies.verifier;
             const params = new URLSearchParams();
@@ -299,7 +299,7 @@ const build = (authMiddleware: any) => {
         } else if (provider == 'instagram') {
 
 
-           
+
             const formData = new FormData();
             formData.append('client_id', INSTAGRAM_CLIENT_ID!);
             formData.append('client_secret', INSTAGRAM_CLIENT_SECRET!);
@@ -310,18 +310,17 @@ const build = (authMiddleware: any) => {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
-           })/*.then(({ data: { access_token } }) => axios.get('https://graph.instagram.com/v22.0/me', {
+            }).then(({ data: { access_token, user_id } }) => axios.get('https://graph.instagram.com/v22.0/me', {
                 params: {
                     access_token,
                     fields: 'user_id,username,profile_picture_url,followers_count,media_count'
                 }
-            }))*/.then(({ data }) => {
-                return { data };
+            })).then(({ data: { access_token, user_id } }) => {
                 return axios.get('https://graph.instagram.com/access_token', {
                     params: {
-                        grant_type: 'ig_exchange_token', client_secret: INSTAGRAM_CLIENT_SECRET, access_token:data.access_token
+                        grant_type: 'ig_exchange_token', client_secret: INSTAGRAM_CLIENT_SECRET, access_token: access_token
                     }
-                }).then(({ data: result }) => ({ ...result }))
+                }).then(({ data: result }) => ({ ...result, user_id }))
             }).then(({ data }) => {
                 return Contact.findOne({ 'user': userId })
                     .lean()
