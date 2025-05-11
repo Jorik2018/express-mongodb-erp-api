@@ -318,25 +318,31 @@ const build = (authMiddleware: any) => {
             }).then(({ data }) => ({ ...data, access_token, user_id })))).then(({ access_token, ...others }) => (
                 axios.get('https://graph.instagram.com/access_token', {
                     params: {
-                        grant_type: 'ig_exchange_token', client_secret: INSTAGRAM_CLIENT_SECRET, access_token: access_token
+                        grant_type: 'ig_exchange_token', client_secret: INSTAGRAM_CLIENT_SECRET, access_token
                     }
                 }).then(({ data }) => ({ ...others, ...data }))
-            )).then((data) => {
+            )).then(({ access_token, user_id: id, username: name, profile_picture_url: profileImage, followers_count: followers, media_count: medias }) => {
+
+
+
+                const social = { id, name, followers, medias, access_token }
+
                 return Contact.findOne({ 'user': userId })
                     .lean()
-                    .then((contact) => {
+                    .then((contact: any) => {
                         const socials = contact?.socials || {};
-                        /*socials[provider] = {
-                            id: String,
-                            access_token: String,
-                            refresh_token: String,
-                            expires_in: Number,
-                            refresh_expire_in: Number,
-                            name: String,
-                            followers: Number,
-                            medias: Number,
-                        }*/
-                        return { socials, data,contact }
+                        socials[provider] = {
+                            id,
+                            access_token,
+                            name,
+                            followers,
+                            medias,
+                            refresh_token: undefined,
+                            expires_in: undefined,
+                            refresh_expire_in: undefined
+                        }
+                        contact.socials = socials;
+                        return contact;
                     })
             })
                 .then(sendJson(res))
