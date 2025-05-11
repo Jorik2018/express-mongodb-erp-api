@@ -336,7 +336,7 @@ const build = (authMiddleware: any) => {
                             followers: Number,
                             medias: Number,
                         }*/
-                        return { socials, data }
+                        return { socials, data,contact }
                     })
             })
                 .then(sendJson(res))
