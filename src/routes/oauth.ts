@@ -310,13 +310,13 @@ const build = (authMiddleware: any) => {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
-            }).then(({ data: { access_token, user_id } }) => axios.get('https://graph.instagram.com/v22.0/me', {
+            }).then(({ data: { access_token, user_id } }) => (axios.get('https://graph.instagram.com/v22.0/me', {
                 params: {
                     access_token,
                     fields: 'user_id,username,profile_picture_url,followers_count,media_count'
                 }
-            })).then(({ data: { access_token, user_id } }) => {
-                return {data:{user_id,access_token,userId}}
+            }).then(({ data }) => ({ ...data, access_token, user_id })))).then(({ data: { access_token, user_id } }) => {
+                return { data: { user_id, access_token, userId } }
                 /*return axios.get('https://graph.instagram.com/access_token', {
                     params: {
                         grant_type: 'ig_exchange_token', client_secret: INSTAGRAM_CLIENT_SECRET, access_token: access_token
