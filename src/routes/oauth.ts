@@ -320,9 +320,9 @@ const build = (authMiddleware: any) => {
                     params: {
                         grant_type: 'ig_exchange_token', client_secret: INSTAGRAM_CLIENT_SECRET, access_token: access_token
                     }
-                }).then(({ data }) => ({ ...others, ...data, user_id }))
+                }).then(({ data }) => ({ ...others, ...data }))
             )).then((data) => {
-                return data;
+                return {...data,userId};
                 return Contact.findOne({ 'user': userId })
                     .lean()
                     .then((contact) => {
