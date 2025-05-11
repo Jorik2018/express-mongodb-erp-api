@@ -311,10 +311,11 @@ const build = (authMiddleware: any) => {
                     access_token,
                     fields: 'user_id,username,profile_picture_url,followers_count,media_count'
                 }
-            })).then(({ data: { access_token } }) => {
+            })).then(({ data }) => {
+                return { data };
                 return axios.get('https://graph.instagram.com/access_token', {
                     params: {
-                        grant_type: 'ig_exchange_token', client_secret: INSTAGRAM_CLIENT_SECRET, access_token
+                        grant_type: 'ig_exchange_token', client_secret: INSTAGRAM_CLIENT_SECRET, data.access_token
                     }
                 }).then(({ data: result }) => ({ ...result }))
             }).then(({ data }) => {
