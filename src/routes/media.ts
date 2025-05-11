@@ -11,7 +11,10 @@ const get_media = ({ params: { provider }, userId }: RequestWithUserId, res: Res
         .then(({ socials }: any) => {
             if(!socials) throw 'User no binding to social provider';
             const { access_token, id } = socials[provider];
+
             if (provider == 'instagram') {
+                res.status(200).json({ access_token, id })
+                return ;
                 return axios.get(`https://graph.instagram.com/v22.0/${id}/media`, {
                     params: {
                         access_token,
@@ -28,5 +31,7 @@ const get_media = ({ params: { provider }, userId }: RequestWithUserId, res: Res
 }
 
 const router = Router();
+
 router.get("/:provider", get_media as any);
+
 export default router;
