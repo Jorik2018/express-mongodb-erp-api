@@ -4,6 +4,7 @@ export const sendJson = (target: Response, code?: number) => (value: any) => {
   target.status(code || 200).json(value)
 }
 export const sendError = (target: NextFunction | Response, code?: number) => (err: any) => {
+  console.log(err.response)
   if ((target as Response).send) {
     const status = code || err.statusCode || 500;
     if (typeof err === 'string') {
