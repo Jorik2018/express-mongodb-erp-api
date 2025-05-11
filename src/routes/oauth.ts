@@ -306,12 +306,12 @@ const build = (authMiddleware: any) => {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
-            }).then(({ data: { access_token } }) => axios.get('https://graph.instagram.com/v22.0/me', {
+           })/*.then(({ data: { access_token } }) => axios.get('https://graph.instagram.com/v22.0/me', {
                 params: {
                     access_token,
                     fields: 'user_id,username,profile_picture_url,followers_count,media_count'
                 }
-            })).then(({ data }) => {
+            }))*/.then(({ data }) => {
                 return { data };
                 return axios.get('https://graph.instagram.com/access_token', {
                     params: {
