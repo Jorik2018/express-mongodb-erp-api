@@ -315,14 +315,14 @@ const build = (authMiddleware: any) => {
                     access_token,
                     fields: 'user_id,username,profile_picture_url,followers_count,media_count'
                 }
-            }).then(({ data }) => ({ ...data, access_token, user_id })))).then(({ access_token, user_id }) => {
-                return { data: { user_id, access_token, userId } }
-                /*return axios.get('https://graph.instagram.com/access_token', {
+            }).then(({ data }) => ({ ...data, access_token, user_id })))).then(({ access_token, user_id }) => (
+                 axios.get('https://graph.instagram.com/access_token', {
                     params: {
                         grant_type: 'ig_exchange_token', client_secret: INSTAGRAM_CLIENT_SECRET, access_token: access_token
                     }
-                }).then(({ data: result }) => ({ ...result, user_id }))*/
-            }).then(({ data }) => {
+                }).then(({ data }) => ({ ...data, user_id }))
+            )).then(( data ) => {
+                return data;
                 return Contact.findOne({ 'user': userId })
                     .lean()
                     .then((contact) => {
