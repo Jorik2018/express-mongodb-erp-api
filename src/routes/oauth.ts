@@ -321,23 +321,27 @@ const build = (authMiddleware: any) => {
                         grant_type: 'ig_exchange_token', client_secret: INSTAGRAM_CLIENT_SECRET, access_token
                     }
                 }).then(({ data }) => ({ ...others, ...data }))
-            )).then(({ access_token, user_id: id, username: name, followers_count: followers, media_count: medias }) => Contact.findOne({ 'user': userId })
-                .lean()
-                .then((contact: any) => {
-                    const socials = contact?.socials || {};
-                    socials[provider] = {
-                        id,
-                        access_token,
-                        name,
-                        followers,
-                        medias,
-                        refresh_token: undefined,
-                        expires_in: undefined,
-                        refresh_expire_in: undefined
-                    }
-                    contact.socials = socials;
-                    return contact;
-                })
+            )).then(({ access_token, user_id: id, username: name, followers_count: followers, media_count: medias }) =>
+                Contact.findOne({ 'user': userId })
+                    .lean()
+                    .then((contact: any) => {
+                        const { socials, _id } = (contact || {});
+                        const social = {
+                            id,
+                            access_token,
+                            name,
+                            followers,
+                            medias,
+                            refresh_token: undefined,
+                            expires_in: undefined,
+                            refresh_expire_in: undefined
+                        }
+                        socials[provider] = social;
+                        contact.socials = socials;
+                        return Contact.updateOne({ _id }, { $set: { socials } }).then(() => (
+                            { ...social, provider }
+                        ));
+                    })
             )
                 .then(sendJson(res))
                 .catch(sendError(res));
