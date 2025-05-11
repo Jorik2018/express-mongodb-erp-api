@@ -239,7 +239,7 @@ const build = (authMiddleware: any) => {
             provider = cookies.provider || provider;
             action = cookies.action || action;
         }
-        sendJson(res)({code,redirect_uri,provider})
+       
         if (provider == 'tiktok') {
             const codeVerifier = cookies.verifier;
             const params = new URLSearchParams();
@@ -299,7 +299,7 @@ const build = (authMiddleware: any) => {
         } else if (provider == 'instagram') {
 
 
-            return;
+           
             const formData = new FormData();
             formData.append('client_id', INSTAGRAM_CLIENT_ID!);
             formData.append('client_secret', INSTAGRAM_CLIENT_SECRET!);
@@ -319,7 +319,7 @@ const build = (authMiddleware: any) => {
                 return { data };
                 return axios.get('https://graph.instagram.com/access_token', {
                     params: {
-                        grant_type: 'ig_exchange_token', client_secret: INSTAGRAM_CLIENT_SECRET, data.access_token
+                        grant_type: 'ig_exchange_token', client_secret: INSTAGRAM_CLIENT_SECRET, access_token:data.access_token
                     }
                 }).then(({ data: result }) => ({ ...result }))
             }).then(({ data }) => {
