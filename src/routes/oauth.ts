@@ -325,7 +325,10 @@ const build = (authMiddleware: any) => {
                 Contact.findOne({ 'user': userId })
                     .lean()
                     .then((contact: any) => {
-                        const { socials, _id } = (contact || {});
+                        if (!contact) {
+                            throw 'Contact not found!';
+                        }
+                        const { socials = {}, _id } = contact;
                         const social = {
                             id,
                             access_token,
