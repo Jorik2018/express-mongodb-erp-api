@@ -315,7 +315,7 @@ const build = (authMiddleware: any) => {
                     access_token,
                     fields: 'user_id,username,profile_picture_url,followers_count,media_count'
                 }
-            }).then(({ data }) => ({ ...data, access_token, user_id })))).then(({ data: { access_token, user_id } }) => {
+            }).then(({ data }) => ({ ...data, access_token, user_id })))).then(({ access_token, user_id }) => {
                 return { data: { user_id, access_token, userId } }
                 /*return axios.get('https://graph.instagram.com/access_token', {
                     params: {
