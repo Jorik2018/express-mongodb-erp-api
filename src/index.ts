@@ -47,7 +47,7 @@ const fileFilter = (req: Request, file: { mimetype: string }, cb: Function) => {
 //app.use(knexMiddleware);
 
 //app.use(
- // multer({ storage: fileStorage, fileFilter }).single('image')
+// multer({ storage: fileStorage, fileFilter }).single('image')
 //);
 
 app.use(cookieParser());
@@ -70,8 +70,9 @@ app.get(`${api}/hola/:name?`, (req, res) => {
 import authRoute from './routes/auth'
 const isAuth = require('./auth/is-auth').default
 app.use(`${api}/file`, require('./controllers/upload').default);
-app.use(`${api}/oauth`, require('./routes/oauth').default);
+app.use(`${api}/oauth`,);
 app.use(api, authRoute(isAuth));
+app.use(api, require('./routes/oauth').default(isAuth));
 app.use(isAuth);
 app.use(`${api}/users`, require('./routes/user').default);
 app.use(`${api}/media`, require('./routes/media').default);
@@ -96,7 +97,7 @@ readdirSync('./routes').map((route) => {
 });
 */
 app.use((err: any, _req: Request, res: Response) => {
-  console.log('index=',err)
+  console.log('index=', err)
   sendError(res)(err)
 })
 
@@ -143,5 +144,5 @@ mongoose.connect(process.env.DB_URI!, {})
         */
   }).catch((error) => {
     console.log(`*** DB CONNECTION ERROR ❌ => [${process.env.DB_URI}]`, error);
-    
+
   });
