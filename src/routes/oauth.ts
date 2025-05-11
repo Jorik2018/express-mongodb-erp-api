@@ -343,7 +343,7 @@ const build = (authMiddleware: any) => {
                         socials[provider] = social;
                         contact.socials = socials;
                         return Contact.updateOne({ _id }, { $set: { socials } }).then(() => (
-                            { ...social, provider }
+                            { ...social, key:provider }
                         ));
                     })
             )
