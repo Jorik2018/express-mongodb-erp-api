@@ -87,7 +87,7 @@ const find = (_id: string, userId: string) => {
                                 from: 'contacts',
                                 localField: 'contact',
                                 foreignField: '_id',
-                                pipeline: [{ $project: { _id: 1, name: 1 } }],
+                                pipeline: [{ $project: { _id: 1, name: 1, profileImage: 1 } }],
                                 as: 'contact'
                             }
                         },
