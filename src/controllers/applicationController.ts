@@ -1,9 +1,7 @@
 import { Request, Response } from 'express';
 import { Types } from 'mongoose';
-import Application, { IApplication } from '../database/models/application';
+import Application from '../database/models/application';
 import applicationService from '../services/applicationService';
-import Contact from '../database/models/contact';
-import User from '../database/models/user';
 import { sendError, sendJson } from '../utils/responses';
 import { RequestWithUserId } from '../auth/is-auth';
 

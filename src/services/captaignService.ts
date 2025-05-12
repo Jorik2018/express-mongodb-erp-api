@@ -4,6 +4,7 @@ import User, { IUser } from "../database/models/user";
 import { moveTmp } from "../controllers/upload";
 import Contact from "../database/models/contact";
 import Application from "../database/models/application";
+import axios from "axios";
 
 const list = ({ userId }: any) => {
 
@@ -26,7 +27,46 @@ const list = ({ userId }: any) => {
     });
 }
 
-
+const calculate = (campaign: string, userId: string) => {
+    return Application.find({
+        campaign
+    }).populate('contact').lean().then((applications) => {
+        applications.forEach(({ _id, contact: { socials }, content }: any) => {
+            Promise.all(content.map((content: any) => {
+                const social = socials[content.provider];
+                if (!social) throw 'No provider for media ' + content._id;
+                if (content.provider == 'instagram') {
+                    return axios.get('https://graph.instagram.com/v22.0/' + content.id + '/insights', {
+                        params: {
+                            access_token: social.access_token,
+                            metric: 'shares, views, likes, reach'
+                        }
+                    }).then(({ data: { data } }: any) => data.reduce((colector: any, { name, values }: any) => {
+                        colector[name] = values[0].value;
+                        return colector;
+                    }, { _id: content._id }))
+                } else {
+                    return Promise.resolve({ _id: content._id });
+                }
+            })).then((contents: any) => Promise.all(contents.map(({ _id: content_id, likes, shares, views, reach }: any) =>
+                Application.updateOne(
+                    { _id, "content._id": content_id },
+                    {
+                        $set: {
+                            "content.$.likes": likes,
+                            "content.$.shares": shares,
+                            "content.$.views": views,
+                            "content.$.reach": reach
+                        }
+                    }
+                )
+            ))
+            ).then(results => {
+                console.log(results)
+            })
+        })
+    });
+};
 
 const find = (_id: string, userId: string) => {
     const user = Types.ObjectId.createFromHexString(userId);
@@ -43,26 +83,26 @@ const find = (_id: string, userId: string) => {
                     return Application.aggregate([
                         { $match: { campaign: _id } },
                         {
-                          $lookup: {
-                            from: 'contacts',
-                            localField: 'contact',
-                            foreignField: '_id',
-                            pipeline:[{$project:{_id:1,name:1}}],
-                            as: 'contact'
-                          }
+                            $lookup: {
+                                from: 'contacts',
+                                localField: 'contact',
+                                foreignField: '_id',
+                                pipeline: [{ $project: { _id: 1, name: 1 } }],
+                                as: 'contact'
+                            }
                         },
                         { $unwind: '$contact' },
                         { $unwind: '$content' },
                         {
-                          $replaceWith: {
-                            $mergeObjects: [
-                              '$content',
-                              { contact: '$contact' }
-                            ]
-                          }
+                            $replaceWith: {
+                                $mergeObjects: [
+                                    '$content',
+                                    { contact: '$contact' }
+                                ]
+                            }
                         }
-                      ]).then((content: any) => {
-                        
+                    ]).then((content: any) => {
+
                         //return Application.findOne({ campaign: _id }).lean().then((application: any) => {
                         return {
                             id: _id,
@@ -117,4 +157,4 @@ const remove = (_id: string) => {
     })
 };
 
-export default { list, find, create, update, remove, activate }
+export default { list, find, create, update, remove, activate, calculate }

@@ -49,7 +49,7 @@ const find = (_id: string, userId: string) => {
         name
       })) : undefined;
       return Brand.countDocuments({ user, _id: campaign.brand }).then(count => {
-        
+
         return { ...application, id: applicationId, socials, campaign: campaign._id, approve: count ? true : undefined, status: 'pending' }
       })
     })

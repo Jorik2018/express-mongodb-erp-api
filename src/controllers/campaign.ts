@@ -38,6 +38,12 @@ const remove = (req: Request, res: Response) => {
     .then(sendJson(res)).catch(sendError(res));
 };
 
+const calculate = ({ body: { campaign }, userId }: RequestWithUserId, res: Response) => {
+  captaignService.calculate(campaign, userId)
+    .then(sendJson(res))
+    .catch(sendError(res));
+};
+
 const router = Router();
 
 router.get('/', list as any);
@@ -46,4 +52,6 @@ router.get('/:id', find as any);
 router.patch('/:id', update);
 router.patch('/activate/:id', activate);
 router.delete('/:id', remove);
+router.post('/calculate', calculate as any);
+
 export default router;

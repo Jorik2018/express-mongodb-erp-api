@@ -7,7 +7,8 @@ const mediaSchema: Schema = new Schema({
   thumbnail: { type: String, required: true },
   type: { type: String, required: true },
   likes: { type: Number, default: 0 },
-  shared: { type: Number, default: 0 }
+  views: { type: Number, default: 0 },
+  shares: { type: Number, default: 0 }
 });
 
 const applicationSchema: Schema = new Schema({
