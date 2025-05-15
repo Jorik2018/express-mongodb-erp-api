@@ -1,5 +1,4 @@
 import { Response, Router } from 'express';
-import Contact from '../database/models/contact';
 import { sendError, sendJson } from '../utils/responses';
 import contactService from '../services/contactService';
 import { RequestWithUserId } from '../auth/is-auth';

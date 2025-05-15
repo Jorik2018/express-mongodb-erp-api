@@ -36,12 +36,6 @@ const UserSchema: Schema = new Schema({
 			required: true,
 			default: false
 		},
-		contacts: [
-			{
-				type: Schema.Types.ObjectId,
-				ref: 'Contact'
-			}
-		],
 		displayName: {
 			type: String,
 		},

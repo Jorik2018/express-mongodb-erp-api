@@ -25,6 +25,12 @@ const contactSchema = new Schema({
     email: {
         type: String
     },
+    contacts: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'Contact'
+        }
+    ],
     phone: {
         type: String,
         minlength: 8,

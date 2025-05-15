@@ -195,7 +195,7 @@ export const generateToken = (res: Response, user: any) => {
 	return Promise.resolve({
 		token,
 		id: _id,
-		perms: roles.includes('Sponsor') ? { 'CREATE_CAMPAIGNS': 1 } : {},
+		perms: roles&&roles.includes('Sponsor') ? { 'CREATE_CAMPAIGNS': 1 } : {},
 		...other
 	});
 }
