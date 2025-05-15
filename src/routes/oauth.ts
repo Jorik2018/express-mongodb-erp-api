@@ -67,6 +67,7 @@ const build = (authMiddleware: any) => {
 
     const get_oauth_url = (res: Response, provider: string, redirect_uri?: any) => {
         if (provider == 'facebook') {
+            
             return `https://www.facebook.com/v13.0/dialog/oauth?client_id=${FACEBOOK_APP_ID}&redirect_uri=${redirect_uri || FACEBOOK_REDIRECT_URI}&scope=email`;
         } else if (provider == 'tiktok') {
             const csrfState = Math.random().toString(36).substring(2);
