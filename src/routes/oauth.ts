@@ -67,7 +67,6 @@ const build = (authMiddleware: any) => {
 
     const get_oauth_url = (res: Response, provider: string, redirect_uri?: any) => {
         if (provider == 'facebook') {
-            
             return `https://www.facebook.com/v13.0/dialog/oauth?client_id=${FACEBOOK_APP_ID}&redirect_uri=${redirect_uri || FACEBOOK_REDIRECT_URI}&scope=email`;
         } else if (provider == 'tiktok') {
             const csrfState = Math.random().toString(36).substring(2);
@@ -81,7 +80,7 @@ const build = (authMiddleware: any) => {
             return url;
             
         } else if (provider == 'instagram') {
-            return `https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_authentication=1&client_id=${INSTAGRAM_CLIENT_ID}&redirect_uri=${redirect_uri || INSTAGRAM_REDIRECT_URI}&response_type=code&scope=instagram_business_basic`;
+            return `https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_authentication=1&client_id=${INSTAGRAM_CLIENT_ID}&redirect_uri=${redirect_uri || INSTAGRAM_REDIRECT_URI}&response_type=code&scope=instagram_business_basic%2Cinstagram_business_manage_insights`;
         }
         throw "No oauth provider"
     }

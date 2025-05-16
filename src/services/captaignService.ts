@@ -59,8 +59,11 @@ const calculate = (campaign: string, userId: string) => {
                             "content.$.reach": reach
                         }
                     }
-                )
-            ))
+                ).then((r) => {
+                    console.log(r)
+                    return ({ modifiedCount: r.modifiedCount, likes, shares, views, reach });
+                }
+                )))
             ).then(results => {
                 console.log(results)
             })
