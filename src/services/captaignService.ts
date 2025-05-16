@@ -30,43 +30,45 @@ const list = ({ userId }: any) => {
 const calculate = (campaign: string, userId: string) => {
     return Application.find({
         campaign
-    }).populate('contact').lean().then((applications) => {
-        applications.forEach(({ _id, contact: { socials }, content }: any) => {
-            Promise.all(content.map((content: any) => {
-                const social = socials[content.provider];
-                if (!social) throw 'No provider for media ' + content._id;
-                if (content.provider == 'instagram') {
-                    return axios.get('https://graph.instagram.com/v22.0/' + content.id + '/insights', {
-                        params: {
-                            access_token: social.access_token,
-                            metric: 'shares, views, likes, reach'
-                        }
-                    }).then(({ data: { data } }: any) => data.reduce((colector: any, { name, values }: any) => {
-                        colector[name] = values[0].value;
-                        return colector;
-                    }, { _id: content._id }))
-                } else {
-                    return Promise.resolve({ _id: content._id });
-                }
-            })).then((contents: any) => Promise.all(contents.map(({ _id: content_id, likes, shares, views, reach }: any) =>
-                Application.updateOne(
-                    { _id, "content._id": content_id },
-                    {
-                        $set: {
-                            "content.$.likes": likes,
-                            "content.$.shares": shares,
-                            "content.$.views": views,
-                            "content.$.reach": reach
-                        }
+    }).populate('contact').lean().then((applications) =>
+        applications.map(({ _id, contact, content }: any) => {
+            if (contact) {
+                const socials = contact.socials;
+                return Promise.all(content.map((content: any) => {
+                    const social = socials[content.provider];
+                    if (!social) throw 'No provider for media ' + content._id;
+                    if (content.provider == 'instagram') {
+                        return axios.get('https://graph.instagram.com/v22.0/' + content.id + '/insights', {
+                            params: {
+                                access_token: social.access_token,
+                                metric: 'shares, views, likes, reach'
+                            }
+                        }).then(({ data: { data } }: any) => data.reduce((colector: any, { name, values }: any) => {
+                            colector[name] = values[0].value;
+                            return colector;
+                        }, { _id: content._id }))
+                    } else {
+                        return Promise.resolve({ _id: content._id });
                     }
-                ).then((r) => {
-                    console.log(r)
-                    return ({ modifiedCount: r.modifiedCount, likes, shares, views, reach });
-                }
-                )))
-            ).then(results => {
-                console.log(results)
-            })
+                }))
+                    .then((contents: any) => Promise.all(contents.map(({ _id: content_id, likes, shares, views, reach }: any) =>
+                        Application.updateOne(
+                            { _id, "content._id": content_id },
+                            {
+                                $set: {
+                                    "content.$.likes": likes,
+                                    "content.$.shares": shares,
+                                    "content.$.views": views,
+                                    "content.$.reach": reach
+                                }
+                            }
+                        ).then(({ modifiedCount }) => ({ modifiedCount, likes, shares, views, reach })
+                        ))))
+            }
+        })
+    ).then((r) => {
+        Promise.all(r).then((r)=>{
+           
         })
     });
 };
