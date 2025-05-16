@@ -19,7 +19,7 @@ const get_media = ({ params: { provider }, userId }: RequestWithUserId, res: Res
                     }
                 }).then(({ data }) => data)
             } else if (provider == 'tiktok') {
-                return Promise.resolve({
+                 Promise.resolve({
                     params: {
                         fields: 'cover_image_url, id, title'
                     },
@@ -28,7 +28,7 @@ const get_media = ({ params: { provider }, userId }: RequestWithUserId, res: Res
                         'Content-Type': 'application/json',
                     }
                 })
-                return axios.post(`https://open.tiktokapis.com/v2/video/list/`, null, {
+                return axios.post(`https://open.tiktokapis.com/v2/video/list/?fields=cover_image_url, id, title`, null, {
                     params: {
                         fields: 'cover_image_url, id, title'
                     },
