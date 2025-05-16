@@ -11,35 +11,31 @@ const get_media = ({ params: { provider }, userId }: RequestWithUserId, res: Res
         .then(({ socials }: any) => {
             if (!socials) throw 'User no binding to social provider';
             const { access_token, id } = socials[provider];
-
             if (provider == 'instagram') {
-
                 return axios.get(`https://graph.instagram.com/v22.0/${id}/media`, {
                     params: {
                         access_token,
                         fields: 'id,ig_id,media_product_type,media_type,media_url,thumbnail_url,timestamp,like_count'
                     }
-                })
-                    .then(({ data }) => data)
-                    .then((data) => {
-                        res.status(200).json(data)
-                    })
+                }).then(({ data }) => data)
             } else if (provider == 'tiktok') {
-                axios.post(`https://open.tiktokapis.com/v2/video/list/`, {
+                return axios.post(`https://open.tiktokapis.com/v2/video/list/`, {
                     headers: {
+                        'Authorization': `Bearer ${access_token}`,
                         'Content-Type': 'application/json',
                     },
                     params: {
                         fields: 'cover_image_url,id,title'
                     }
-                })
-                    .then(({ data }) => data)
-                    .then((data) => {
-                        res.status(200).json(data)
-                    })
+                }).then(({ data }) => data)
+            } else {
+                return Promise.resolve({})
             }
         })
-        .catch(sendError(res));
+        .catch(sendError(res))
+        .then((data) => {
+            res.status(200).json(data)
+        });
 }
 
 const router = Router();
