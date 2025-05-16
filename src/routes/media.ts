@@ -19,11 +19,10 @@ const get_media = ({ params: { provider }, userId }: RequestWithUserId, res: Res
                     }
                 }).then(({ data }) => data)
             } else if (provider == 'tiktok') {
-                return axios.post(`https://open.tiktokapis.com/v2/video/list/`, {
+                return axios.post(`https://open.tiktokapis.com/v2/video/list/`, null, {
                     params: {
                         fields: 'cover_image_url, id, title'
-                    }
-                }, {
+                    },
                     headers: {
                         'Authorization': `Bearer ${access_token}`,
                         'Content-Type': 'application/json',
