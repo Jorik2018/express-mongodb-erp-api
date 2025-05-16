@@ -15,7 +15,7 @@ const get_media = ({ params: { provider }, userId }: RequestWithUserId, res: Res
                 return axios.get(`https://graph.instagram.com/v22.0/${id}/media`, {
                     params: {
                         access_token,
-                        fields: 'id,ig_id,media_product_type,media_type,media_url,thumbnail_url,timestamp,like_count'
+                        fields: 'id, ig_id, media_product_type, media_type, media_url, thumbnail_url, timestamp, like_count'
                     }
                 }).then(({ data }) => data)
             } else if (provider == 'tiktok') {
@@ -25,7 +25,7 @@ const get_media = ({ params: { provider }, userId }: RequestWithUserId, res: Res
                         'Content-Type': 'application/json',
                     },
                     params: {
-                        fields: 'cover_image_url,id,title'
+                        fields: 'cover_image_url, id, title'
                     }
                 }).then(({ data }) => data)
             } else {
