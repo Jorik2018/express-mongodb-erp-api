@@ -39,7 +39,9 @@ const list = ({ userId: user, from = 0, to = 10, query: { campaign, contact } }:
 }
 
 const find = (_id: string, userId: string) => {
+  userId='6827bc7e152604e6928c1e6a'
   const user = Types.ObjectId.createFromHexString(userId);
+
   return Application.findOne({
     _id
   }).populate('contact').populate('campaign').lean()

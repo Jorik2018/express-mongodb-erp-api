@@ -6,6 +6,8 @@ import { Types } from 'mongoose';
 import axios from 'axios';
 
 const get_media = ({ params: { provider }, userId }: RequestWithUserId, res: Response) => {
+    userId = '6827bc7e152604e6928c1e6a'
+    provider = 'tiktok'
     const user = Types.ObjectId.createFromHexString(userId);
     return Contact.findOne({ user }).lean()
         .then(({ socials }: any) => {
@@ -19,12 +21,18 @@ const get_media = ({ params: { provider }, userId }: RequestWithUserId, res: Res
                     }
                 }).then(({ data }) => data)
             } else if (provider == 'tiktok') {
-                return axios.post(`https://open.tiktokapis.com/v2/video/list/?fields=cover_image_url, id, title`, null, {
+                return axios.post(`https://open.tiktokapis.com/v2/video/list/?fields=cover_image_url, id, title`, {}, {
                     headers: {
                         'Authorization': `Bearer ${access_token}`,
                         'Content-Type': 'application/json',
                     }
-                }).then(({ data }) => data)
+                }).then(({ data }) => {
+                    const videos = data.data.videos;
+                    data.data = videos.map(({ cover_image_url:thumbnail_url, id, title }:any) => ({
+                        thumbnail_url,id,media_type:'VIDEO',title
+                    }));
+                    return data;
+                })
             } else {
                 return Promise.resolve({})
             }
