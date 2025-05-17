@@ -74,7 +74,7 @@ const calculate = (campaign: string, userId: string) => {
 };
 
 const find = (_id: string, userId: string) => {
-    userId='6827bc7e152604e6928c1e6a'
+    //userId='6827bc7e152604e6928c1e6a'
     const user = Types.ObjectId.createFromHexString(userId);
     //Se debe procurar q cada usuario tenga solo un perfil
     return Contact.findOne({ user }).lean().then(({ _id: contact }: any) =>
