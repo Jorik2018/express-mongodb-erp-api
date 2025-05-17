@@ -28,8 +28,8 @@ const get_media = ({ params: { provider }, userId }: RequestWithUserId, res: Res
                     }
                 }).then(({ data }) => {
                     const videos = data.data.videos;
-                    data.data = videos.map(({ cover_image_url:thumbnail_url, id, title }:any) => ({
-                        thumbnail_url,id,media_type:'VIDEO',title
+                    data.data = videos.map(({ cover_image_url: thumbnail_url, id, title, view_count, share_count, like_count, share_url, embed_link }: any) => ({
+                        thumbnail_url, id, media_type: 'VIDEO', title, view_count, share_count, like_count, share_url, embed_link
                     }));
                     return data;
                 })
