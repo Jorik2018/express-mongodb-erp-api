@@ -33,8 +33,8 @@ export const refreshToken = (socialName: string, contact: FlattenMaps<IContact &
         //debe revisarse si ya ha expirado el token
         let shouldRefresh = true;
         if (updateAt) {
-            const expirationDate = new Date(updateAt!.getTime() + expires_in! * 1000);
-            shouldRefresh = (expirationDate.getTime() - Date.now()) < (24 * 60 * 60 * 1000);
+            //expires_in in seconds de un dia
+            shouldRefresh = ((Date.now() - updateAt.getTime()) / 1000) > (expires_in! - 60 * 60)!
         }
         if (shouldRefresh) {
             const params = new URLSearchParams();
