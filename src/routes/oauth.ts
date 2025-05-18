@@ -2,10 +2,10 @@ import axios from 'axios';
 import { Router, Response } from 'express';
 import generatePKCE from '../utils/pkce'
 import { sendError, sendJson } from '../utils/responses';
-import Contact from '../database/models/contact';
+import Contact, { IContact } from '../database/models/contact';
 import Temporal from '../database/models/temporal';
 import { generateToken } from '../controllers/auth';
-import { Types } from 'mongoose';
+import { FlattenMaps, Types } from 'mongoose';
 import { RequestWithUserId } from '../auth/is-auth';
 
 
@@ -16,6 +16,46 @@ const {
     INSTAGRAM_REDIRECT_URI,
     TIKTOK_CLIENT_KEY, TIKTOK_CLIENT_SECRET, TIKTOK_REDIRECT_URI
 } = process.env;
+
+export const refreshToken = (socialName: string, contact: FlattenMaps<IContact & { _id: any }>) => {
+    if (!contact.socials) throw 'User no binding to social provider';
+    const social = contact.socials![socialName];
+    const { access_token, refresh_token, expires_in, updateAt } = social;
+    if (socialName == 'instagram') {
+        return axios.get('https://graph.instagram.com/access_token', {
+            params: {
+                grant_type: 'ig_exchange_token', client_secret: INSTAGRAM_CLIENT_SECRET, access_token
+            }
+        }).then(({ data }) => {
+            return { [socialName]: { ...social, ...data } };
+        })
+    } else if (socialName == 'tiktok') {
+        //debe revisarse si ya ha expirado el token
+        const params = new URLSearchParams();
+        params.append('client_key', TIKTOK_CLIENT_KEY!);
+        params.append('client_secret', TIKTOK_CLIENT_SECRET!);
+        params.append('grant_type', 'refresh_token');
+        params.append('refresh_token', refresh_token!);
+        const expirationDate = new Date(updateAt!.getTime() + expires_in! * 1000);
+        const shouldRefresh = (expirationDate.getTime() - Date.now()) < (24 * 60 * 60 * 1000);
+        if (shouldRefresh) {
+            return axios.post(`https://open.tiktokapis.com/v2/oauth/token/`, params, {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            }).then(({ data }) => {
+                contact.socials![socialName] = { ...social, ...data, updateAt: Date.now() };
+                return Contact.updateOne({ _id: contact._id }, { socials: contact.socials }).then(() => {
+                    return { ...social, ...data, updateAt: Date.now() };
+                })
+            })
+        } else {
+            return Promise.resolve(social);
+        }
+    } else {
+        throw `provider "${socialName}" unknow!`
+    }
+}
 
 export const getSocial = (social: string) => Temporal.findOne({ _id: Types.ObjectId.createFromHexString(social) }).lean().then((temporal: any) => {
 
@@ -78,7 +118,7 @@ const build = (authMiddleware: any) => {
             url += `&redirect_uri=${redirect_uri || TIKTOK_REDIRECT_URI}&state=${csrfState}`;
             url += `&code_challenge=${codeChallenge}&code_challenge_method=S256`;
             return url;
-            
+
         } else if (provider == 'instagram') {
             return `https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_authentication=1&client_id=${INSTAGRAM_CLIENT_ID}&redirect_uri=${redirect_uri || INSTAGRAM_REDIRECT_URI}&response_type=code&scope=instagram_business_basic%2Cinstagram_business_manage_insights`;
         }
@@ -344,7 +384,7 @@ const build = (authMiddleware: any) => {
                         socials[provider] = social;
                         contact.socials = socials;
                         return Contact.updateOne({ _id }, { $set: { socials } }).then(() => (
-                            { ...social, key:provider }
+                            { ...social, key: provider }
                         ));
                     })
             )

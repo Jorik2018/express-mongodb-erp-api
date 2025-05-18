@@ -5,6 +5,7 @@ import { moveTmp } from "../controllers/upload";
 import Contact from "../database/models/contact";
 import Application from "../database/models/application";
 import axios from "axios";
+import { refreshToken } from "../routes/oauth";
 
 const list = ({ userId }: any) => {
 
@@ -56,31 +57,34 @@ const calculate = (campaign: string, userId: string) => {
                     .then((contents: any) => {
                         const tiktok = contents.filter((content: any) => content.provider === 'tiktok').map(({ id }: any) => id)
                         if (tiktok.length > 0) {
-                            const social = socials['tiktok'];
-                            return axios.post(`https://open.tiktokapis.com/v2/video/query/?fields=id, view_count, share_count, like_count`, {filters:{
-                                video_ids:tiktok
-                            }}, {
-                                headers: {
-                                    'Authorization': `Bearer ${social.access_token}`,
-                                    'Content-Type': 'application/json',
-                                }
-                            }).then(({data})=>data)
+                            return refreshToken('tiktok', contact).then(({ access_token }) => {
+                                return axios.post(`https://open.tiktokapis.com/v2/video/query/?fields=id, view_count, share_count, like_count`, {
+                                    filters: {
+                                        video_ids: tiktok
+                                    }
+                                }, {
+                                    headers: {
+                                        'Authorization': `Bearer ${access_token}`,
+                                        'Content-Type': 'application/json',
+                                    }
+                                }).then(({ data }) => data)
+                            })
                         }
                         return contents.filter((content: any) => !content.provider);
                     })
-                   /* .then((contents: any) => Promise.all(contents.map(({ _id: content_id, likes, shares, views, reach }: any) =>
-                        Application.updateOne(
-                            { _id, "content._id": content_id },
-                            {
-                                $set: {
-                                    "content.$.likes": likes,
-                                    "content.$.shares": shares,
-                                    "content.$.views": views,
-                                    "content.$.reach": reach
-                                }
-                            }
-                        ).then(({ modifiedCount }) => ({ modifiedCount, likes, shares, views, reach })
-                        ))))*/
+                /* .then((contents: any) => Promise.all(contents.map(({ _id: content_id, likes, shares, views, reach }: any) =>
+                     Application.updateOne(
+                         { _id, "content._id": content_id },
+                         {
+                             $set: {
+                                 "content.$.likes": likes,
+                                 "content.$.shares": shares,
+                                 "content.$.views": views,
+                                 "content.$.reach": reach
+                             }
+                         }
+                     ).then(({ modifiedCount }) => ({ modifiedCount, likes, shares, views, reach })
+                     ))))*/
             }
         })
     ).then((r) => {

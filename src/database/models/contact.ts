@@ -9,6 +9,7 @@ const socialMediaSchema = new Schema({
     name: String,
     followers: Number,
     medias: Number,
+    updateAt: Date
 });
 
 const contactSchema = new Schema({
