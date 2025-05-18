@@ -47,11 +47,28 @@ const calculate = (campaign: string, userId: string) => {
                             colector[name] = values[0].value;
                             return colector;
                         }, { _id: content._id }))
+                    } else if (content.provider == 'tiktok') {
+                        return Promise.resolve(content);
                     } else {
                         return Promise.resolve({ _id: content._id });
                     }
                 }))
-                    .then((contents: any) => Promise.all(contents.map(({ _id: content_id, likes, shares, views, reach }: any) =>
+                    .then((contents: any) => {
+                        const tiktok = contents.filter((content: any) => content.provider === 'tiktok').map(({ id }: any) => id)
+                        if (tiktok.length > 0) {
+                            const social = socials['tiktok'];
+                            return axios.post(`https://open.tiktokapis.com/v2/video/query/?fields=id, view_count, share_count, like_count`, {filters:{
+                                video_ids:tiktok
+                            }}, {
+                                headers: {
+                                    'Authorization': `Bearer ${social.access_token}`,
+                                    'Content-Type': 'application/json',
+                                }
+                            }).then(({data})=>data)
+                        }
+                        return contents.filter((content: any) => !content.provider);
+                    })
+                   /* .then((contents: any) => Promise.all(contents.map(({ _id: content_id, likes, shares, views, reach }: any) =>
                         Application.updateOne(
                             { _id, "content._id": content_id },
                             {
@@ -63,63 +80,64 @@ const calculate = (campaign: string, userId: string) => {
                                 }
                             }
                         ).then(({ modifiedCount }) => ({ modifiedCount, likes, shares, views, reach })
-                        ))))
+                        ))))*/
             }
         })
     ).then((r) => {
-        Promise.all(r).then((r)=>{
-           
+        Promise.all(r).then((r) => {
+
         })
     });
 };
+
+const findCampaign = (_id: any, application?: any) => Campaign.findOne({
+    _id
+}).populate('sponsor').populate('brand').lean()
+    .then(({ _id, categories, category, gallery, image, brand, ...campaign }: any) => {
+        const { _id: brandId, __v, ...brandOther } = brand || {};
+        return Application.aggregate([
+            { $match: { campaign: _id } },
+            {
+                $lookup: {
+                    from: 'contacts',
+                    localField: 'contact',
+                    foreignField: '_id',
+                    pipeline: [{ $project: { _id: 1, name: 1, profileImage: 1 } }],
+                    as: 'contact'
+                }
+            },
+            { $unwind: '$contact' },
+            { $unwind: '$content' },
+            {
+                $replaceWith: {
+                    $mergeObjects: [
+                        '$content',
+                        { contact: '$contact' }
+                    ]
+                }
+            }
+        ]).then((content: any) => {
+            //return Application.findOne({ campaign: _id }).lean().then((application: any) => {
+            return {
+                id: _id,
+                content,
+                taken: !!application,
+                categories: categories && Array.isArray(categories) ? categories : [category],
+                gallery: gallery && gallery.length ? gallery : [image, image, image, image], brand: brandId ? { id: brandId, ...brandOther } : null, ...campaign
+            }
+        })
+    });
 
 const find = (_id: string, userId: string) => {
     //userId='6827bc7e152604e6928c1e6a'
     const user = Types.ObjectId.createFromHexString(userId);
     //Se debe procurar q cada usuario tenga solo un perfil
-    return Contact.findOne({ user }).lean().then(({ _id: contact }: any) =>
-        Application.findOne({ contact, campaign: _id }).lean().then((application: any) => {
-            return Campaign.findOne({
-                _id
-            }).populate('sponsor').populate('brand').lean()
-                .then(({ _id, categories, category, gallery, image, brand, ...campaign }: any) => {
-                    const { _id: brandId, __v, ...brandOther } = brand || {};
-
-
-                    return Application.aggregate([
-                        { $match: { campaign: _id } },
-                        {
-                            $lookup: {
-                                from: 'contacts',
-                                localField: 'contact',
-                                foreignField: '_id',
-                                pipeline: [{ $project: { _id: 1, name: 1, profileImage: 1 } }],
-                                as: 'contact'
-                            }
-                        },
-                        { $unwind: '$contact' },
-                        { $unwind: '$content' },
-                        {
-                            $replaceWith: {
-                                $mergeObjects: [
-                                    '$content',
-                                    { contact: '$contact' }
-                                ]
-                            }
-                        }
-                    ]).then((content: any) => {
-
-                        //return Application.findOne({ campaign: _id }).lean().then((application: any) => {
-                        return {
-                            id: _id,
-                            content,
-                            taken: !!application,
-                            categories: categories && Array.isArray(categories) ? categories : [category],
-                            gallery: gallery && gallery.length ? gallery : [image, image, image, image], brand: brandId ? { id: brandId, ...brandOther } : null, ...campaign
-                        }
-                    })
-                })
-        }))
+    return Contact.findOne({ user }).lean().then((contact: any) => {
+        if (contact)
+            return Application.findOne({ contact: contact._id, campaign: _id }).lean().then((application: any) => findCampaign(_id, application))
+        else
+            return findCampaign(_id);
+    })
 }
 
 const create = ({ brandId, userId, coverImage, gallery, ...body }: any) => {
