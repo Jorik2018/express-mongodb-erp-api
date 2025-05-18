@@ -36,8 +36,11 @@ export const refreshToken = (socialName: string, contact: FlattenMaps<IContact &
         params.append('client_secret', TIKTOK_CLIENT_SECRET!);
         params.append('grant_type', 'refresh_token');
         params.append('refresh_token', refresh_token!);
-        const expirationDate = new Date(updateAt!.getTime() + expires_in! * 1000);
-        const shouldRefresh = (expirationDate.getTime() - Date.now()) < (24 * 60 * 60 * 1000);
+        let shouldRefresh = true;
+        if (updateAt) {
+            const expirationDate = new Date(updateAt!.getTime() + expires_in! * 1000);
+            shouldRefresh = (expirationDate.getTime() - Date.now()) < (24 * 60 * 60 * 1000);
+        }
         if (shouldRefresh) {
             return axios.post(`https://open.tiktokapis.com/v2/oauth/token/`, params, {
                 headers: {
