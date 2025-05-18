@@ -30,6 +30,9 @@ const CampaignSchema: Schema = new Schema({
   budget: { type: String },
   applicants: [{ type: Schema.Types.ObjectId, ref: 'User' }], // Reference to User collection
   status: { type: String, required: true, enum: ['active', 'upcoming', 'completed', 'draft'] },
+  likes: { type: Number, default: 0 },
+  views: { type: Number, default: 0 },
+  shares: { type: Number, default: 0 }
 });
 
 const Campaign: Model<ICampaign> = model<ICampaign>('Campaign', CampaignSchema);

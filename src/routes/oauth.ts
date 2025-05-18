@@ -36,7 +36,7 @@ export const refreshToken = (socialName: string, contact: FlattenMaps<IContact &
             //expires_in in seconds de un dia
             shouldRefresh = ((Date.now() - updateAt.getTime()) / 1000) > (expires_in! - 60 * 60)!
         }
-        if (shouldRefresh) {
+        if (shouldRefresh) {//2025-05-18T04:33:23.973+00:00
             const params = new URLSearchParams();
             params.append('client_key', TIKTOK_CLIENT_KEY!);
             params.append('client_secret', TIKTOK_CLIENT_SECRET!);

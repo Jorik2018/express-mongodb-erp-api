@@ -67,31 +67,63 @@ const calculate = (campaign: string, userId: string) => {
                                         'Authorization': `Bearer ${access_token}`,
                                         'Content-Type': 'application/json',
                                     }
-                                }).then(({ data }) => data)
+                                }).then(({ data }) => {
+                                    const videos = data.data.videos;
+                                    return videos.map(({ id, view_count, share_count, like_count }: any) => ({
+                                        _id: contents.find((content: any) => content.provider === 'tiktok' && content.id === id)._id, views: view_count, shares: share_count, likes: like_count
+                                    }));
+                                })
                             })
                         }
                         return contents.filter((content: any) => !content.provider);
                     })
-                /* .then((contents: any) => Promise.all(contents.map(({ _id: content_id, likes, shares, views, reach }: any) =>
-                     Application.updateOne(
-                         { _id, "content._id": content_id },
-                         {
-                             $set: {
-                                 "content.$.likes": likes,
-                                 "content.$.shares": shares,
-                                 "content.$.views": views,
-                                 "content.$.reach": reach
-                             }
-                         }
-                     ).then(({ modifiedCount }) => ({ modifiedCount, likes, shares, views, reach })
-                     ))))*/
+                    .then((contents: any) => Promise.all(contents.map(({ _id: content_id, likes, shares, views, reach }: any) =>
+                        Application.updateOne(
+                            { _id, "content._id": content_id },
+                            {
+                                $set: {
+                                    "content.$.likes": likes,
+                                    "content.$.shares": shares,
+                                    "content.$.views": views,
+                                    "content.$.reach": reach
+                                }
+                            }
+                        ).then(({ modifiedCount }) => ({ modifiedCount, likes, shares, views, reach })
+                        ))))
             }
         })
-    ).then((r) => {
-        Promise.all(r).then((r) => {
-
-        })
-    });
+    ).then((r) => Promise.all(r).then((r) => {
+        Application.aggregate([
+            {
+                $match: {
+                    campaign: new Types.ObjectId(campaign)
+                }
+            },
+            {
+                $unwind: '$content'
+            },
+            {
+                $group: {
+                    _id: null,
+                    views: { $sum: '$content.views' },
+                    likes: { $sum: '$content.likes' },
+                    shares: { $sum: '$content.shares' }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    views: 1,
+                    likes: 1,
+                    shares: 1
+                }
+            }
+        ]).then(summary => (summary[0] || { views: 0, likes: 0, shares: 0 }))
+            .then(({ views, likes, shares }) =>
+                Campaign.updateOne({ _id: campaign }, { views, likes, shares })
+            );
+    })
+    );
 };
 
 const findCampaign = (_id: any, application?: any) => Campaign.findOne({
