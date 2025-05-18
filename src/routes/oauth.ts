@@ -31,17 +31,17 @@ export const refreshToken = (socialName: string, contact: FlattenMaps<IContact &
         })
     } else if (socialName == 'tiktok') {
         //debe revisarse si ya ha expirado el token
-        const params = new URLSearchParams();
-        params.append('client_key', TIKTOK_CLIENT_KEY!);
-        params.append('client_secret', TIKTOK_CLIENT_SECRET!);
-        params.append('grant_type', 'refresh_token');
-        params.append('refresh_token', refresh_token!);
         let shouldRefresh = true;
-        if (updateAt) {
+        if (!updateAt) {
             const expirationDate = new Date(updateAt!.getTime() + expires_in! * 1000);
             shouldRefresh = (expirationDate.getTime() - Date.now()) < (24 * 60 * 60 * 1000);
         }
         if (shouldRefresh) {
+            const params = new URLSearchParams();
+            params.append('client_key', TIKTOK_CLIENT_KEY!);
+            params.append('client_secret', TIKTOK_CLIENT_SECRET!);
+            params.append('grant_type', 'refresh_token');
+            params.append('refresh_token', refresh_token!);
             return axios.post(`https://open.tiktokapis.com/v2/oauth/token/`, params, {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
