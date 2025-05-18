@@ -32,7 +32,7 @@ export const refreshToken = (socialName: string, contact: FlattenMaps<IContact &
     } else if (socialName == 'tiktok') {
         //debe revisarse si ya ha expirado el token
         let shouldRefresh = true;
-        if (!updateAt) {
+        if (updateAt) {
             const expirationDate = new Date(updateAt!.getTime() + expires_in! * 1000);
             shouldRefresh = (expirationDate.getTime() - Date.now()) < (24 * 60 * 60 * 1000);
         }
