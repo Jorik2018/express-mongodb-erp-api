@@ -1,8 +1,8 @@
-import { Types } from "mongoose";
+import { FlattenMaps, Types } from "mongoose";
 import Campaign from "../database/models/campaign";
 import User, { IUser } from "../database/models/user";
 import { moveTmp } from "../controllers/upload";
-import Contact from "../database/models/contact";
+import Contact, { IContact } from "../database/models/contact";
 import Application from "../database/models/application";
 import axios from "axios";
 import { refreshToken } from "../routes/oauth";
@@ -126,7 +126,7 @@ const calculate = (campaign: string, userId: string) => {
     );
 };
 
-const findCampaign = (_id: any, application?: any) => Campaign.findOne({
+const findCampaign = (_id: any, application?: any, contact?:FlattenMaps<IContact>) => Campaign.findOne({
     _id
 }).populate('sponsor').populate('brand').lean()
     .then(({ _id, categories, category, gallery, image, brand, ...campaign }: any) => {
@@ -158,7 +158,7 @@ const findCampaign = (_id: any, application?: any) => Campaign.findOne({
                 id: _id,
                 content,
                 taken: !!application,
-                socials: application ? application.contact : undefined,
+                socials: contact ? contact.socials : undefined,
                 categories: categories && Array.isArray(categories) ? categories : [category],
                 gallery: gallery && gallery.length ? gallery : [image, image, image, image], brand: brandId ? { id: brandId, ...brandOther } : null, ...campaign
             }
@@ -171,7 +171,7 @@ const find = (_id: string, userId: string) => {
     //Se debe procurar q cada usuario tenga solo un perfil
     return Contact.findOne({ user }).lean().then((contact: any) => {
         if (contact)
-            return Application.findOne({ contact: contact._id, campaign: _id }).lean().then((application: any) => findCampaign(_id, application))
+            return Application.findOne({ contact: contact._id, campaign: _id }).lean().then((application: any) => findCampaign(_id, application, contact))
         else
             return findCampaign(_id);
     })
