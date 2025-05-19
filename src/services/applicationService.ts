@@ -95,9 +95,8 @@ const update = ({ id, content: newContent, ...body }: any, userId: string) => {
         if (!exists) {
           if (nc.provider == 'tiktok') {
             //console.log('campaign=',''+campaign)
-            promises.push(axios.get(nc.thumbnail, { responseType: 'stream' }).then((response: any) =>{
-              if(!response.data)throw 'stream is null';
-              return saveStream(response.data, 'campaign', '' + campaign, nc.id + '.jpeg').then((path) => {
+            promises.push(axios.get(nc.thumbnail, { responseType: 'stream' }).then(({ data }: any) => {
+              return saveStream(data, 'campaign', '' + campaign, nc.id + '.jpeg').then((path) => {
                 nc.thumbnail = path;
                 return nc;
               })
