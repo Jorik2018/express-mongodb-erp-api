@@ -94,7 +94,6 @@ const update = ({ id, content: newContent, ...body }: any, userId: string) => {
         const exists = content.find((oc: any) => (oc.id == nc.id && oc.provider == nc.provider));
         if (!exists) {
           if (nc.provider == 'tiktok') {
-            //console.log('campaign=',''+campaign)
             nc.href = 'https://tiktok.com/@' + contact.socials['tiktok'].name + '/video/' + nc.id;
             promises.push(axios.get(nc.thumbnail, { responseType: 'stream' }).then(({ data }: any) => {
               return saveStream(data, 'campaign', '' + campaign, nc.id + '.jpeg').then((path) => {
