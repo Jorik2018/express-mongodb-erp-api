@@ -71,11 +71,11 @@ const calculate = (campaign: string, userId: string) => {
                                     const videos = data.data.videos;
                                     return videos.map(({ id, view_count, share_count, like_count }: any) => ({
                                         _id: contents.find((content: any) => content.provider === 'tiktok' && content.id === id)._id, views: view_count, shares: share_count, likes: like_count
-                                    }));
+                                    })).concat(contents.filter((content: any) => !content.provider));
                                 })
                             })
                         }
-                        return contents.filter((content: any) => content.provider!== 'tiktok');
+                        return contents;
                     })
                     .then((contents: any) => Promise.all(contents.map(({ _id: content_id, likes, shares, views, reach }: any) =>
                         Application.updateOne(
