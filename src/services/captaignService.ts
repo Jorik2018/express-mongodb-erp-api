@@ -158,7 +158,7 @@ const findCampaign = (_id: any, application?: any) => Campaign.findOne({
                 id: _id,
                 content,
                 taken: !!application,
-                socials:application?application.contact.socials:undefined,
+                socials: application ? application.contact : undefined,
                 categories: categories && Array.isArray(categories) ? categories : [category],
                 gallery: gallery && gallery.length ? gallery : [image, image, image, image], brand: brandId ? { id: brandId, ...brandOther } : null, ...campaign
             }
