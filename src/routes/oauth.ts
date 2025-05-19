@@ -22,13 +22,17 @@ export const refreshToken = (socialName: string, contact: FlattenMaps<IContact &
     const social = contact.socials![socialName];
     const { access_token, refresh_token, expires_in, updateAt } = social;
     if (socialName == 'instagram') {
-        return axios.get('https://graph.instagram.com/access_token', {
-            params: {
-                grant_type: 'ig_exchange_token', client_secret: INSTAGRAM_CLIENT_SECRET, access_token
-            }
-        }).then(({ data }) => {
-            return { [socialName]: { ...social, ...data } };
-        })
+        if (refresh_token) {
+            return axios.get('https://graph.instagram.com/access_token', {
+                params: {
+                    grant_type: 'ig_exchange_token', client_secret: INSTAGRAM_CLIENT_SECRET, access_token
+                }
+            }).then(({ data }) => {
+                return { ...social, ...data };
+            })
+        } else {
+            return Promise.resolve(social);
+        }
     } else if (socialName == 'tiktok') {
         //debe revisarse si ya ha expirado el token
         let shouldRefresh = true;
