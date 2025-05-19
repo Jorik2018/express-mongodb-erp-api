@@ -75,7 +75,7 @@ const calculate = (campaign: string, userId: string) => {
                                 })
                             })
                         }
-                        return contents.filter((content: any) => !content.provider);
+                        return contents.filter((content: any) => content.provider!== 'tiktok');
                     })
                     .then((contents: any) => Promise.all(contents.map(({ _id: content_id, likes, shares, views, reach }: any) =>
                         Application.updateOne(
