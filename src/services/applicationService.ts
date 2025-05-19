@@ -5,6 +5,8 @@ import Contact from '../database/models/contact';
 import User from '../database/models/user';
 import { sendError } from '../utils/responses';
 import Brand from '../database/models/brand';
+import axios from 'axios';
+import { saveStream } from '../controllers/upload';
 
 const list = ({ userId: user, from = 0, to = 10, query: { campaign, contact } }: Request | any, res: Response) => {
   if (contact) {
@@ -86,18 +88,27 @@ const create = (body: any, userId: string) => {
 const update = ({ id, content: newContent, ...body }: any, userId: string) => {
   const _id = Types.ObjectId.createFromHexString(id);
   return Application.findOne({ _id }).lean()
-    .then(({ _id, content = [] }: any) => {
+    .then(({ _id, content = [], campaign }: any) => {
+      const promises: Promise<any>[] = [];
       (newContent || []).forEach((nc: any) => {
-        const v = content.find((oc: any) => (oc.id == nc.id && oc.provider == nc.provider));
-        if (!v) {
+        const exists = content.find((oc: any) => (oc.id == nc.id && oc.provider == nc.provider));
+        if (!exists) {
+          if (nc.provider == 'tiktok') {
+            promises.push(axios.get(nc.thumbnail_url, { responseType: 'stream' }).then(({ stream }: any) =>
+              saveStream(stream, 'campaign', campaign, nc.id).then((path) => {
+                nc.thumbnail_url = path;
+                return nc;
+              })
+            ))
+          }
           content.push(nc)
         }
       });
-      return Application.updateOne({ _id }, { $set: { content } }).lean().then(data => ({
+      return Promise.all(promises).then(() => Application.updateOne({ _id }, { $set: { content } }).lean().then(data => ({
         ...data,
         content,
-        id: _id
-      }))
+        id: _id,
+      })))
     });
 };
 

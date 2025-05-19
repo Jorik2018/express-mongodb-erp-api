@@ -1,6 +1,8 @@
 import { bool } from 'aws-sdk/clients/signer';
 import { Request, Response, Router } from 'express';
 import path from 'path';
+import { promisify } from 'util';
+import { pipeline } from 'stream';
 const multer = require('multer');
 const fs = require('fs-extra');
 
@@ -114,6 +116,19 @@ export const moveTmp = (files: string[], ...paths: string[]): Promise<string[]> 
       }
     });
     return Promise.all(promises);  // Waits for all file move or existence checks to complete
+  });
+};
+
+
+export const saveStream = (stream: any, ...paths: string[]): Promise<string[]> => {
+  const filename = paths.pop(); 
+  const finalDir = path.join(UPLOAD_DIR, ...paths);
+  const ensureFinalDirPromise = fs.ensureDir(finalDir);
+  return ensureFinalDirPromise.then(() => {
+    const pipelinePromise = promisify(pipeline);
+    const savePath = path.join(finalDir, filename!);
+    const writer = fs.createWriteStream(savePath);
+    return pipelinePromise(stream, writer).then(() => path.join(...paths, filename!))
   });
 };
 
