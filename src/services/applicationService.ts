@@ -87,14 +87,15 @@ const create = (body: any, userId: string) => {
 
 const update = ({ id, content: newContent, ...body }: any, userId: string) => {
   const _id = Types.ObjectId.createFromHexString(id);
-  return Application.findOne({ _id }).lean()
-    .then(({ _id, content = [], campaign }: any) => {
+  return Application.findOne({ _id }).populate('contact').lean()
+    .then(({ _id, content = [], campaign, contact }: any) => {
       const promises: Promise<any>[] = [];
       (newContent || []).forEach((nc: any) => {
         const exists = content.find((oc: any) => (oc.id == nc.id && oc.provider == nc.provider));
         if (!exists) {
           if (nc.provider == 'tiktok') {
             //console.log('campaign=',''+campaign)
+            nc.href = 'https://tiktok.com/@' + contact.socials['tiktok'].name + '/video/' + nc.id;
             promises.push(axios.get(nc.thumbnail, { responseType: 'stream' }).then(({ data }: any) => {
               return saveStream(data, 'campaign', '' + campaign, nc.id + '.jpeg').then((path) => {
                 nc.thumbnail = path;
