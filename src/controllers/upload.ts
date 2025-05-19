@@ -121,7 +121,7 @@ export const moveTmp = (files: string[], ...paths: string[]): Promise<string[]> 
 
 
 export const saveStream = (stream: any, ...paths: string[]): Promise<string[]> => {
-  const filename = paths.pop(); 
+  const filename = paths.pop();
   const finalDir = path.join(UPLOAD_DIR, ...paths);
   const ensureFinalDirPromise = fs.ensureDir(finalDir);
   return ensureFinalDirPromise.then(() => {

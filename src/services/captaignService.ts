@@ -158,6 +158,7 @@ const findCampaign = (_id: any, application?: any, contact?: FlattenMaps<IContac
                 id: _id,
                 content,
                 taken: !!application,
+                application:application.id,
                 socials: contact ? Object.entries(contact?.socials || {}).map(([key, { name }]: any) => ({
                     key,
                     name
@@ -195,6 +196,7 @@ const create = ({ brandId, userId, coverImage, gallery, ...body }: any) => {
             )
         });
 };
+
 
 const update = (_id: string, { brandId, userId, coverImage, gallery, ...body }: any) => {
     return Campaign.find({ _id }).lean().then(({ _id, ...campaign }: any) => {
