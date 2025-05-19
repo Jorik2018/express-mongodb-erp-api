@@ -158,7 +158,7 @@ const findCampaign = (_id: any, application?: any, contact?: FlattenMaps<IContac
                 id: _id,
                 content,
                 taken: !!application,
-                application: application.id,
+                application: application,
                 socials: contact ? Object.entries(contact?.socials || {}).map(([key, { name }]: any) => ({
                     key,
                     name
