@@ -68,7 +68,6 @@ const calculate = (campaign: string, userId: string) => {
                                         'Content-Type': 'application/json',
                                     }
                                 }).then(({ data }) => {
-                                    console.log('====',contents.filter((content: any) => !content.provider))
                                     const videos = data.data.videos;
                                     return videos.map(({ id, view_count, share_count, like_count }: any) => ({
                                         _id: contents.find((content: any) => content.provider === 'tiktok' && content.id === id)._id, views: view_count, shares: share_count, likes: like_count
