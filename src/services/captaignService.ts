@@ -126,7 +126,7 @@ const calculate = (campaign: string, userId: string) => {
     );
 };
 
-const findCampaign = (_id: any, application?: any, contact?:FlattenMaps<IContact>) => Campaign.findOne({
+const findCampaign = (_id: any, application?: any, contact?: FlattenMaps<IContact>) => Campaign.findOne({
     _id
 }).populate('sponsor').populate('brand').lean()
     .then(({ _id, categories, category, gallery, image, brand, ...campaign }: any) => {
@@ -158,7 +158,10 @@ const findCampaign = (_id: any, application?: any, contact?:FlattenMaps<IContact
                 id: _id,
                 content,
                 taken: !!application,
-                socials: contact ? contact.socials : undefined,
+                socials: contact ? Object.entries(contact?.socials || {}).map(([key, { name }]: any) => ({
+                    key,
+                    name
+                })) : undefined,
                 categories: categories && Array.isArray(categories) ? categories : [category],
                 gallery: gallery && gallery.length ? gallery : [image, image, image, image], brand: brandId ? { id: brandId, ...brandOther } : null, ...campaign
             }
