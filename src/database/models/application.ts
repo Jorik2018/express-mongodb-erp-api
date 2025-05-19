@@ -5,6 +5,7 @@ const mediaSchema: Schema = new Schema({
   id: { type: String, required: true },
   provider: { type: String, required: true },
   thumbnail: { type: String, required: true },
+  href: { type: String },
   type: { type: String, required: true },
   likes: { type: Number, default: 0 },
   views: { type: Number, default: 0 },
