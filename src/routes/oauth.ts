@@ -33,7 +33,10 @@ export const refreshToken = (socialName: string, contact: FlattenMaps<IContact &
                     grant_type: 'ig_refresh_token', access_token
                 }
             }).then(({ data }) => {
-                return { ...social, ...data };
+                contact.socials![socialName] = { ...social, ...data, updateAt: Date.now() };
+                return Contact.updateOne({ _id: contact._id }, { socials: contact.socials }).then(() => {
+                    return { ...social, ...data, updateAt: Date.now() };
+                })
             })
         } else {
             return Promise.resolve(social);
