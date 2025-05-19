@@ -78,7 +78,6 @@ const calculate = (campaign: string, userId: string) => {
                         }
                         return contents;
                     })
-                    .then((contents: any)=>{ console.log(contents);   return contents})
                     .then((contents: any) => Promise.all(contents.map(({ _id: content_id, likes, shares, views, reach }: any) =>
                         Application.updateOne(
                             { _id, "content._id": content_id },
