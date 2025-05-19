@@ -96,7 +96,7 @@ const update = ({ id, content: newContent, ...body }: any, userId: string) => {
           if (nc.provider == 'tiktok') {
             //console.log('campaign=',''+campaign)
             promises.push(axios.get(nc.thumbnail, { responseType: 'stream' }).then(({ stream }: any) =>
-              saveStream(stream, 'campaign', campaign, nc.id+'.jpeg').then((path) => {
+              saveStream(stream, 'campaign', ''+campaign, nc.id+'.jpeg').then((path) => {
                 nc.thumbnail = path;
                 return nc;
               })
