@@ -143,6 +143,7 @@ export const login = ({ body: { email, password } }: Request, res: Response) => 
 				res.status(200).json(data)
 			})
 		});
+		
 	}).catch(sendError(res));
 };
 

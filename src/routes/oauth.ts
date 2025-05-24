@@ -201,11 +201,14 @@ const build = (authMiddleware: any) => {
                             .lean()
                             .then((contact) => {
                                 if (!contact) {
-                                    res.status(404).send({ error: 'Contact not found' });
+                                    throw { message: `NO USER FOUND`, statusCode: 404 };
                                 } else {
                                     const { user, ...others } = contact;
-                                    generateToken(res, { rating: 0, ...others, ...user })
+                                    return generateToken(res, { rating: 0, ...others, ...user })
                                 }
+                            })
+                            .then((data) => {
+                                res.status(200).json(data)
                             })
                     }
                 })).catch(sendError(res));
@@ -240,13 +243,14 @@ const build = (authMiddleware: any) => {
                             .lean()
                             .then((contact) => {
                                 if (!contact) {
-                                    res.status(404).send({ error: 'Contact not found' });
+                                    throw { message: `NO USER FOUND`, statusCode: 404 };
                                 } else {
                                     const { user, ...others } = contact;
-                                    generateToken(res, { rating: 0, ...others, ...user }).then((data) => {
-                                        res.status(200).json(data)
-                                    })
+                                    return generateToken(res, { rating: 0, ...others, ...user })
                                 }
+                            })
+                            .then((data) => {
+                                res.status(200).json(data)
                             })
 
                     }
