@@ -191,9 +191,9 @@ const build = (authMiddleware: any) => {
                         //tiene q verificarse si existe el socialnet con el id para evitar volver a
                         const { union_id: id, username: name, avatar_url: profileImage, follower_count: followers, video_count: medias } = data;
                         const social = { id, name, profileImage, followers, medias, expires_in, refresh_token, refresh_expires_in, token_type }
-                        return new Temporal({ content: JSON.stringify({ tiktok: social }) }).save().then(({ _doc: { _id } }: any) => {
-                            res.send({ social: _id, ...social });
-                        })
+                        return new Temporal({ content: JSON.stringify({ tiktok: social }) }).save()
+                            .then(({ _doc: { _id } }: any) => ({ social: _id, ...social }))
+
                     } else {
                         const { union_id: user_id } = data;
                         return Contact.findOne({ 'socials.tiktok.id': user_id })
@@ -207,11 +207,10 @@ const build = (authMiddleware: any) => {
                                     return generateToken(res, { rating: 0, ...others, ...user })
                                 }
                             })
-                            .then((data) => {
-                                res.status(200).json(data)
-                            })
                     }
-                })).catch(sendError(res));
+                }))
+                    .then(sendJson(res))
+                    .catch(sendError(res));
             } else if (provider == 'instagram') {
                 const formData = new FormData();
                 formData.append('client_id', INSTAGRAM_CLIENT_ID!);
@@ -233,9 +232,9 @@ const build = (authMiddleware: any) => {
                         //tiene q verificarse si existe el socialnet con el id para evitar volver a
                         const { user_id: id, username: name, profile_picture_url: profileImage, followers_count: followers, media_count: medias } = data;
                         const social = { id, name, profileImage, followers, medias, access_token }
-                        return new Temporal({ content: JSON.stringify({ instagram: social }) }).save().then(({ _doc: { _id } }: any) => {
-                            res.send({ social: _id, ...social });
-                        })
+                        return new Temporal({ content: JSON.stringify({ instagram: social }) }).save()
+                            .then(({ _doc: { _id } }: any) => ({ social: _id, ...social }))
+
                     } else {
                         const { user_id } = data;
                         return Contact.findOne({ 'socials.instagram.id': user_id })
@@ -249,12 +248,11 @@ const build = (authMiddleware: any) => {
                                     return generateToken(res, { rating: 0, ...others, ...user })
                                 }
                             })
-                            .then((data) => {
-                                res.status(200).json(data)
-                            })
 
                     }
-                })).catch(sendError(res));
+                }))
+                    .then(sendJson(res))
+                    .catch(sendError(res));
             } else if (provider == 'facebook') {
                 /*const { data } = await axios.get(`https://graph.facebook.com/v13.0/oauth/access_token?client_id=${FACEBOOK_APP_ID}&client_secret=${FACEBOOK_APP_SECRET}&code=${code}&redirect_uri=${FACEBOOK_REDIRECT_URI}`);
                 const { access_token } = data;
