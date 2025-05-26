@@ -207,6 +207,7 @@ const build = (authMiddleware: any) => {
                                     return generateToken(res, { rating: 0, ...others, ...user })
                                 }
                             })
+                            
                     }
                 }))
                     .then(sendJson(res))

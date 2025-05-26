@@ -7,7 +7,7 @@ import axios from 'axios';
 import { refreshToken } from './oauth';
 
 const get_media = ({ params: { provider }, userId }: RequestWithUserId, res: Response) => {
-    userId = '6827bc7e152604e6928c1e6a'
+    //userId = '6827bc7e152604e6928c1e6a'
     //provider = 'tiktok'
     const user = Types.ObjectId.createFromHexString(userId);
     return Contact.findOne({ user }).lean()
