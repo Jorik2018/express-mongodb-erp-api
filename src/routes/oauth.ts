@@ -207,7 +207,7 @@ const build = (authMiddleware: any) => {
                                     return generateToken(res, { rating: 0, ...others, ...user })
                                 }
                             })
-                            
+
                     }
                 }))
                     .then(sendJson(res))
@@ -312,53 +312,64 @@ const build = (authMiddleware: any) => {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-            }).then(({ data: { access_token, expires_in, refresh_token, refresh_expires_in, token_type } }) => axios.get('https://open.tiktokapis.com/v2/user/info/', {
-                /*
-                open_id:
-                scope:
-                access_token:
-                expires_in:
-                refresh_token:
-                refresh_expire_in:
-                token_type:
-                */
-                headers: {
-                    Authorization: `Bearer ${access_token}`,
-                },
-                params: {
-                    fields: 'open_id,union_id,display_name,avatar_url,username,follower_count,bio_description',
-                },
-            }).then(({ data: { data: { user: data }, error: { code } } }) => {
-                /*
-                display_name:
-                open_id:user id en app
-                union_id:user id global
-                follower_count:
-                likes_count: 
-                video_count:
-                username:
-                bio_description:
-                */
-                //res.send(user);
-                {
-                    const { union_id: user_id } = data;
-                    return Contact.findOne({ 'socials.tiktok.id': user_id })
-                        .populate('user')
-                        .lean()
-                        .then((contact) => {
+            }).then(({ data: { access_token, expires_in, refresh_token, refresh_expires_in, token_type } }) =>
+                axios.get('https://open.tiktokapis.com/v2/user/info/', {
+                    /*
+                    open_id:
+                    scope:
+                    access_token:
+                    expires_in:
+                    refresh_token:
+                    refresh_expire_in:
+                    token_type:
+                    */
+                    headers: {
+                        Authorization: `Bearer ${access_token}`,
+                    },
+                    params: {
+                        fields: 'open_id,union_id,display_name,avatar_url,username,follower_count,bio_description',
+                    },
+                }).then(({ data: { data: { user: { username, union_id: id, follower_count: followers, video_count: medias } }, error: { code } } }) =>
+                    /*
+                    display_name:
+                    open_id:user id en app
+                    union_id:user id global
+                    follower_count:
+                    likes_count: 
+                    video_count:
+                    username:
+                    bio_description:
+                    */
+                    //res.send(user);
+                    //const { union_id: user_id } = data;
+                Contact.findOne({ 'user': userId })
+                    .lean()
+                        .then((contact: any) => {
                             if (!contact) {
-                                res.status(404).send({ error: 'Contact not found' });
-                            } else {
-                                const { user, ...others } = contact;
-                                generateToken(res, { rating: 0, ...others, ...user })
+                                throw 'Contact not found2!';
                             }
+                            const { socials = {}, _id } = contact;
+                            const social = {
+                                id,
+                                access_token,
+                                name: username,
+                                followers,
+                                medias,
+                                refresh_token,
+                                expires_in,
+                                refresh_expire_in: refresh_expires_in
+                            }
+                            socials[provider] = social;
+                            contact.socials = socials;
+                            return Contact.updateOne({ _id }, { $set: { socials } }).then(() => (
+                                { ...social, key: provider }
+                            ));
                         })
-                }
-            })).catch(sendError(res));
+
+                ))
+                .then(sendJson(res))
+                .catch(sendError(res));
         } else if (provider == 'instagram') {
-
-
-
             const formData = new FormData();
             formData.append('client_id', INSTAGRAM_CLIENT_ID!);
             formData.append('client_secret', INSTAGRAM_CLIENT_SECRET!);
@@ -408,6 +419,8 @@ const build = (authMiddleware: any) => {
             )
                 .then(sendJson(res))
                 .catch(sendError(res));
+        } else {
+            sendError(res)('No-valid-provider!');
         }
     };
 
