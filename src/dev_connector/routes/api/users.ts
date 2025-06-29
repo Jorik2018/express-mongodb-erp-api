@@ -1,5 +1,5 @@
 import { Request, Router, Response } from 'express';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import User from '../../../database/models/user';
 import { sendError } from '../../../utils/responses';
 

@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 export const hashPassword = (password: string) => {
   return new Promise((resolve, reject) => {
@@ -7,7 +7,7 @@ export const hashPassword = (password: string) => {
       if (err) {
         reject(err);
       }
-      bcrypt.hash(password, salt, (err, hash) => {
+      bcrypt.hash(password, salt!, (err, hash) => {
         if (err) {
           reject(err);
         }
