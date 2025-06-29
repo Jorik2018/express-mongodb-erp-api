@@ -26,11 +26,9 @@ jobs:
 
       - name: Copy deployable files to folder
         run: |
-          mkdir deploy
-          cp -r dist deploy/
-          cp package.json deploy/
-          cp package-lock.json deploy/
-          cp .env deploy/ || echo "No .env found, skipping"
+          cp package.json dist/
+          cp package-lock.json dist/
+          cp .env dist/ || echo "No .env found, skipping"
 
       - name: FTP Deploy
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -39,4 +37,4 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           server-dir: /redinfluye/
-          local-dir: ./deploy/
+          local-dir: ./dist/
