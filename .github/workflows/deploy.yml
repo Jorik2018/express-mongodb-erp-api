@@ -38,3 +38,4 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           server-dir: /redinfluye.dbasure.com/
           local-dir: ./dist/
+
